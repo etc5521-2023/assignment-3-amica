@@ -14,6 +14,16 @@ format: html
 <br><br> Be as specific as reasonably possible for your wild thing!
 -->
 
+Whale Shark (Rhincodon typus) is the largest of all fishes alive. It may grow up to 18 metres (m) in length, but commonly seen between 4 m to 12 m. They are found on all the tropical oceans of the world. In Australia, it is known primarily in northern Western Australia, the Northern Territory, and Queensland. They are easy to distinguish by their white spotted colouration, and they are notoriously very gentle to humans. There is actually a big ecotourism for the chance to swim with them, which usually occur during April to July where this big fish congregate in the Ningaloo Marine Park of Western Australia. In terms of the diet, they feed on plankton, small crustaceans, squid, and fishes. The main feature of their food processing tools are their filtering screens on the gills and their tiny, more than 300 hooked teeth in both jaws. Sadly, now, their status is an endangered species due to massive hunt of parts of their bodies.
+
+Questions:
+1.	We expect to find the most occurrences in the middle of ocean. 
+2.	We expect to see the most occurrences during fall months.
+3.	We expect to spot the most occurrences in the northern Western Australia.
+4.	We expect to observe declining occurrences up to this year (2023).
+5.	We expect to detect ….
+
+
 ## Data description
 
 <!--
@@ -39,3 +49,10 @@ Weather data exploration here too.
 ## Summary 
 
 ## References
+Department of Fisheries, Government of Western Australia. (2011, September). Fisheries Fact Sheet: Whale Shark. https://www.fish.wa.gov.au/documents/recreational_fishing/fact_sheets/fact_sheet_whale_shark.pdf
+ 
+McGrouther, Mark. (2022, October). Whale Shark, Rhincodon typus (Smith, 1828). Australian Museum. https://australian.museum/learn/animals/fishes/whale-shark-rhincodon-typus-smith-1828/
+
+Britannica. (2023, August). Whale Shark. Britannica. https://www.britannica.com/animal/whale-shark
+
+
