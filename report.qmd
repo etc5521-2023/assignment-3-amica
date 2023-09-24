@@ -4,46 +4,104 @@ author: "AMICA - EVAN GINTING & HARSH JAIN"
 format: html
 ---
 
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(here)
+```
+
 ## Introduction
 
 Whale Shark (Rhincodon typus) is the largest of all fishes alive. It may grow up to 18 metres (m) in length, but commonly seen between 4 m to 12 m. It is typically blue-grey or brownish in color with a pattern of white spots and vertical lines on its body. In terms of the diet, they feed on plankton, small crustaceans, squid, and fishes. The main feature of their food processing tools are their filtering screens on the gills and their tiny, more than 300 hooked teeth in both jaws. They are found on all the tropical oceans of the world where the water temperatures are ranging from 21 to 25 degrees Celsius and typically at depths of up to 1000 meters. Whale sharks are generally known to be active swimmers, and their activity can vary throughout the day and night. They do not exhibit diurnal (daytime) or seasonal (summer/winter) patterns of activity in the same way that some other species do. However, they seasonally come close to inshore areas, especially at plankton-rich locations. In Australia, it is found primarily in northern Western Australia, the Northern Territory, and Queensland. Whale sharks are known to migrate to the Ningaloo Marine park during specific times of the year, usually between March and July which is associated with the availability of plankton and other food sources in the area. During this time, there is usually a big ecotourism activity happening here for the chance to swim with them. Sadly, now, their status is an endangered species due to massive hunt of parts of their bodies. Hence, Conservation measures, including protections and regulations, are being implemented to safeguard this species in Australia and many other countries.
 
 Expectations:
 
-- We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during fall months.
-- We expect to see differences in the frequency of sightings between coastal areas and open ocean regions, indicating habitat preferences.
-- We expect to observe declining occurrences up to this year (2023).
-- We anticipate finding correlations between environmental factors, such as sea surface temperature and ocean currents, and the presence or absence of whale sharks in specific locations.
-- We expect to spot the most occurrences in the northern Western Australia.
+-   We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during fall months.
+-   We expect to see differences in the frequency of sightings between coastal areas and open ocean regions, indicating habitat preferences.
+-   We expect to observe declining occurrences up to this year (2023).
+-   We anticipate finding correlations between environmental factors, such as sea surface temperature and ocean currents, and the presence or absence of whale sharks in specific locations.
+-   We expect to spot the most occurrences in the northern Western Australia.
 
 ## Data description
 
-<!--
-2. Download all the occurrence records from the Atlas of Living Australia, ideally scripted using the `atlas_occurrences()` function from the `galah` package. Make sure you include date, time, collector identification details. Save this into a `data-raw` folder in your repo.
--->
+This dataset contains the information about the occurence of Whale Shark (Rhincodon Typus) in Australia at a certain time and place. The data is retrieved from the [Atlas of Living Australia (ALA) Website](https://www.ala.org.au/). ALA is a collaborative, digital, open infrastructure that pulls together Australian biodiversity data from multiple sources, making it accessible and reusable.
+
+```{r}
+# Extracting the occurence data from ALA Website
+library(galah) 
+galah_config(email = "egin0003@student.monash.edu") 
+ws_raw <- galah_call() |> 
+  galah_identify("Rhincodon typus") |> 
+  atlas_occurrences()
+
+# Saving the raw data
+save(ws_raw, file=here::here("data-raw/ws_raw.rda")) 
+```
+
+The data is located in folder `data-raw` named as `ws_raw.rda`. It contains these variables:
+
+| Variables        | Description                                                                                                                                                                                     |
+|------------------------------------|------------------------------------|
+| decimalLongitude | The geographic longitude (in decimal degrees) of the geographic center of a Location.                                                                                                           |
+| decimalLatitude  | The geographic latitude (in decimal degrees) of the geographic center of a Location.                                                                                                            |
+| eventDate        | The date-time or interval during which an Event occurred. For occurrences, this is the date-time when the event was recorded. Not suitable for a time in a geological context.                  |
+| scientificName   | The full scientific name, with authorship and date information if known. When forming part of an Identification, this should be the name in lowest level taxonomic rank that can be determined. |
+| taxonConceptID   | The ID in an external taxonomic database, like a sequence reference database for example.                                                                                                       |
+| recordID         | The ID of the occurence.                                                                                                                                                                        |
+| dataResourceName | The name identifying the data set from which the record was derived.                                                                                                                            |
+| occurenceStatus  | A statement about the presence or absence of a Taxon at a Location.                                                                                                                             |
+
+```{r}
+#| warning: false
+#| message: false
+#| eval: false
+#| include: false
+
+# NOT SURE WHAT THIS IS FOR, NEED TO RESEARCH
+# Extracting the assertion data from ALA Website 
+ws_assert <- galah_call() |>
+  galah_identify("Rhincodon typus") |>
+  galah_select(group = "assertions") |>
+  atlas_occurrences()
+
+# Saving the assertion data
+save(ws_raw, file=here::here("data-raw/ws_assertion.rda"))
+
+
+# Extracting the event data from ALA Website
+ws_event <- galah_call() |>
+  galah_identify("Rhincodon typus") |>
+  galah_select(group = "event") |>
+  atlas_occurrences()
+
+# Saving the event data
+save(ws_raw, file=here::here("data-raw/ws_event.rda"))
+```
 
 ## Initial data analysis
 
+```{=html}
 <!--
 3. Perform a data quality check, and then go ahead and clean the data, saving only the wild sightings. Save the resulting data in a `data` folder as an `WILD_THING_COMMON_NAME.rda` file, so that any special variable types are clearly available. (Replace `WILD_THING_COMMON_NAME` with lower case common name of your assigned wild thing.) *Note:* Some are museum or historical records or live in an animal sanctuary or zoo, which do not truly capture their wild behaviour. Downloading the event information (`galah_select(group = "event")`) can help identify wild sightings.
 
 Weather data pre-processing here too.
 -->
-
+```
 ## Exploratory data analysis
 
+```{=html}
 <!--
 4. Make plots of the data to check each of your expectations, and report what you learn. *Note:* This might also be a place where visual inference methods *may* be useful to determine if what is seen agrees or disputes what you expected. 
 
 Weather data exploration here too.
 -->
-
-## Summary 
+```
+## Summary
 
 ## References
+
 Department of Fisheries, Government of Western Australia. (2011, September). Fisheries Fact Sheet: Whale Shark. https://www.fish.wa.gov.au/documents/recreational_fishing/fact_sheets/fact_sheet_whale_shark.pdf
- 
+
 McGrouther, Mark. (2022, October). Whale Shark, Rhincodon typus (Smith, 1828). Australian Museum. https://australian.museum/learn/animals/fishes/whale-shark-rhincodon-typus-smith-1828/
 
 Britannica. (2023, August). Whale Shark. Britannica. https://www.britannica.com/animal/whale-shark
-
