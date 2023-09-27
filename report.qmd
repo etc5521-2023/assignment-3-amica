@@ -4,7 +4,15 @@ author: "AMICA - EVAN GINTING & HARSH JAIN"
 format: html
 ---
 
-```{r}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      eval = TRUE,
+                      warning = FALSE,
+                      message = FALSE)
+```
+
+```{r loadLibraries}
 library(tidyverse)
 library(ggplot2)
 library(here)
@@ -26,7 +34,7 @@ Expectations:
 
 This dataset contains the information about the occurence of Whale Shark (Rhincodon Typus) in Australia at a certain time and place. The data is retrieved from the [Atlas of Living Australia (ALA) Website](https://www.ala.org.au/). ALA is a collaborative, digital, open infrastructure that pulls together Australian biodiversity data from multiple sources, making it accessible and reusable.
 
-```{r}
+```{r loadData}
 # Extracting the occurence data from ALA Website
 library(galah) 
 galah_config(email = "egin0003@student.monash.edu") 
@@ -51,7 +59,7 @@ The data is located in folder `data-raw` named as `ws_raw.rda`. It contains thes
 | dataResourceName | The name identifying the data set from which the record was derived.                                                                                                                            |
 | occurenceStatus  | A statement about the presence or absence of a Taxon at a Location.                                                                                                                             |
 
-```{r}
+```{r wildOccurences}
 #| warning: false
 #| message: false
 #| eval: false
@@ -78,6 +86,10 @@ ws_event <- galah_call() |>
 save(ws_raw, file=here::here("data-raw/ws_event.rda"))
 ```
 
+- There are `r ws_raw$dataResourceName %>% n_distinct()` different data sources and upon referring their data collection method on atlas website, it is evident that all the sightings are wild sightings.
+- ws_event data has the samplingProtocol variable which basically indicates what type of sighting or data collection method was used. Most of the values are missing for this variable so it is also not a reliable method to identify wild sightings.
+- According to the `BASIS_OF_RECORD_INVALID` column, there are `r ws_assert %>% filter(BASIS_OF_RECORD_INVALID == "TRUE") %>% nrow()` values recorded as TRUE indicating that they are invalid records. So, they are also removed.
+
 ## Initial data analysis
 
 ```{=html}
@@ -87,6 +99,39 @@ save(ws_raw, file=here::here("data-raw/ws_event.rda"))
 Weather data pre-processing here too.
 -->
 ```
+
+```{r IDA}
+library(visdat)
+vis_dat(ws_raw)
+# Checking data types and replacing them with correct data types
+ws_raw <- ws_raw %>%
+  mutate(decimalLatitude = as.numeric(decimalLatitude),
+         decimalLongitude = as.numeric(decimalLongitude),
+         eventDate = as.Date(eventDate))
+```
+
+- The classes for all the variables in the ws_raw data set are correct except for `eventDate` which needs to be of Date type and only include dates.
+- There are a few missing values for `decimalLatitude` and `decimalLongitude` . We can also see that if `decimalLatitude` is missing, `decimalLongitude` is also missing and vice-versa.
+- There are `r ws_raw %>% filter(is.na(eventDate)) %>% nrow()` missing values in the `eventDate` variable out of `r ws_raw %>% nrow()` records. 
+- There are `r ws_raw %>% filter(year(eventDate) < 1990) %>% nrow()` rows with record year less than 1990 which will be removed as they are not really reliable. 
+
+```{r IDA2}
+ws_raw %>% filter(!is.na(eventDate)) %>% ggplot(aes(y = year(eventDate))) + geom_boxplot()
+```
+
+- There are only a few outlier years out of which the year below 1980 is farthest from the population. 
+- The other outliers might have some valid information since they follow natural order so we won't be excluding them in clean data.
+
+```{r IDA3}
+library(leaflet)
+m <- leaflet() %>%
+  addTiles() %>%
+  addMarkers(data = ws_raw, lat = ~decimalLatitude, lng = ~decimalLongitude)
+m
+```
+
+- When plotting the locations of whale shark spotting, it is evident that some instances are from around the world and not just Australian waters. We can ignore the values which are far away from Australia since our expectations are only about analyzing these species in Australia. Some of the locations can be wrong as well and could be faulty data entry. For example, interchanging the sign of the longitude could take a point from Australia to South America.
+
 ## Exploratory data analysis
 
 ```{=html}
