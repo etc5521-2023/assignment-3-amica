@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = TRUE,
 library(tidyverse)
 library(ggplot2)
 library(here)
+library(dplyr)
 ```
 
 ## Introduction
@@ -120,7 +121,7 @@ From the plot above, we can see:
 - There are `r ws_raw %>% filter(is.na(eventDate)) %>% nrow()` missing values in the `eventDate` variable out of `r ws_raw %>% nrow()` records. 
 
 #### Outliers Check
-- Checking eventDate variables:
+**Checking eventDate variables:**
 ```{r IDA2}
 ws_raw %>% filter(!is.na(eventDate)) %>% ggplot(aes(y = year(eventDate))) + geom_boxplot()
 ```
@@ -130,18 +131,49 @@ ws_raw %>% filter(!is.na(eventDate)) %>% ggplot(aes(y = year(eventDate))) + geom
 - The other outliers might have some valid information since they follow natural order so we won't be excluding them in clean data.
 
 
-### Data Cleansing and Transforming
-
+**Checking Location of Occurences**
 ```{r IDA3}
 library(leaflet)
 m <- leaflet() %>%
   addTiles() %>%
-  addMarkers(data = ws_raw, lat = ~decimalLatitude, lng = ~decimalLongitude)
+  addMarkers(data = ws_raw, 
+             lat = ~decimalLatitude, 
+             lng = ~decimalLongitude,
+             popup = paste0("Lat:", ws_raw$decimalLatitude,
+                            "<br/>", 
+                            "Long:", ws_raw$decimalLongitude))
 m
 ```
 
 - When plotting the locations of whale shark spotting, it is evident that some instances are from around the world and not just Australian waters. 
 - We will put identifier for occurences near coastal area and open ocean range area by looking at the map above.
+
+
+### Data Cleansing and Transforming
+```{r}
+# Getting Invalid Record
+ws_assert <- ws_assert %>%
+              select(recordID, BASIS_OF_RECORD_INVALID)
+
+# Joining Raw Occurence data to Assert data to filter out the invalid records
+# Performing further data cleansing & manipulating
+whale_shark <- ws_raw %>%
+                left_join(ws_assert, by = "recordID") %>%
+                filter(BASIS_OF_RECORD_INVALID == FALSE, #1249 rows
+                       is.na(eventDate) == FALSE, #1001 rows
+                       year(eventDate) > 1990, #999 rows
+                       is.na(decimalLatitude) == FALSE) %>% #997 rows
+                mutate(location = case_when(decimalLatitude == -22.6 & decimalLongitude == -113.65 ~ 'Open Range',
+                                            decimalLatitude == 19.000669 & decimalLongitude == -112.067012 ~ 'Open Range',
+                                            decimalLatitude == 1.6737 & decimalLongitude == -91.98911 ~ 'Open Range',
+                                            decimalLatitude == 0.917 & decimalLongitude == -29.345 ~ 'Open Range',
+                                            decimalLatitude == -23.86667 & decimalLongitude == -35.55 ~ 'Open Range',
+                                            decimalLatitude == 4.302202 & decimalLongitude == 72.883557 ~ 'Open Range',
+                                            TRUE ~ 'Coastal Area'))
+
+# Saving into RDA file
+save(whale_shark, file = "data/whale_shark.rda")
+```
 
 
 ## Visual Inference Analysis (EDA)
