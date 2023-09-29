@@ -28,7 +28,7 @@ Expectations:
 -   We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during fall months.
 -   We expect to see differences in the frequency of sightings between coastal areas and open ocean regions, indicating habitat preferences.
 -   We expect to observe declining occurrences up to this year (2023).
--   We anticipate finding correlations between environmental factors, such as sea surface temperature and ocean currents, and the presence or absence of whale sharks in specific locations.
+-   We anticipate the sharks tend to move from east to west during fall and west to east during summer.
 -   We expect to spot the most occurrences in the northern Western Australia.
 
 
