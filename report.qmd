@@ -26,7 +26,7 @@ Whale Shark (Rhincodon typus) is the largest of all fishes alive. It may grow up
 
 Expectations:
 
--   We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during fall months. 
+-   We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months. 
 -   We expect to see differences in the frequency of sightings between coastal areas and open ocean regions, indicating habitat preferences. 
 -   We expect to observe declining occurrences up to this year (2023).
 -   We anticipate the sharks tend to move from east to west during fall and west to east during summer.
@@ -167,42 +167,27 @@ ws_assert <- ws_assert %>%
 # Joining Raw Occurence data to Assert data to filter out the invalid records
 # Performing further data cleansing & manipulating
 whale_shark <- ws_raw %>%
-  left_join(ws_assert, by = "recordID") %>% #1281 rows
-  filter(
-    BASIS_OF_RECORD_INVALID == FALSE,
-    #1249 rows
-    is.na(eventDate) |
-      year(eventDate) > 1990,
-    #1247 rows
-    is.na(decimalLatitude) == FALSE
-  ) %>% #1241 rows
-  mutate(
-    location = case_when(
-      decimalLatitude == -22.6 &
-        decimalLongitude == -113.65 ~ 'Open Range',
-      decimalLatitude == 19.000669 &
-        decimalLongitude == -112.067012 ~ 'Open Range',
-      decimalLatitude == 1.6737 &
-        decimalLongitude == -91.98911 ~ 'Open Range',
-      decimalLatitude == 0.917 &
-        decimalLongitude == -29.345 ~ 'Open Range',
-      decimalLatitude == -23.86667 &
-        decimalLongitude == -35.55 ~ 'Open Range',
-      decimalLatitude == 4.302202 &
-        decimalLongitude == 72.883557 ~ 'Open Range',
-      TRUE ~ 'Coastal Area'
-    ),
-    season = case_when(
-      month(eventDate) %in% c(12, 1, 2) ~ 'Summer',
-      month(eventDate) %in% c(3, 4, 5) ~ 'Fall',
-      month(eventDate) %in% c(6, 7, 8) ~ 'Winter',
-      month(eventDate) %in% c(9, 10, 11) ~ 'Spring',
-      TRUE ~ NA
-    )
-  )
-
+                left_join(ws_assert, by = "recordID") %>% #1281 rows
+                filter(BASIS_OF_RECORD_INVALID == FALSE, #1249 rows
+                       is.na(eventDate) | year(eventDate) > 1990, #1247 rows
+                       is.na(decimalLatitude) == FALSE) %>% #1241 rows
+                mutate(location = case_when(decimalLatitude == -22.6 & decimalLongitude == -113.65 ~ 'Open Range',
+                                            decimalLatitude == 19.000669 & decimalLongitude == -112.067012 ~ 'Open Range',
+                                            decimalLatitude == 1.6737 & decimalLongitude == -91.98911 ~ 'Open Range',
+                                            decimalLatitude == 0.917 & decimalLongitude == -29.345 ~ 'Open Range',
+                                            decimalLatitude == -23.86667 & decimalLongitude == -35.55 ~ 'Open Range',
+                                            decimalLatitude == 4.302202 & decimalLongitude == 72.883557 ~ 'Open Range',
+                                            TRUE ~ 'Coastal Area'),
+                       season = case_when(month(eventDate) %in% c(12, 1, 2) ~ 'Summer',
+                                          month(eventDate) %in% c(3, 4, 5) ~ 'Fall',
+                                          month(eventDate) %in% c(6, 7, 8) ~ 'Winter',
+                                          month(eventDate) %in% c(9, 10, 11) ~ 'Spring',
+                                          TRUE ~ NA))
+                       
 # Removing unnecessary columns from data
 whale_shark <- whale_shark %>% select(-4, -5, -7, -8, -9)
+
+
 # Saving into RDA file
 save(whale_shark, file = "data/whale_shark.rda")
 ```
@@ -223,6 +208,36 @@ In the code above, we have performed some steps of data cleansing, which include
 Weather data exploration here too.
 -->
 ```
+
+### **Expectation 1: We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months.** 
+```{r}
+#| label: fig-countoccur
+#| fig-cap: "Number of Occurences per Season"
+#| fig-width: 8
+#| fig-heigth: 8
+#| echo: true
+#| warning: false
+#| message: false
+
+whale_shark %>%
+  filter(is.na(eventDate) == FALSE) %>%
+  group_by(season) %>%
+  summarise(count = n()) %>%
+  ggplot(aes(x = fct_reorder(season, -count), y = count)) +
+    geom_bar(stat = "identity", position = "dodge", fill = "darkturquoise") +
+    geom_text(aes(label = count, x = season, y = count),
+                              position = position_dodge(width = 0.9),
+                              vjust = 1.5,
+                              hjust = 0.5,
+                              size = 4) +
+    ggtitle("Number of Occurences per Season") +
+    xlab("Season") +
+    ylab("Count of Occurences") +
+    theme(plot.title = element_text(face = "bold")) +
+    theme_classic()
+```
+Based on plot above, it turns out that Winter season comes out as no 2 of the most occurence, only behind by three occurence to Spring season, which mean the data is very close to what our expectation was. 
+
 
 ### Coastal v/s Open Ocean Sightings
 
@@ -333,7 +348,124 @@ whale_shark %>% na.omit() %>%
 - This might suggest (if we get more data about the sharks in east), Sharks travel from west to east to enjoy summer months in east and east to west to enjoy winter months in west.
 - Note: Here, 134 degrees longitude is used as reference line to separate the East from West since it equally divides the continents in two halves.
 
+### **Expectation 5: We expect to spot the most occurrences in the northern Western Australia.**
+```{r}
+#| warning: false
+#| message: false
+
+library(rworldmap)
+
+# Loading the World map
+wmap <- rworldmap::getMap(resolution = "low") %>%
+          st_as_sf()
+
+# Filtering to Australia map only
+australia <- wmap %>%
+  filter(NAME == "Australia")
+
+# Loading AU State
+states <- read_sf(here::here('data/STE_2021_AUST_SHP_GDA2020/STE_2021_AUST_GDA2020.shp'))
+
+# Plotting the Map
+ggplot() +
+  geom_sf(data = states) +
+  ylim(-45, -5) +
+  xlim(110, 155) +
+  geom_count(data = whale_shark, aes(x = decimalLongitude, y = decimalLatitude, color = season)) +
+  theme_bw()
+```
+As can be seen from the plot above, our expectation is satisfied with the fact that most of occurences happened in the northern part of Western Australia. This is align with the information that we gathered from different sources, which says whale shark usually migrate to Ningaloo Marine Park that is located in the northern Western Australia. On the other hand, the high number of occurences could also supported by the fact that there are eco-tourism around that area, meaning more people will be around that area (on certain season) and record the occurences.   
+
+
+### Q5
+```{r}
+library(rnoaa)
+aus_stations <- ghcnd_stations() |>
+  filter(str_starts(id, "ASN")) |>
+  filter(last_year >= 2020) |>
+  mutate(wmo_id = as.numeric(wmo_id),
+         name = str_to_lower(name)) |>
+  select(-state, -gsn_flag) |>
+  filter(element %in% c("PRCP", "TMAX", "TMIN")) |>
+  nest(element: last_year) |>
+  rowwise() |>
+  filter(nrow(data) == 3) |>
+  select(-data) 
+```
+
+```{r}
+# Plotting All Weather Station
+ggplot() +
+  geom_sf(data = states) +
+  ylim(-45, -5) +
+  xlim(110, 155) +
+  geom_point(data = aus_stations, aes(x = longitude, y = latitude)) +
+  theme_bw()
+
+# Nearest Station
+ggplot() +
+  geom_sf(data = states) +
+  ylim(-45, -5) +
+  xlim(110, 155) +
+  geom_point(data = (aus_stations %>% filter(name == "learmonth airport")), aes(x = longitude, y = latitude)) +
+  theme_bw()
+```
+
+
+```{r}
+narrogin <- aus_stations |>
+  filter(id == "ASN00005007") |>
+  rowwise() |>
+  mutate(ts = list(meteo_pull_monitors(
+    monitors = id, var = c("PRCP", "TMAX", "TMIN"),
+    date_min = "2004-01-01",
+    date_max = "2023-09-13") |>
+      select(-id))) |>
+  rename(lat = latitude, long = longitude, elev = elevation) |> select(id, long, lat, elev, name, wmo_id, ts) %>%
+  unnest(ts) |>
+  mutate(tmax = tmax/10, tmin = tmin/ 10)
+```
+
+
+```{r}
+narrogin_v2 <- narrogin %>%
+                select(date, prcp, tmax, tmin)
+
+whale_shark_weather <- whale_shark %>%
+                         # Filter occurence to near learmonth weather station
+                         filter(decimalLatitude < -20, decimalLatitude > -24,
+                                decimalLongitude > 112, decimalLongitude < 115) %>%
+                         left_join(narrogin_v2, by = c("eventDate" = "date")) %>%
+                         mutate(sighting = ifelse(is.na(tmin) & is.na(tmax), 0, 1))
+
+# Saving into RDA file
+save(whale_shark_weather, file = "data/whale_shark_weather.rda")
+```
+
+
+
+```{r}
+#| warning: false
+#| message: false
+
+ggplot() +
+  geom_sf(data = states) +
+  ylim(-24, -21) +
+  xlim(112, 116) +
+  geom_count(data = whale_shark_weather, aes(x = decimalLongitude, y = decimalLatitude, color = season)) +
+  geom_point(data = (aus_stations %>% filter(name == "learmonth airport")), aes(x = longitude, y = latitude, label = name)) +
+  geom_label(data = (aus_stations %>% filter(name == "learmonth airport")), aes(label = name, x = longitude, y = latitude),
+                              position = position_dodge(width = 0.9),
+                              vjust = 0.5,
+                              hjust = -0.05,
+                              size = 4) +
+  theme_classic()
+```
+
+
 ## Summary
+
+
 
 ## References
 
