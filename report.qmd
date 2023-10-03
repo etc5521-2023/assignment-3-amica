@@ -196,7 +196,88 @@ Weather data exploration here too.
 -->
 ```
 
+Expectations:
+
+We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during fall months. 
+```{r}
+whale_shark %>%
+  filter(is.na(eventDate) == FALSE) %>%
+  group_by(season) %>%
+  summarise(count = n()) %>%
+  ggplot(aes(x = fct_reorder(season, -count), y = count)) +
+    geom_bar(stat = "identity", position = "dodge") +
+    theme_bw()
+```
+
+
+We expect to spot the most occurrences in the northern Western Australia.
+```{r}
+library(sf)
+library(rworldmap)
+library(raster)
+
+wmap <- rworldmap::getMap(resolution = "low") %>%
+          st_as_sf()
+
+australia <- wmap %>%
+  filter(NAME == "Australia")
+
+plot(australia$geometry, 
+     axes = TRUE)
+```
+
+```{r}
+# Loading AU State
+states <- read_sf(here::here('data/STE_2021_AUST_SHP_GDA2020/STE_2021_AUST_GDA2020.shp'))
+
+
+# Converting whale shark dataset to sf object
+ws_sf <- st_as_sf(whale_shark,
+                  coords = c("decimalLongitude",
+                             "decimalLatitude"),
+                  crs = 4326)
+
+st_crs(states)
+st_crs(ws_sf)
+
+ws_transform <- st_transform(ws_sf, crs = st_crs(states))
+
+
+
+```
+
+```{r}
+#| warning: false
+#| message: false
+
+ggplot() +
+  geom_sf(data = states) +
+  ylim(-45, -5) +
+  xlim(110, 155) +
+  geom_point(data = whale_shark, aes(x = decimalLongitude, y = decimalLatitude)) +
+  theme_bw()
+```
+
+### no 5
+```{r}
+library(rnoaa)
+aus_stations <- ghcnd_stations() |>
+  filter(str_starts(id, "ASN")) |>
+  filter(last_year >= 2020) |>
+  mutate(wmo_id = as.numeric(wmo_id),
+         name = str_to_lower(name)) |>
+  select(-state, -gsn_flag) |>
+  filter(element %in% c("PRCP", "TMAX", "TMIN")) |>
+  nest(element: last_year) |>
+  rowwise() |>
+  filter(nrow(data) == 3) |>
+  select(-data) 
+```
+
+
 ## Summary
+
+
 
 ## References
 
