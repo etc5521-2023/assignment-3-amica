@@ -17,6 +17,7 @@ library(tidyverse)
 library(ggplot2)
 library(here)
 library(dplyr)
+library(sf)
 ```
 
 ## Introduction
@@ -38,14 +39,14 @@ This dataset contains the information about the occurence of Whale Shark (Rhinco
 
 ```{r loadData}
 # Extracting the occurence data from ALA Website
-library(galah) 
-galah_config(email = "egin0003@student.monash.edu") 
-ws_raw <- galah_call() |> 
-  galah_identify("Rhincodon typus") |> 
+library(galah)
+galah_config(email = "egin0003@student.monash.edu")
+ws_raw <- galah_call() |>
+  galah_identify("Rhincodon typus") |>
   atlas_occurrences()
 
 # Saving the raw data
-save(ws_raw, file=here::here("data-raw/ws_raw.rda")) 
+save(ws_raw, file = here::here("data-raw/ws_raw.rda")) 
 ```
 
 The data is located in folder `data-raw` named as `ws_raw.rda`. It contains these variables:
@@ -74,7 +75,7 @@ ws_assert <- galah_call() |>
   atlas_occurrences()
 
 # Saving the assertion data
-save(ws_raw, file=here::here("data-raw/ws_assertion.rda"))
+save(ws_raw, file = here::here("data-raw/ws_assertion.rda"))
 
 
 # Extracting the event data from ALA Website
@@ -84,7 +85,7 @@ ws_event <- galah_call() |>
   atlas_occurrences()
 
 # Saving the event data
-save(ws_raw, file=here::here("data-raw/ws_event.rda"))
+save(ws_raw, file = here::here("data-raw/ws_event.rda"))
 ```
 
 
@@ -111,9 +112,11 @@ library(visdat)
 vis_dat(ws_raw)
 # Checking data types and replacing them with correct data types
 ws_raw <- ws_raw %>%
-  mutate(decimalLatitude = as.numeric(decimalLatitude),
-         decimalLongitude = as.numeric(decimalLongitude),
-         eventDate = as.Date(eventDate))
+  mutate(
+    decimalLatitude = as.numeric(decimalLatitude),
+    decimalLongitude = as.numeric(decimalLongitude),
+    eventDate = as.Date(eventDate)
+  )
 ```
 From the plot above, we can see:
 - The classes for all the variables in the ws_raw data set are correct except for `eventDate` which needs to be of Date type and only include dates.
@@ -136,12 +139,18 @@ ws_raw %>% filter(!is.na(eventDate)) %>% ggplot(aes(y = year(eventDate))) + geom
 library(leaflet)
 m <- leaflet() %>%
   addTiles() %>%
-  addMarkers(data = ws_raw, 
-             lat = ~decimalLatitude, 
-             lng = ~decimalLongitude,
-             popup = paste0("Lat:", ws_raw$decimalLatitude,
-                            "<br/>", 
-                            "Long:", ws_raw$decimalLongitude))
+  addMarkers(
+    data = ws_raw,
+    lat = ~ decimalLatitude,
+    lng = ~ decimalLongitude,
+    popup = paste0(
+      "Lat:",
+      ws_raw$decimalLatitude,
+      "<br/>",
+      "Long:",
+      ws_raw$decimalLongitude
+    )
+  )
 m
 ```
 
@@ -153,28 +162,47 @@ m
 ```{r}
 # Getting Invalid Record
 ws_assert <- ws_assert %>%
-              select(recordID, BASIS_OF_RECORD_INVALID)
+  select(recordID, BASIS_OF_RECORD_INVALID)
 
 # Joining Raw Occurence data to Assert data to filter out the invalid records
 # Performing further data cleansing & manipulating
 whale_shark <- ws_raw %>%
-                left_join(ws_assert, by = "recordID") %>% #1281 rows
-                filter(BASIS_OF_RECORD_INVALID == FALSE, #1249 rows
-                       is.na(eventDate) | year(eventDate) > 1990, #1247 rows
-                       is.na(decimalLatitude) == FALSE) %>% #1241 rows
-                mutate(location = case_when(decimalLatitude == -22.6 & decimalLongitude == -113.65 ~ 'Open Range',
-                                            decimalLatitude == 19.000669 & decimalLongitude == -112.067012 ~ 'Open Range',
-                                            decimalLatitude == 1.6737 & decimalLongitude == -91.98911 ~ 'Open Range',
-                                            decimalLatitude == 0.917 & decimalLongitude == -29.345 ~ 'Open Range',
-                                            decimalLatitude == -23.86667 & decimalLongitude == -35.55 ~ 'Open Range',
-                                            decimalLatitude == 4.302202 & decimalLongitude == 72.883557 ~ 'Open Range',
-                                            TRUE ~ 'Coastal Area'),
-                       season = case_when(month(eventDate) == c("12", "1", "2") ~ 'Summer',
-                                          month(eventDate) == c("3", "4", "5") ~ 'Fall',
-                                          month(eventDate) == c("6", "7", "8") ~ 'Winter',
-                                          TRUE ~ 'Spring'))
-                       
+  left_join(ws_assert, by = "recordID") %>% #1281 rows
+  filter(
+    BASIS_OF_RECORD_INVALID == FALSE,
+    #1249 rows
+    is.na(eventDate) |
+      year(eventDate) > 1990,
+    #1247 rows
+    is.na(decimalLatitude) == FALSE
+  ) %>% #1241 rows
+  mutate(
+    location = case_when(
+      decimalLatitude == -22.6 &
+        decimalLongitude == -113.65 ~ 'Open Range',
+      decimalLatitude == 19.000669 &
+        decimalLongitude == -112.067012 ~ 'Open Range',
+      decimalLatitude == 1.6737 &
+        decimalLongitude == -91.98911 ~ 'Open Range',
+      decimalLatitude == 0.917 &
+        decimalLongitude == -29.345 ~ 'Open Range',
+      decimalLatitude == -23.86667 &
+        decimalLongitude == -35.55 ~ 'Open Range',
+      decimalLatitude == 4.302202 &
+        decimalLongitude == 72.883557 ~ 'Open Range',
+      TRUE ~ 'Coastal Area'
+    ),
+    season = case_when(
+      month(eventDate) %in% c(12, 1, 2) ~ 'Summer',
+      month(eventDate) %in% c(3, 4, 5) ~ 'Fall',
+      month(eventDate) %in% c(6, 7, 8) ~ 'Winter',
+      month(eventDate) %in% c(9, 10, 11) ~ 'Spring',
+      TRUE ~ NA
+    )
+  )
 
+# Removing unnecessary columns from data
+whale_shark <- whale_shark %>% select(-4, -5, -7, -8, -9)
 # Saving into RDA file
 save(whale_shark, file = "data/whale_shark.rda")
 ```
@@ -196,6 +224,115 @@ Weather data exploration here too.
 -->
 ```
 
+### Coastal v/s Open Ocean Sightings
+
+```{r}
+# Checking Layers of the GDB file to figure out which files we require for our boundaries.
+st_layers(
+  "data/Seas_and_Submerged_Lands_Act_1973_Australian_Maritime_Boundaries_Database_2014_v2/Seas and Submerged Lands Act 1973/Seas and Submerged Lands Act 1973.gdb"
+)
+
+open_ocean_boundary <-
+  st_read(
+    "data/Seas_and_Submerged_Lands_Act_1973_Australian_Maritime_Boundaries_Database_2014_v2/Seas and Submerged Lands Act 1973/Seas and Submerged Lands Act 1973.gdb",
+    layer = "Exclusive_Economic_Zone_AMB2014a_Area"
+  )
+
+coastal_boundary <-
+  st_read(
+    "data/Seas_and_Submerged_Lands_Act_1973_Australian_Maritime_Boundaries_Database_2014_v2/Seas and Submerged Lands Act 1973/Seas and Submerged Lands Act 1973.gdb",
+    layer = "Territorial_Sea_AMB2014a_Area"
+  )
+
+points_sf1 <-
+  st_as_sf(
+    whale_shark,
+    coords = c("decimalLongitude", "decimalLatitude"),
+    crs = st_crs(open_ocean_boundary)
+  )
+sf_use_s2(FALSE)
+points_sf2 <-
+  st_as_sf(
+    whale_shark,
+    coords = c("decimalLongitude", "decimalLatitude"),
+    crs = st_crs(coastal_boundary)
+  )
+
+points_within_coast <- st_intersection(points_sf2, coastal_boundary)
+points_within_ocean <-
+  st_intersection(points_sf1, open_ocean_boundary)
+
+ggplot() +
+  geom_sf(data = coastal_boundary) +
+  geom_sf(data = points_within_coast,
+          color = "red",
+          size = 1) +
+  geom_sf(data = points_within_ocean,
+          color = "blue",
+          size = 1) +
+  ylim(-45,-5) +
+  xlim(110, 155) +
+  theme_minimal()
+```
+
+- As we can see from the map above, there are very few observations in the open ocean area and majority of the wild sightings have been in the coastal area indicated by red dots.
+- Since the Geoscience Australia considers coastal waters different from territorial sea(coastal boundary), some of the points which are in the coastal waters are excluded from the plot. Also, shape file for coastal waters is not available which doesn't allow us to plot them on the map.
+- So, we can say that our expectation has been met and the chances that whale sharks appear in the coastal area is higher than the open ocean region of Australia.
+
+### Declining occurrences
+
+```{r}
+whale_shark %>%
+  na.omit() %>%
+  group_by(Year = year(eventDate)) %>%
+  summarise(Sightings = n_distinct(recordID)) %>%
+  ggplot(aes(x = Year, y = Sightings)) +
+  geom_line() +
+  geom_text(aes(label = ifelse(
+    Sightings > 150,
+    paste("Year: ", Year, "\nSharks: ",
+          as.character(Sightings)),
+    ""
+  )),
+  hjust = 0, vjust = 1) +
+  theme_minimal() +
+  labs(x = "Year",
+       y = "Observations",
+       title = "Whale Shark sightings every year")
+```
+
+- The plot suggests that there was a notable increase in whale shark sightings from around 2008 to 2013, with the highest number of sightings occurring in 2013. This period might represent a peak in whale shark observations.
+
+- After the peak, there is a decline in sightings, but the decline stabilizes after 2017. The number of sightings remains relatively consistent from 2018 to 2023, without a clear trend of continuous decline.
+
+- While there may be fluctuations in the number of sightings from year to year, the data does not show a significant decline in occurrences up to the year 2023. It suggests that the population of whale sharks in the observed area may have stabilized or reached a plateau, at least within the scope of the available data.
+
+- Note that this interpretation is based on the available data and the assumption that the observations are representative of the entire whale shark population in the area. Factors such as changes in survey effort or environmental conditions may also influence the observed trends.
+
+- The expectation is not met according to the data.
+
+### Migrating sharks
+
+```{r}
+whale_shark %>% na.omit() %>%
+  mutate(Direction = ifelse(decimalLongitude <
+                              134, "West", "East")) %>%
+  group_by(season, Direction, year(eventDate)) %>%
+  summarise(sum = n_distinct(recordID)) %>%
+  ggplot(aes(x = season, y = sum)) +
+  geom_col() +
+  labs(x = "Seasons",
+       y = "Sightings",
+       title = "Sightings East v/s West season wise") +
+  facet_grid( ~ Direction) +
+  coord_flip()
+```
+
+- Whale sharks generally prefer Western Australian waters more than Eastern waters. 
+- They also prefer winter months over summer months in West whereas other way round in the East.
+- This might suggest (if we get more data about the sharks in east), Sharks travel from west to east to enjoy summer months in east and east to west to enjoy winter months in west.
+- Note: Here, 134 degrees longitude is used as reference line to separate the East from West since it equally divides the continents in two halves.
+
 ## Summary
 
 ## References
@@ -205,3 +342,5 @@ Department of Fisheries, Government of Western Australia. (2011, September). Fis
 McGrouther, Mark. (2022, October). Whale Shark, Rhincodon typus (Smith, 1828). Australian Museum. https://australian.museum/learn/animals/fishes/whale-shark-rhincodon-typus-smith-1828/
 
 Britannica. (2023, August). Whale Shark. Britannica. https://www.britannica.com/animal/whale-shark
+
+French, C.J. 2006. Australia's Maritime Zones/Boundaries Map. Geoscience Australia, Canberra. https://pid.geoscience.gov.au/dataset/ga/63690
