@@ -312,6 +312,18 @@ whale_shark_weather <- whale_shark %>%
 save(whale_shark_weather, file = "data/whale_shark_weather.rda")
 ```
 
+### Why labeling days when sighting occurs is necessary?
+
+- So, we're trying to figure out how weather conditions relate to wildlife sightings, specifically with whale sharks. We've got two main datasets: one with daily weather data from NOAA weather stations, and another with records of when and where whale shark sightings occurred.
+
+- Weather data is collected every day, like clockwork, but whale shark sightings don't happen every day. So, to connect the dots and see how weather affects sightings, we need a way to match up the weather conditions with whether a sighting happened on that day.
+
+- That's where this "sighting occurred" or "didn't occur" label comes in. Basically, we're creating a new variable that says "1" if there was a whale shark sighting on a particular day and "0" if there wasn't.
+
+- This is all about making our data analysis easier. With these labels, we can do things like calculate correlations between weather factors (precipitation, temperature) and sightings. We can test hypotheses like, "Do sightings increase when there are higher chances of rain?" or "Are sightings more likely in certain temperature ranges?"
+
+- Plus, when we visualise the data, it's much clearer. We can make time series plots that show how weather conditions and sightings line up over time. And if we want to build models that predict when whale sharks might appear based on weather forecasts, these labels are essential.
+
 ## Visual Inference Analysis (EDA)
 
 ### **Expectation 1: We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months.** 
@@ -503,17 +515,21 @@ ggplot() +
 
 Created a map that shows the distribution of whale shark sightings surrounding the location of Learmonth Airport. The color of the points represents different seasons when the sightings occurred while the size of the points represent the number of sightings at a particular location. According to the plot, we can note that the most occurrences are in the spring season as they and they are also spread out across the coast. Next, highest occurrences are during winter season and then summer followed by fall. During winter, they appear towards north of the weather station and during summer they appear in south. 
 
-### Why labeling days when sighting occurs is necessary?
+### Finding relation between Temperature and sightings
 
-- So, we're trying to figure out how weather conditions relate to wildlife sightings, specifically with whale sharks. We've got two main datasets: one with daily weather data from NOAA weather stations, and another with records of when and where whale shark sightings occurred.
+```{r}
+whale_shark_weather %>% na.omit() %>% 
+  group_by(Month = month(eventDate)) %>%
+  summarise(Sightings = sum(sighting),
+            tmin_avg = sum(tmin)/n(),
+            tmax_avg = sum(tmax)/n(),) %>% 
+  ggplot() +
+  geom_line(aes(x = Month, y = tmin_avg, color = "blue")) +
+  geom_line(aes(x = Month, y = tmax_avg, color = "red")) +
+  geom_line(aes(x = Month, y = Sightings, color = "green"))
+  
+```
 
-- Weather data is collected every day, like clockwork, but whale shark sightings don't happen every day. So, to connect the dots and see how weather affects sightings, we need a way to match up the weather conditions with whether a sighting happened on that day.
-
-- That's where this "sighting occurred" or "didn't occur" label comes in. Basically, we're creating a new variable that says "1" if there was a whale shark sighting on a particular day and "0" if there wasn't.
-
-- This is all about making our data analysis easier. With these labels, we can do things like calculate correlations between weather factors (precipitation, temperature) and sightings. We can test hypotheses like, "Do sightings increase when there are higher chances of rain?" or "Are sightings more likely in certain temperature ranges?"
-
-- Plus, when we visualize the data, it's much clearer. We can make time series plots that show how weather conditions and sightings line up over time. And if we want to build models that predict when whale sharks might appear based on weather forecasts, these labels are essential.
 
 ## Summary
 
