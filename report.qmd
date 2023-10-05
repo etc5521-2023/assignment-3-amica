@@ -35,6 +35,8 @@ Expectations:
 
 ## Data description
 
+### Whale-shark Data
+
 This dataset contains the information about the occurence of Whale Shark (Rhincodon Typus) in Australia at a certain time and place. The data is retrieved from the [Atlas of Living Australia (ALA) Website](https://www.ala.org.au/). ALA is a collaborative, digital, open infrastructure that pulls together Australian biodiversity data from multiple sources, making it accessible and reusable.
 
 ```{r loadData}
@@ -88,17 +90,84 @@ ws_event <- galah_call() |>
 save(ws_raw, file = here::here("data-raw/ws_event.rda"))
 ```
 
+### Weather stations data
 
-## Initial data analysis
+The dataset contains the information about Weather station locations which can be found in a Global Historical Climatology Network (GHCN) database maintained by the National Oceanic and Atmospheric Administration. This data is downloaded using the rnoaa package.
+
+```{r}
+library(rnoaa)
+aus_stations <- ghcnd_stations() |>
+  filter(str_starts(id, "ASN")) |>
+  filter(last_year >= 2020) |>
+  mutate(wmo_id = as.numeric(wmo_id),
+         name = str_to_lower(name)) |>
+  select(-state, -gsn_flag) |>
+  filter(element %in% c("PRCP", "TMAX", "TMIN")) |>
+  nest(element: last_year) |>
+  rowwise() |>
+  filter(nrow(data) == 3) |>
+  select(-data) 
+```
+
+| Variables        | Description                                                                                                                                                                                     |
+|------------------------------------|------------------------------------|
+
+|id                | An identifier associated with a specific station.                                |
+
+|latitude          | The latitude (in decimal degrees) of the station's location.                     |
+
+|longitude         | The longitude (in decimal degrees) of the station's location.                    |
+
+|elevation         | The elevation (in meters) of the station's location.                             |
+
+|name              | The name or description of the station.                                          |
+
+|wmo_id            | The World Meteorological Organization (WMO) identifier associated with the station. |
+
+### Downloading weather data from the nearest weather station (Learmonth Station)
+
+This dataset contains the information about the weather(Precipitation, Minimum and Maximum temperature) recorded by the selected station.
+
+```{r}
+narrogin <- aus_stations |>
+  filter(id == "ASN00005007") |>
+  rowwise() |>
+  mutate(ts = list(meteo_pull_monitors(
+    monitors = id, var = c("PRCP", "TMAX", "TMIN"),
+    date_min = "2004-01-01",
+    date_max = "2023-09-13") |>
+      select(-id))) |>
+  rename(lat = latitude, long = longitude, elev = elevation) |> select(id, long, lat, elev, name, wmo_id, ts) %>%
+  unnest(ts) |>
+  mutate(tmax = tmax/10, tmin = tmin/ 10)
+```
+
+| Variables        | Description                                                                                                                                                                                     |
+|------------------------------------|------------------------------------|
+
+|id                | An identifier associated with a specific location or station.                    |
+
+|long              | The longitude (in decimal degrees) of the location.                              |
+
+|lat               | The latitude (in decimal degrees) of the location.                               |
+
+|elev              | The elevation (in meters) of the location.                                       |
+
+|name              | The name or description of the location or station.                              |
+
+|wmo_id            | The World Meteorological Organization (WMO) identifier associated with the location.|
+
+|date              | The date of the recorded weather data.                                           |
+
+|prcp              | Precipitation amount.                                                            |
+
+|tmax              | Maximum temperature.                                                             |
+
+|tmin              | Minimum temperature.                                                             |
+
+## Initial data analysis (IDA)
 ### Data Quality Check
 #### General Check
-```{=html}
-<!--
-3. Perform a data quality check, and then go ahead and clean the data, saving only the wild sightings. Save the resulting data in a `data` folder as an `WILD_THING_COMMON_NAME.rda` file, so that any special variable types are clearly available. (Replace `WILD_THING_COMMON_NAME` with lower case common name of your assigned wild thing.) *Note:* Some are museum or historical records or live in an animal sanctuary or zoo, which do not truly capture their wild behaviour. Downloading the event information (`galah_select(group = "event")`) can help identify wild sightings.
-
-Weather data pre-processing here too.
--->
-```
 
 - There are `r ws_raw$dataResourceName %>% n_distinct()` different data sources and upon referring their data collection method on atlas website, it is evident that all the sightings are wild sightings.
 - ws_event data has the samplingProtocol variable which basically indicates what type of sighting or data collection method was used. Most of the values are missing for this variable so it is also not a reliable method to identify wild sightings.
@@ -157,8 +226,32 @@ m
 - When plotting the locations of whale shark spotting, it is evident that some instances are from around the world and not just Australian waters. 
 - We will put identifier for occurences near coastal area and open ocean range area by looking at the map above.
 
+### Finding nearest weather station
+
+```{r}
+# Plotting All Weather Station
+ggplot() +
+  geom_sf(data = states) +
+  ylim(-45, -5) +
+  xlim(110, 155) +
+  geom_point(data = aus_stations, aes(x = longitude, y = latitude)) +
+  theme_bw()
+
+# Nearest Station
+ggplot() +
+  geom_sf(data = states) +
+  ylim(-45, -5) +
+  xlim(110, 155) +
+  geom_point(data = (aus_stations %>% filter(name == "learmonth airport")), aes(x = longitude, y = latitude)) +
+  theme_bw()
+```
+
+- In the first plot we have plotted all weather station recently active in Australia. 
+- In the second plot we have plotted the weather station (Learmonth airport) which is closest to the site with most occurrences of whale sharks. Since we already have the site with the highest occurrences that is the Ningaloo reef, we were able to find the weather station using [this website](https://www.honeymoonguide.com.au/australia/ningaloo-reef-weather.html#:~:text=Note%3A%20Meteorological%20data%20for%20the%20Ningaloo%20Coast%20is).
 
 ### Data Cleansing and Transforming
+
+**Whale Shark data **
 ```{r}
 # Getting Invalid Record
 ws_assert <- ws_assert %>%
@@ -198,16 +291,28 @@ In the code above, we have performed some steps of data cleansing, which include
 - Filter out the occurences that has missing value in `decimalLatitude`.
 - Add 2 new column as identifier. First column `location`, is an identifier for location when the whale sharks are spotted in the open ocean or coastal area based on `decimalLatitude` and `decimalLongitude`. Second column `season`, is a identifier for season (e.g. Summer, Fall, Winter, and Spring). These two columns are needed to perform the plot for our expectations.
 
+**Weather Data**
+Filtering out the variables that we won't need for our analysis using select query.
+```{r}
+narrogin_v2 <- narrogin %>%
+                select(date, prcp, tmax, tmin)
+```
+
+### Joining weather data with whale shark data
+
+```{r}
+whale_shark_weather <- whale_shark %>%
+                         # Filter occurrence to near learmonth weather station
+                         filter(decimalLatitude < -20, decimalLatitude > -24,
+                                decimalLongitude > 112, decimalLongitude < 115) %>%
+                         left_join(narrogin_v2, by = c("eventDate" = "date")) %>%
+                         mutate(sighting = ifelse(is.na(tmin) & is.na(tmax), 0, 1))
+
+# Saving into RDA file
+save(whale_shark_weather, file = "data/whale_shark_weather.rda")
+```
 
 ## Visual Inference Analysis (EDA)
-
-```{=html}
-<!--
-4. Make plots of the data to check each of your expectations, and report what you learn. *Note:* This might also be a place where visual inference methods *may* be useful to determine if what is seen agrees or disputes what you expected. 
-
-Weather data exploration here too.
--->
-```
 
 ### **Expectation 1: We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months.** 
 ```{r}
@@ -239,23 +344,23 @@ whale_shark %>%
 Based on plot above, it turns out that Winter season comes out as no 2 of the most occurence, only behind by three occurence to Spring season, which mean the data is very close to what our expectation was. 
 
 
-### Coastal v/s Open Ocean Sightings
+### **Expectation 2: We expect to see differences in the frequency of sightings between coastal areas and open ocean regions, indicating habitat preferences.** 
 
 ```{r}
 # Checking Layers of the GDB file to figure out which files we require for our boundaries.
 st_layers(
-  "data/Seas_and_Submerged_Lands_Act_1973_Australian_Maritime_Boundaries_Database_2014_v2/Seas and Submerged Lands Act 1973/Seas and Submerged Lands Act 1973.gdb"
+  "data/Maritime_Boundaries_Database/Seas and Submerged Lands Act 1973/Seas and Submerged Lands Act 1973.gdb"
 )
 
 open_ocean_boundary <-
   st_read(
-    "data/Seas_and_Submerged_Lands_Act_1973_Australian_Maritime_Boundaries_Database_2014_v2/Seas and Submerged Lands Act 1973/Seas and Submerged Lands Act 1973.gdb",
+    "data/Maritime_Boundaries_Database/Seas and Submerged Lands Act 1973/Seas and Submerged Lands Act 1973.gdb",
     layer = "Exclusive_Economic_Zone_AMB2014a_Area"
   )
 
 coastal_boundary <-
   st_read(
-    "data/Seas_and_Submerged_Lands_Act_1973_Australian_Maritime_Boundaries_Database_2014_v2/Seas and Submerged Lands Act 1973/Seas and Submerged Lands Act 1973.gdb",
+    "data/Maritime_Boundaries_Database/Seas and Submerged Lands Act 1973/Seas and Submerged Lands Act 1973.gdb",
     layer = "Territorial_Sea_AMB2014a_Area"
   )
 
@@ -294,7 +399,7 @@ ggplot() +
 - Since the Geoscience Australia considers coastal waters different from territorial sea(coastal boundary), some of the points which are in the coastal waters are excluded from the plot. Also, shape file for coastal waters is not available which doesn't allow us to plot them on the map.
 - So, we can say that our expectation has been met and the chances that whale sharks appear in the coastal area is higher than the open ocean region of Australia.
 
-### Declining occurrences
+### **Expectation 3: We expect to observe declining occurrences up to this year (2023).**
 
 ```{r}
 whale_shark %>%
@@ -326,7 +431,7 @@ whale_shark %>%
 
 - The expectation is not met according to the data.
 
-### Migrating sharks
+### **Expectation 4: We anticipate the sharks tend to move from east to west during fall and west to east during summer.**
 
 ```{r}
 whale_shark %>% na.omit() %>%
@@ -376,73 +481,7 @@ ggplot() +
 ```
 As can be seen from the plot above, our expectation is satisfied with the fact that most of occurences happened in the northern part of Western Australia. This is align with the information that we gathered from different sources, which says whale shark usually migrate to Ningaloo Marine Park that is located in the northern Western Australia. On the other hand, the high number of occurences could also supported by the fact that there are eco-tourism around that area, meaning more people will be around that area (on certain season) and record the occurences.   
 
-
-### Q5
-```{r}
-library(rnoaa)
-aus_stations <- ghcnd_stations() |>
-  filter(str_starts(id, "ASN")) |>
-  filter(last_year >= 2020) |>
-  mutate(wmo_id = as.numeric(wmo_id),
-         name = str_to_lower(name)) |>
-  select(-state, -gsn_flag) |>
-  filter(element %in% c("PRCP", "TMAX", "TMIN")) |>
-  nest(element: last_year) |>
-  rowwise() |>
-  filter(nrow(data) == 3) |>
-  select(-data) 
-```
-
-```{r}
-# Plotting All Weather Station
-ggplot() +
-  geom_sf(data = states) +
-  ylim(-45, -5) +
-  xlim(110, 155) +
-  geom_point(data = aus_stations, aes(x = longitude, y = latitude)) +
-  theme_bw()
-
-# Nearest Station
-ggplot() +
-  geom_sf(data = states) +
-  ylim(-45, -5) +
-  xlim(110, 155) +
-  geom_point(data = (aus_stations %>% filter(name == "learmonth airport")), aes(x = longitude, y = latitude)) +
-  theme_bw()
-```
-
-
-```{r}
-narrogin <- aus_stations |>
-  filter(id == "ASN00005007") |>
-  rowwise() |>
-  mutate(ts = list(meteo_pull_monitors(
-    monitors = id, var = c("PRCP", "TMAX", "TMIN"),
-    date_min = "2004-01-01",
-    date_max = "2023-09-13") |>
-      select(-id))) |>
-  rename(lat = latitude, long = longitude, elev = elevation) |> select(id, long, lat, elev, name, wmo_id, ts) %>%
-  unnest(ts) |>
-  mutate(tmax = tmax/10, tmin = tmin/ 10)
-```
-
-
-```{r}
-narrogin_v2 <- narrogin %>%
-                select(date, prcp, tmax, tmin)
-
-whale_shark_weather <- whale_shark %>%
-                         # Filter occurence to near learmonth weather station
-                         filter(decimalLatitude < -20, decimalLatitude > -24,
-                                decimalLongitude > 112, decimalLongitude < 115) %>%
-                         left_join(narrogin_v2, by = c("eventDate" = "date")) %>%
-                         mutate(sighting = ifelse(is.na(tmin) & is.na(tmax), 0, 1))
-
-# Saving into RDA file
-save(whale_shark_weather, file = "data/whale_shark_weather.rda")
-```
-
-
+### Plotting whale sharks spotted near Learmonth weather station 
 
 ```{r}
 #| warning: false
@@ -462,6 +501,7 @@ ggplot() +
   theme_classic()
 ```
 
+Created a map that shows the distribution of whale shark sightings surrounding the location of Learmonth Airport. The color of the points represents different seasons when the sightings occurred while the size of the points represent the number of sightings at a particular location. According to the plot, we can note that the most occurrences are in the spring season as they and they are also spread out across the coast. Next, highest occurrences are during winter season and then summer followed by fall. During winter, they appear towards north of the weather station and during summer they appear in south. 
 
 ## Summary
 
@@ -476,3 +516,5 @@ McGrouther, Mark. (2022, October). Whale Shark, Rhincodon typus (Smith, 1828). A
 Britannica. (2023, August). Whale Shark. Britannica. https://www.britannica.com/animal/whale-shark
 
 French, C.J. 2006. Australia's Maritime Zones/Boundaries Map. Geoscience Australia, Canberra. https://pid.geoscience.gov.au/dataset/ga/63690
+
+Bowie, A. (n.d.). Best time to visit Ningaloo Reef. Honeymoon Guide. Retrieved October 5, 2023, from https://www.honeymoonguide.com.au/australia/ningaloo-reef-weather.html#:~:text=Note%3A%20Meteorological%20data%20for%20the%20Ningaloo%20Coast%20is
