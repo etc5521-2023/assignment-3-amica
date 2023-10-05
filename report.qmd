@@ -209,7 +209,8 @@ Weather data exploration here too.
 -->
 ```
 
-### **Expectation 1: We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months.** 
+### **Expectation 1: We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months.**
+The @fig-countoccur below depict the number of occurence for every season from 1993 until 2023.
 ```{r}
 #| label: fig-countoccur
 #| fig-cap: "Number of Occurences per Season"
@@ -230,13 +231,18 @@ whale_shark %>%
                               vjust = 1.5,
                               hjust = 0.5,
                               size = 4) +
-    ggtitle("Number of Occurences per Season") +
+    ggtitle(label = "Number of Occurences per Season",
+            subtitle = "Data Period: 1993 - 2023") +
     xlab("Season") +
     ylab("Count of Occurences") +
-    theme(plot.title = element_text(face = "bold")) +
-    theme_classic()
+    theme_classic() +
+    theme(plot.title = element_text(face = "bold"),
+          plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10))
+   
 ```
-Based on plot above, it turns out that Winter season comes out as no 2 of the most occurence, only behind by three occurence to Spring season, which mean the data is very close to what our expectation was. 
+- Based on the plot above, it seems that winter indeed had a substantial number of sightings (319), which kind of align with our expectation. Spring had a slightly higher number of sightings (322) than winter, but even though this contradicts with our initial expectation, it is important to note that the difference between spring and winter is relatively small. The other two season, Fall and Summer, clearly have less occurences with 258 and 98 sightings respectively. 
+
+- Although our initial expectation was to observe higher occurrences during the winter months, the data shows that sightings were relatively evenly distributed between spring and winter, with spring has slightly more occurences. Additionally, fall had a significant number of sightings, while summer had the fewest.
 
 
 ### Coastal v/s Open Ocean Sightings
@@ -349,21 +355,17 @@ whale_shark %>% na.omit() %>%
 - Note: Here, 134 degrees longitude is used as reference line to separate the East from West since it equally divides the continents in two halves.
 
 ### **Expectation 5: We expect to spot the most occurrences in the northern Western Australia.**
+In analysing this expectation, here we employ the usage of geospatial object of Australia, known as Geocentric Datum of Australia 2020 (GDA2020) that is provided by Australian Bureau of Statistics [here](https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs-edition-3/jul2021-jun2026/access-and-downloads/digital-boundary-files). By using this, we are able to plot the map of Australia with separation line of Australian Federal State (e.g. Victoria, New South Wales, Queensland, Western Australia, etc.). The figure @fig-aumap below shows the sightings of whale shark.
 ```{r}
+#| label: fig-aumap
+#| fig-cap: "Number of Occurences per Season"
+#| fig-width: 10
+#| fig-heigth: 8
+#| echo: true
 #| warning: false
 #| message: false
 
-library(rworldmap)
-
-# Loading the World map
-wmap <- rworldmap::getMap(resolution = "low") %>%
-          st_as_sf()
-
-# Filtering to Australia map only
-australia <- wmap %>%
-  filter(NAME == "Australia")
-
-# Loading AU State
+# Loading AU Map
 states <- read_sf(here::here('data/STE_2021_AUST_SHP_GDA2020/STE_2021_AUST_GDA2020.shp'))
 
 # Plotting the Map
@@ -374,7 +376,11 @@ ggplot() +
   geom_count(data = whale_shark, aes(x = decimalLongitude, y = decimalLatitude, color = season)) +
   theme_bw()
 ```
-As can be seen from the plot above, our expectation is satisfied with the fact that most of occurences happened in the northern part of Western Australia. This is align with the information that we gathered from different sources, which says whale shark usually migrate to Ningaloo Marine Park that is located in the northern Western Australia. On the other hand, the high number of occurences could also supported by the fact that there are eco-tourism around that area, meaning more people will be around that area (on certain season) and record the occurences.   
+- As can be seen from the map plot above, the sightings are spread out accross western, northern, and eastern part of Australia. We added another dimension, a size, that make some of the occurence have bigger circle (like a bubble). This is needed because from the dataset, we identified there are so many location that have exact latitude & longitude, which will overlapping each other if we only show it as dot points, and hinder the underlying value of the plot. With this additional dimension, it is clear that most of the occurences are recorded in the northern of Western Australia area. 
+
+- In contrast, we can see that the number of occurences are very small in the southern part of Australia. Right now, we can only assume that Whale Shark may not prefer this area due to it is closer to the south pole, which make the sea water temperature colder compare to the other area. Unfortunately, we could not find any dataset regarding the sea water temperature that can be downloaded and plotted according to the time when the sightings happened. Otherwise, it will provide deeper understanding of whale shark behaviour.
+
+- As we have explained so far, we can conclude that our expectation is satisfied with the fact that most of occurences happened in the northern part of Western Australia. This is align with the information that we gathered from different sources, which says whale shark usually migrate to Ningaloo Marine Park that is located in the northern Western Australia. On the other hand, the high number of occurences could also supported by the fact that there are eco-tourism around that area, meaning more people will be around that area (on certain season) and record the occurences.   
 
 
 ### Q5
