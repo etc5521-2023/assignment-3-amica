@@ -487,13 +487,15 @@ st_layers(
 open_ocean_boundary <-
   st_read(
     "data/Maritime_Boundaries_Database/Seas and Submerged Lands Act 1973/Seas and Submerged Lands Act 1973.gdb",
-    layer = "Exclusive_Economic_Zone_AMB2014a_Area"
+    layer = "Exclusive_Economic_Zone_AMB2014a_Area",
+    quiet = TRUE
   )
 
 coastal_boundary <-
   st_read(
     "data/Maritime_Boundaries_Database/Seas and Submerged Lands Act 1973/Seas and Submerged Lands Act 1973.gdb",
-    layer = "Territorial_Sea_AMB2014a_Area"
+    layer = "Territorial_Sea_AMB2014a_Area",
+    quiet = TRUE
   )
 
 points_sf1 <-
