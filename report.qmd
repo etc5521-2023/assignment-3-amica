@@ -388,6 +388,7 @@ In the code above, we have performed some steps of data cleansing, which include
 - Add a new variable as identifier. Variable `season`, is an identifier for season (e.g. Summer, Fall, Winter, and Spring). These two columns are needed to perform the plot for our expectations.
 
 **Weather Data**
+
 Filtering out the variables that we don't need for our analysis using select query.
 ```{r}
 narrogin_v2 <- narrogin %>%
@@ -822,7 +823,13 @@ whale_shark_weather %>%
 
 ## Summary
 
-
+- The data analysis showed that there were relatively even occurrences of whale shark sightings between spring and winter, with a slight edge for spring. Fall had a significant number of sightings, while summer had the fewest. This finding contradicted the expectation of higher occurrences during winter months. 
+- The analysis using geospatial data confirmed that most whale shark sightings occurred in coastal areas rather than open ocean regions of Australia, aligning with the expectation of differences in habitat preferences. 
+- Contrary to the expectation of declining occurrences, the data showed an increase in whale shark sightings from around 2008 to 2013, reaching a peak in 2013. Afterward, there was a decline, but it stabilized after 2017, suggesting that the population may have stabilized. 
+- The analysis also suggested that whale sharks tend to prefer Western Australian waters, with a preference for winter months in the West and summer months in the East, indicating potential seasonal movement from west to east and vice versa. 
+- The data confirmed the expectation of most occurrences in the northern part of Western Australia, particularly in the Ningaloo Marine Park area, which aligns with the known migration patterns and ecotourism activities in that region. 
+- The correlation analysis between temperature whale shark sightings showed no significant pattern or dependency between them.
+- Similarly, the correlation analysis between rain precipitation and whale shark sightings suggest that rain precipitation did not directly affect sightings. But it was noted that frequent rainfall may indirectly impact sea ecosystems by promoting plankton growth, which could benefit whale sharks.
 
 ## References
 
