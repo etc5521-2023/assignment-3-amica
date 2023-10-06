@@ -1,6 +1,6 @@
 ---
-title: "MY WHALE SHARK REPORT"
-author: "AMICA - EVAN GINTING & HARSH JAIN"
+title: "Whale Shark Observations: A Comprehensive Study"
+author: "AMICA - Evan Hadinata Ginting & Harsh Jain"
 format: html
 ---
 
@@ -12,7 +12,14 @@ knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE)
 ```
 
+
 ```{r loadLibraries}
+#| warning: false
+#| message: false
+#| eval: true
+#| include: true
+#| echo: false
+
 library(tidyverse)
 library(ggplot2)
 library(here)
@@ -21,13 +28,15 @@ library(sf)
 library(galah)
 library(visdat)
 library(leaflet)
+library(rnoaa)
+library(gridExtra)
 ```
 
 ## Introduction
 
 Whale Shark (Rhincodon typus) is the largest of all fishes alive. It may grow up to 18 metres (m) in length, but commonly seen between 4 m to 12 m. It is typically blue-grey or brownish in color with a pattern of white spots and vertical lines on its body. In terms of the diet, they feed on plankton, small crustaceans, squid, and fishes. The main feature of their food processing tools are their filtering screens on the gills and their tiny, more than 300 hooked teeth in both jaws. They are found on all the tropical oceans of the world where the water temperatures are ranging from 21 to 25 degrees Celsius and typically at depths of up to 1000 meters. Whale sharks are generally known to be active swimmers, and their activity can vary throughout the day and night. They do not exhibit diurnal (daytime) or seasonal (summer/winter) patterns of activity in the same way that some other species do. However, they seasonally come close to inshore areas, especially at plankton-rich locations. In Australia, it is found primarily in northern Western Australia, the Northern Territory, and Queensland. Whale sharks are known to migrate to the Ningaloo Marine park during specific times of the year, usually between March and July which is associated with the availability of plankton and other food sources in the area. During this time, there is usually a big ecotourism activity happening here for the chance to swim with them. Sadly, now, their status is an endangered species due to massive hunt of parts of their bodies. Hence, Conservation measures, including protections and regulations, are being implemented to safeguard this species in Australia and many other countries.
 
-Expectations:
+In this study, We expect to encounter these with our data analysis:
 
 -   We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months. 
 -   We expect to see differences in the frequency of sightings between coastal areas and open ocean regions, indicating habitat preferences. 
@@ -91,6 +100,7 @@ ws_event <- galah_call() |>
 # Saving the event data
 save(ws_raw, file = here::here("data-raw/ws_event.rda"))
 ```
+
 
 ### Weather stations data
 
@@ -167,6 +177,7 @@ narrogin <- aus_stations |>
 
 |tmin              | Minimum temperature.                                                             |
 
+
 ## Initial data analysis (IDA)
 ### Data Quality Check
 #### General Check
@@ -179,6 +190,14 @@ narrogin <- aus_stations |>
 For the occurences dataset, we are going to perform some quality check, as mention below: 
 
 ```{r IDA}
+#| label: fig-visdat
+#| fig-cap: "Checking Data Types"
+#| fig-width: 10
+#| fig-heigth: 8
+#| echo: true
+#| warning: false
+#| message: false
+
 vis_dat(ws_raw)
 # Checking data types and replacing them with correct data types
 ws_raw <- ws_raw %>%
@@ -188,7 +207,7 @@ ws_raw <- ws_raw %>%
     eventDate = as.Date(eventDate)
   )
 ```
-From the plot above, we can see:
+From the @fig-visdat above, we can see:
 - The classes for all the variables in the ws_raw data set are correct except for `eventDate` which needs to be of Date type and only include dates.
 - There are a few missing values for `decimalLatitude` and `decimalLongitude` . We can also see that if `decimalLatitude` is missing, `decimalLongitude` is also missing and vice-versa.
 - There are `r ws_raw %>% filter(is.na(eventDate)) %>% nrow()` missing values in the `eventDate` variable out of `r ws_raw %>% nrow()` records. 
@@ -223,6 +242,15 @@ Based on @fig-boxplot:
 
 **Checking Location of Occurences**
 ```{r IDA3}
+#| label: fig-alloccu
+#| fig-cap: "All Occurences"
+#| fig-width: 10
+#| fig-heigth: 8
+#| echo: true
+#| warning: false
+#| message: false
+#| eval: false
+
 m <- leaflet() %>%
   addTiles() %>%
   addMarkers(
@@ -241,11 +269,24 @@ m
 ```
 
 - When plotting the locations of whale shark spotting, it is evident that some instances are from around the world and not just Australian waters. 
-- We will put identifier for occurences near coastal area and open ocean range area by looking at the map above.
+- Later we will filter the location to only include sightings around Australia only.
 
 ### Finding nearest weather station
 
+In analysing plotting the map, here we employ the usage of geospatial object of Australia, known as Geocentric Datum of Australia 2020 (GDA2020) that is provided by Australian Bureau of Statistics [here](https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs-edition-3/jul2021-jun2026/access-and-downloads/digital-boundary-files). By using this, we are able to plot the map of Australia with separation line of Australian Federal State (e.g. Victoria, New South Wales, Queensland, Western Australia, etc.), which later help us identify the nearest weather station.
+
 ```{r}
+#| label: fig-allstation
+#| fig-cap: "All Weather Station"
+#| fig-width: 10
+#| fig-heigth: 8
+#| echo: true
+#| warning: false
+#| message: false
+
+# Loading AU Map
+states <- read_sf(here::here('data/STE_2021_AUST_SHP_GDA2020/STE_2021_AUST_GDA2020.shp'))
+
 # Plotting All Weather Station
 ggplot() +
   geom_sf(data = states) +
@@ -253,6 +294,17 @@ ggplot() +
   xlim(110, 155) +
   geom_point(data = aus_stations, aes(x = longitude, y = latitude)) +
   theme_bw()
+```
+
+
+```{r}
+#| label: fig-nearstation
+#| fig-cap: "Nearest Weather Station"
+#| fig-width: 10
+#| fig-heigth: 8
+#| echo: true
+#| warning: false
+#| message: false
 
 # Nearest Station
 ggplot() +
@@ -281,14 +333,7 @@ whale_shark <- ws_raw %>%
                 filter(BASIS_OF_RECORD_INVALID == FALSE, #1249 rows
                        is.na(eventDate) | year(eventDate) > 1990, #1247 rows
                        is.na(decimalLatitude) == FALSE) %>% #1241 rows
-                mutate(location = case_when(decimalLatitude == -22.6 & decimalLongitude == -113.65 ~ 'Open Range',
-                                            decimalLatitude == 19.000669 & decimalLongitude == -112.067012 ~ 'Open Range',
-                                            decimalLatitude == 1.6737 & decimalLongitude == -91.98911 ~ 'Open Range',
-                                            decimalLatitude == 0.917 & decimalLongitude == -29.345 ~ 'Open Range',
-                                            decimalLatitude == -23.86667 & decimalLongitude == -35.55 ~ 'Open Range',
-                                            decimalLatitude == 4.302202 & decimalLongitude == 72.883557 ~ 'Open Range',
-                                            TRUE ~ 'Coastal Area'),
-                       season = case_when(month(eventDate) %in% c(12, 1, 2) ~ 'Summer',
+                mutate(season = case_when(month(eventDate) %in% c(12, 1, 2) ~ 'Summer',
                                           month(eventDate) %in% c(3, 4, 5) ~ 'Fall',
                                           month(eventDate) %in% c(6, 7, 8) ~ 'Winter',
                                           month(eventDate) %in% c(9, 10, 11) ~ 'Spring',
@@ -341,10 +386,10 @@ save(whale_shark_weather, file = "data/whale_shark_weather.rda")
 
 - Plus, when we visualise the data, it's much clearer. We can make time series plots that show how weather conditions and sightings line up over time. And if we want to build models that predict when whale sharks might appear based on weather forecasts, these labels are essential.
 
+
 ## Exploratory Data Analysis (EDA)
 
-### Expectation 1: We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months.
-The @fig-countoccur below depict the number of occurence for every season from 1993 until 2023.
+### Expectation 1: We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months. The @fig-countoccur below depict the number of occurence for every season from 1993 until 2023.
 
 ```{r}
 #| label: fig-countoccur
@@ -381,7 +426,16 @@ whale_shark %>%
 
 ### Expectation 2: We expect to see differences in the frequency of sightings between coastal areas and open ocean regions, indicating habitat preferences.
 
+For this expectation, we use 2 geospatial objects about territorial sea boundary and exclusive economic zone of Australia. These maps have been derived from Geoscience Australia's Australian Maritime Boundaries (AMB) version 2.0 data which is a digital representation of Australia's territorial sea baseline and the maritime limits and boundaries as established under the Sea and Submerged Lands Act 1973. The map describes the different maritime zones, explains how Australia defines and updates its maritime boundaries, and lists the different maritime boundary arrangements with Indonesia, Papua New Guinea, Solomon Islands, France (New Calendonia and Kerguelen) and New Zealand. Their gdb file can be found [here](https://ecat.ga.gov.au/geonetwork/srv/eng/catalog.search#/metadata/63690). Since our expectation requires coastline and open ocean region for Australia, we have used these boundary files.
 ```{r}
+#| label: fig-coastalboundary
+#| fig-cap: "Coastal Boundary"
+#| fig-width: 10
+#| fig-heigth: 8
+#| echo: true
+#| warning: false
+#| message: false
+
 # Checking Layers of the GDB file to figure out which files we require for our boundaries.
 st_layers(
   "data/Maritime_Boundaries_Database/Seas and Submerged Lands Act 1973/Seas and Submerged Lands Act 1973.gdb"
@@ -414,8 +468,7 @@ points_sf2 <-
   )
 
 points_within_coast <- st_intersection(points_sf2, coastal_boundary)
-points_within_ocean <-
-  st_intersection(points_sf1, open_ocean_boundary)
+points_within_ocean <- st_intersection(points_sf1, open_ocean_boundary)
 
 ggplot() +
   geom_sf(data = coastal_boundary) +
@@ -427,7 +480,13 @@ ggplot() +
           size = 1) +
   ylim(-45,-5) +
   xlim(110, 155) +
-  theme_minimal()
+  ggtitle(label = "Coastal vs Open Ocean Sightings",
+            subtitle = "Data Period: 1993 - 2023") +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  theme_classic() +
+  theme(plot.title = element_text(hjust=0.5, face = "bold"),
+        plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10))
 ```
 
 - As we can see from the map above, there are very few observations in the open ocean area and majority of the wild sightings have been in the coastal area indicated by red dots.
@@ -498,7 +557,7 @@ whale_shark %>% na.omit() %>%
   geom_col() +
   facet_grid( ~ Direction) +
   coord_flip() +
-  ggtitle(label = "Sightings East v/s West season wise",
+  ggtitle(label = "Sightings Eastern Part v/s Western Part season wise",
             subtitle = "Data Period: 1993 - 2023") +
   xlab("Seasons") +
   ylab("Sightings") +
@@ -513,7 +572,8 @@ whale_shark %>% na.omit() %>%
 - Note: Here, 134 degrees longitude is used as reference line to separate the East from West since it equally divides the continents in two halves.
 
 ### Expectation 5: We expect to spot the most occurrences in the northern Western Australia.
-In analysing this expectation, here we employ the usage of geospatial object of Australia, known as Geocentric Datum of Australia 2020 (GDA2020) that is provided by Australian Bureau of Statistics [here](https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs-edition-3/jul2021-jun2026/access-and-downloads/digital-boundary-files). By using this, we are able to plot the map of Australia with separation line of Australian Federal State (e.g. Victoria, New South Wales, Queensland, Western Australia, etc.). The figure @fig-aumap below shows the sightings of whale shark.
+
+The figure @fig-aumap below shows the sightings of whale shark.
 ```{r}
 #| label: fig-aumap
 #| fig-cap: "Locations of Where Sightings are Recorded"
@@ -522,9 +582,6 @@ In analysing this expectation, here we employ the usage of geospatial object of 
 #| echo: true
 #| warning: false
 #| message: false
-
-# Loading AU Map
-states <- read_sf(here::here('data/STE_2021_AUST_SHP_GDA2020/STE_2021_AUST_GDA2020.shp'))
 
 # Plotting the Map
 ggplot() +
@@ -544,18 +601,22 @@ ggplot() +
 
 - In contrast, we can see that the number of occurences are very small in the southern part of Australia. Right now, we can only assume that Whale Shark may not prefer this area due to it is closer to the south pole, which make the sea water temperature colder compare to the other area. Unfortunately, we could not find any dataset regarding the sea water temperature that can be downloaded and plotted according to the time when the sightings happened. Otherwise, it will provide deeper understanding of whale shark behaviour.
 
-- As we have explained so far, we can conclude that our expectation is satisfied with the fact that most of occurences happened in the northern part of Western Australia. This is align with the information that we gathered from different sources, which says whale shark usually migrate to Ningaloo Marine Park that is located in the northern Western Australia. On the other hand, the high number of occurences could also supported by the fact that there are eco-tourism around that area, meaning more people will be around that area (on certain season) and record the occurences.   
+- As we have explained so far, we can conclude that our expectation is satisfied with the fact that most of occurences happened in the northern part of Western Australia. This is align with the information that we gathered from different sources, which says whale shark usually migrate to Ningaloo Marine Park that is located in the northern Western Australia. On the other hand, the high number of occurences could also supported by the fact that there are eco-tourism around that area, meaning more people will be around that area (on certain season) and record the sightings.   
 
-### Plotting whale sharks spotted near Learmonth weather station 
+### Whale Sharks Spotted Near Learmonth Weather Station 
 
 ```{r}
+#| label: fig-learmonth
+#| fig-cap: "Locations of Where Sightings are Recorded Near Learmonth Airport Weather Station"
+#| fig-width: 10
+#| fig-heigth: 8
 #| warning: false
 #| message: false
 
 ggplot() +
   geom_sf(data = states) +
-  ylim(-24, -21) +
-  xlim(112, 116) +
+  ylim(-23.5, -21) +
+  xlim(112.5, 115.5) +
   geom_count(data = whale_shark_weather, aes(x = decimalLongitude, y = decimalLatitude, color = season)) +
   geom_point(data = (aus_stations %>% filter(name == "learmonth airport")), aes(x = longitude, y = latitude, label = name)) +
   geom_label(data = (aus_stations %>% filter(name == "learmonth airport")), aes(label = name, x = longitude, y = latitude),
@@ -563,25 +624,153 @@ ggplot() +
                               vjust = 0.5,
                               hjust = -0.05,
                               size = 4) +
-  theme_classic()
+  ggtitle(label = "Location of Sightings near Learmonth Airport Weather Station",
+            subtitle = "Data Period: 1993 - 2023") +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  theme_classic() +
+  theme(plot.title = element_text(hjust=0.4, face = "bold"),
+        plot.subtitle = element_text(hjust=0.4, face = "italic", size = 10))
 ```
 
-Created a map that shows the distribution of whale shark sightings surrounding the location of Learmonth Airport. The color of the points represents different seasons when the sightings occurred while the size of the points represent the number of sightings at a particular location. According to the plot, we can note that the most occurrences are in the spring season as they and they are also spread out across the coast. Next, highest occurrences are during winter season and then summer followed by fall. During winter, they appear towards north of the weather station and during summer they appear in south. 
+We plotted a map that shows the distribution of whale shark sightings surrounding the location of Learmonth Airport. The color of the points represents different seasons when the sightings occurred while the size of the points represent the number of sightings at a particular location. According to the plot, we can note that the most occurrences are in the spring season as they and they are also spread out across the coast. Next, highest occurrences are during winter season and then summer followed by fall. During winter, they appear towards north of the weather station and during summer they appear in south. 
+
 
 ### Finding relation between Temperature and sightings
 
+**Profiling the Weather**
+Prior to performing the analysis for the correlation of sightings and weather, we would like to profile the weather condition around the learmonth aiport first. This will help us to get the preliminary understanding of how the condition around the area, which we will take as our ammunition to enhance the interpretation of our analysis. 
 ```{r}
-whale_shark_weather %>% na.omit() %>% 
-  group_by(Month = month(eventDate)) %>%
-  summarise(Sightings = sum(sighting),
-            tmin_avg = sum(tmin)/n(),
-            tmax_avg = sum(tmax)/n(),) %>% 
-  ggplot() +
-  geom_line(aes(x = Month, y = tmin_avg, color = "blue")) +
-  geom_line(aes(x = Month, y = tmax_avg, color = "red")) +
-  geom_line(aes(x = Month, y = Sightings, color = "green"))
-  
+# Adding a new variable of average temperature
+whale_shark_weather <- whale_shark_weather %>%
+                        mutate(avg_temp = (tmax + tmin) / 2)
+
+# Plot Rain Precipitation Distribution
+p1 <- ggplot(narrogin_v2, aes(x = prcp)) +
+        geom_boxplot() +
+        ggtitle(label = "Rain Precipitation Distribution") +
+        theme_classic()
+
+# Plot Max Temperature Distribution            
+p2 <- ggplot(narrogin_v2, aes(x = tmax)) +
+        geom_boxplot() +
+        ggtitle(label = "Max Temperature Distribution") +
+        theme_classic()
+
+# Plot Min Temperature Distribution            
+p3 <- ggplot(narrogin_v2, aes(x = tmin)) +
+        geom_boxplot() +
+        ggtitle(label = "Min Temperature Distribution") +
+        theme_classic()
 ```
+
+```{r}
+#| label: fig-weatherdist
+#| fig-cap: "Weather Distribution"
+#| fig-width: 12
+#| fig-heigth: 8
+#| echo: false
+#| warning: false
+#| message: false
+
+grid.arrange(p1,p2,p3,ncol = 3)
+```
+Let's breakdown the distribution of each weather related variables from @fig-weatherdist. In terms of rain precipitation, it looks like the area around Learmonth Airport is mostly dry, concluded by the zero (0) precipitation throughout the year with raining happened occasionally. On the other hand, these area experienced a high variance of temperature, as can be seen, the minimum temperature was 3.5 degree celcius and maximum temperature was 48.9 degree celcius. The next paragraph will cover the profile of the weather based on their trend over the time.
+
+```{r}
+#| label: fig-weathertrend
+#| fig-cap: "Weather Trend"
+#| fig-width: 8
+#| fig-heigth: 12
+#| echo: false
+#| warning: false
+#| message: false
+
+# Trend of Rain Precipitation
+p5 <- ggplot(narrogin_v2, aes(x = date)) +
+        geom_point(aes(y = prcp)) +
+        facet_wrap(~ month(date)) +
+        ggtitle(label = "Rain Precipitation Trend") +
+        theme_classic()
+
+# Trend of Temperature (monthly)
+p6 <- ggplot(narrogin_v2, aes(x = date)) +
+        geom_point(aes(y = tmax), color = "red2") +
+        geom_point(aes(y = tmin), color = "deepskyblue3") +
+        facet_wrap(~ month(date)) +
+        ggtitle(label = "Temperature Trend") +
+        theme_classic()
+
+grid.arrange(p5,p6)  
+```
+Now, we will assess the trend of rain precipitation and temperature. From figure @fig-weathertrend, the most interesting insight from this plot is the fact that the rain starting to pour in this area more frequently from January, it continues to increase into months to come until it started to decrease from July. The rest of the year, the rain happened occasionally. Please be mindful that what we meant is not the heavyness of the rain, rather the frequency of rain pouring over the time, we assume that precipitation of more than 0 means raining. As for the temperature, it is basically a common knowledge that summer is the hottest, winter is the coldest, fall and spring are in between the prior categories, which clearly showed by the plot. 
+
+Through this weather profiling, we have got a new perspective that will help us provide better interpretation of the correlation analysis. It allows us to think why would under certain condition the sightings are more frequent. In the next section, we will incorporate this information to the actual sightings of the whale shark, and uncover the insight of whale shark behaviour.  
+
+**Whale Shark Sightings vs Temperature**
+We will start the analysis by unveiling the relationship between whale shark sightings against the average temperature. In the @fig-corrplot1 below, we grouped the observations based on the season to provide better visualisation and level of detail.
+```{r}
+#| label: fig-corrplot1
+#| fig-cap: "Sightings to Avg. Temperature"
+#| fig-width: 12
+#| fig-heigth: 8
+#| echo: true
+#| warning: false
+#| message: false
+
+whale_shark_weather %>%
+  filter(sighting == 1) %>%
+  group_by(eventDate, season) %>%
+  summarise(sightings = sum(sighting),
+            avg_temp = mean(avg_temp)) %>%
+  ggplot(aes(x = sightings, y = avg_temp, color = season)) +
+    geom_point() +
+    facet_wrap(~ season) +
+    ggtitle(label = "Correlation of Sightings to Average Temperature",
+            subtitle = "Around Learmonth Airport Weather Station") +
+    xlab("Sightings") +
+    ylab("Average Temperature (Celcius)") +
+    theme_classic() +
+    theme(plot.title = element_text(hjust=0.5, face = "bold"),
+          plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10))
+```
+- Based on the plot above, there appears to be no significant pattern or dependency between temperature and the occurence of whale shark sightings. Unlike some species that may exhibit preferences for specific temperature ranges, whale shark, in this dataset, seem to defy such temperature-related constrains. This lack of a clear correlation between temperature and sightings suggests that whale sharks may possess a wide temperature tolerance or have a migratory behavior that is not closely tied to local temperature variations.   
+
+- Another think that worth noting is the temperature in this dataset is actually an air temperature, which may be totally different with the sea water temperature where whale shark is spotted. So, there might be a case when the air temperature is hot, the sea water temperature is mild and vice versa. Also, the depth of sightings should be considered as well, since deeper sea level may have colder temperature. 
+
+- Further analysis migh be required by utilising sea water temperature to provide a deeper understanding of the whale shark behaviour. As of now, there is no substantial pattern we can see to conclude the correlation between the air temperature surface to the whale shark sightings.
+
+
+**Whale Shark Sightings vs Rain Precipitation**
+The next analysis will be the correlation analysis between sightings and rain precipitation. As known previously that the area is mostly dry, so this might be affecting the sightings as well. The plot will be similar as the previous analysis, where we grouped the observations based on the season to provide better visualisation and level of detail. 
+```{r}
+#| label: fig-corrplot2
+#| fig-cap: "Sightings to Rain Precipitation"
+#| fig-width: 12
+#| fig-heigth: 8
+#| echo: true
+#| warning: false
+#| message: false
+
+whale_shark_weather %>%
+  filter(sighting == 1) %>%
+  group_by(eventDate, season) %>%
+  summarise(sightings = sum(sighting),
+            prcp = mean(prcp)) %>%
+  ggplot(aes(x = sightings, y = prcp, color = season)) +
+    geom_point() +
+    facet_wrap(~ season) +
+    ggtitle(label = "Correlation of Sightings to Rain Precipitation",
+            subtitle = "Around Learmonth Airport Weather Station") +
+    xlab("Sightings") +
+    ylab("Rain Precipitation") +
+    theme_classic() +
+    theme(plot.title = element_text(hjust=0.5, face = "bold"),
+          plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10))
+```
+- As can be seen from the @fig-corrplot2, predominantly all sightings occur in when there is not raining, while we can still see that whale shark was also spotted when it is raining. However, we tought there might be an underlying factor that could reveal the reason why whale shark spotted more in this area, particularly to the correlation with rain precipitation. If we recall our analysis from figure @fig-countoccur, we know that whale shark are spotted mostly in Winter and Spring season. Additionally, if we consider our insight from weather data profiling of figure @fig-weathertrend, we know that the rain started to pour in this area from January, it consistently happen each month until July. So, from these two insights, there is a chain reaction that might lead to whale shark migrate into this area. After doing some research, we have got the information that a rainfall is actually have an indirect impact into sea ecosystem. When raining pour down, it can lead to increased runoff from land into rivers and eventually into the sea. This runoff can carry nutrients that promotes the growth of plankton, which in turn can be consumed by other creatures in the sea such as fish, crustacean, squid, etc. In the end, a big fish such as whale sharks are getting the benefit as well since those are their primary food. 
+
+- So, as mentioned in the first point, the rain may not be affect the occurence of whale shark directly in certain area, but the chain reaction of frequent raining in that area may lead to changes in the sea ecosystem, which benefitting whale shark. Hence, we conclude that there is still a indirect correlation between raining and whale shark sightings.
 
 
 ## Summary
@@ -623,4 +812,6 @@ The following are the R-packages used in this blog-post:
 - **leaflet**: Cheng J, Schloerke B, Karambelkar B, Xie Y (2023). _leaflet: Create Interactive Web Maps with the JavaScript 'Leaflet' Library_. R package version 2.2.0, <https://CRAN.R-project.org/package=leaflet>.
 
 - **rnoaa**: Chamberlain S, Hocking D (2023). _rnoaa: 'NOAA' Weather Data from R_. R package version 1.4.0, <https://CRAN.R-project.org/package=rnoaa>.
+
+- **gridExtra**: Auguie B (2017). _gridExtra: Miscellaneous Functions for "Grid" Graphics_. R package version 2.3, <https://CRAN.R-project.org/package=gridExtra>.
 
