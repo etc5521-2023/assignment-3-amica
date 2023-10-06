@@ -4,14 +4,12 @@ author: "AMICA - Evan Hadinata Ginting (33477558) & Harsh Jain (33397058)"
 format: html
 ---
 
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE,
                       eval = TRUE,
                       warning = FALSE,
                       message = FALSE)
 ```
-
 
 ```{r loadLibraries}
 #| warning: false
@@ -38,14 +36,13 @@ library(rworldmap)
 ::: {style="text-align: justify;"}
 Whale Shark (Rhincodon typus) is the largest of all fishes alive. It may grow up to 18 metres (m) in length, but commonly seen between 4 m to 12 m. It is typically blue-grey or brownish in color with a pattern of white spots and vertical lines on its body. In terms of the diet, they feed on plankton, small crustaceans, squid, and fishes. The main feature of their food processing tools are their filtering screens on the gills and their tiny, more than 300 hooked teeth in both jaws. They are found on all the tropical oceans of the world where the water temperatures are ranging from 21 to 25 degrees Celsius and typically at depths of up to 1000 meters. Whale sharks are generally known to be active swimmers, and their activity can vary throughout the day and night. They do not exhibit diurnal (daytime) or seasonal (summer/winter) patterns of activity in the same way that some other species do. However, they seasonally come close to inshore areas, especially at plankton-rich locations. In Australia, it is found primarily in northern Western Australia, the Northern Territory, and Queensland. Whale sharks are known to migrate to the Ningaloo Marine park during specific times of the year, usually between March and July which is associated with the availability of plankton and other food sources in the area. During this time, there is usually a big ecotourism activity happening here for the chance to swim with them. Sadly, now, their status is an endangered species due to massive hunt of parts of their bodies. Hence, Conservation measures, including protections and regulations, are being implemented to safeguard this species in Australia and many other countries.
 
-In this study, We expect to encounter these with our data analysis:
+In this study, We expect to encounter these events with our data analysis:
 
--   We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months. 
--   We expect to see differences in the frequency of sightings between coastal areas and open ocean regions, indicating habitat preferences. 
+-   We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months.
+-   We expect to see differences in the frequency of sightings between coastal areas and open ocean regions, indicating habitat preferences.
 -   We expect to observe declining occurrences up to this year (2023).
 -   We anticipate the sharks tend to move from east to west during fall and west to east during summer.
 -   We expect to spot the most occurrences in the northern Western Australia.
-
 
 ## Data description
 
@@ -54,6 +51,11 @@ In this study, We expect to encounter these with our data analysis:
 This dataset contains the information about the occurrence of Whale Shark (Rhincodon Typus) in Australia at a certain time and place. The data is retrieved from the [Atlas of Living Australia (ALA) Website](https://www.ala.org.au/). ALA is a collaborative, digital, open infrastructure that pulls together Australian biodiversity data from multiple sources, making it accessible and reusable.
 
 ```{r loadData}
+#| warning: false
+#| message: false
+#| eval: true
+#| echo: false
+
 # Extracting the occurrence data from ALA Website
 galah_config(email = "egin0003@student.monash.edu")
 ws_raw <- galah_call() |>
@@ -73,15 +75,15 @@ The data is located in folder `data-raw` named as `ws_raw.rda`. It contains thes
 | eventDate        | The date-time or interval during which an Event occurred. For occurrences, this is the date-time when the event was recorded. Not suitable for a time in a geological context.                  |
 | scientificName   | The full scientific name, with authorship and date information if known. When forming part of an Identification, this should be the name in lowest level taxonomic rank that can be determined. |
 | taxonConceptID   | The ID in an external taxonomic database, like a sequence reference database for example.                                                                                                       |
-| recordID         | The ID of the occurrence.                                                                                                                                                                        |
+| recordID         | The ID of the occurrence.                                                                                                                                                                       |
 | dataResourceName | The name identifying the data set from which the record was derived.                                                                                                                            |
-| occurrenceStatus  | A statement about the presence or absence of a Taxon at a Location.                                                                                                                             |
+| occurrenceStatus | A statement about the presence or absence of a Taxon at a Location.                                                                                                                             |
 
 ```{r wildOccurrences}
 #| warning: false
 #| message: false
 #| eval: true
-#| include: true
+#| echo: false
 
 # Extracting the assertion data from ALA Website 
 ws_assert <- galah_call() |>
@@ -103,13 +105,19 @@ ws_event <- galah_call() |>
 save(ws_raw, file = here::here("data-raw/ws_event.rda"))
 ```
 
+Additionally, for data quality check, we also populate the `assertion` and `events` dataset, but ended up only using assertion. The reason for this will be explained in the **General Check** section.
 
 ### Weather stations data
 
 The dataset contains the information about Weather station locations which can be found in a Global Historical Climatology Network (GHCN) database maintained by the National Oceanic and Atmospheric Administration. This data is downloaded using the rnoaa package.
 
 ```{r}
-library(rnoaa)
+#| warning: false
+#| message: false
+#| eval: true
+#| echo: false
+
+# Populating Australian Station from NOAA
 aus_stations <- ghcnd_stations() |>
   filter(str_starts(id, "ASN")) |>
   filter(last_year >= 2020) |>
@@ -123,20 +131,26 @@ aus_stations <- ghcnd_stations() |>
   select(-data) 
 ```
 
-| Variables        | Description                                                                                                                                                                                     |
+| Variables | Description                                                                         |
 |------------------------------------|------------------------------------|
-|id                | An identifier associated with a specific station.                                |
-|latitude          | The latitude (in decimal degrees) of the station's location.                     |
-|longitude         | The longitude (in decimal degrees) of the station's location.                    |
-|elevation         | The elevation (in meters) of the station's location.                             |
-|name              | The name or description of the station.                                          |
-|wmo_id            | The World Meteorological Organization (WMO) identifier associated with the station. |
+| id        | An identifier associated with a specific station.                                   |
+| latitude  | The latitude (in decimal degrees) of the station's location.                        |
+| longitude | The longitude (in decimal degrees) of the station's location.                       |
+| elevation | The elevation (in meters) of the station's location.                                |
+| name      | The name or description of the station.                                             |
+| wmo_id    | The World Meteorological Organization (WMO) identifier associated with the station. |
 
-### Downloading weather data from the nearest weather station (Learmonth Station)
+
+### Downloading weather data from the nearest weather station
 
 This dataset contains the information about the weather(Precipitation, Minimum and Maximum temperature) recorded by the selected station.
 
 ```{r}
+#| warning: false
+#| message: false
+#| eval: true
+#| echo: false
+
 narrogin <- aus_stations |>
   filter(id == "ASN00005007") |>
   rowwise() |>
@@ -150,30 +164,34 @@ narrogin <- aus_stations |>
   mutate(tmax = tmax/10, tmin = tmin/ 10)
 ```
 
-| Variables        | Description                                                                                                                                                                                     |
+| Variables | Description                                                                          |
 |------------------------------------|------------------------------------|
-|id                | An identifier associated with a specific location or station.                    |
-|long              | The longitude (in decimal degrees) of the location.                              |
-|lat               | The latitude (in decimal degrees) of the location.                               |
-|elev              | The elevation (in meters) of the location.                                       |
-|name              | The name or description of the location or station.                              |
-|wmo_id            | The World Meteorological Organization (WMO) identifier associated with the location.|
-|date              | The date of the recorded weather data.                                           |
-|prcp              | Precipitation amount.                                                            |
-|tmax              | Maximum temperature.                                                             |
-|tmin              | Minimum temperature.                                                             |
-
+| id        | An identifier associated with a specific location or station.                        |
+| long      | The longitude (in decimal degrees) of the location.                                  |
+| lat       | The latitude (in decimal degrees) of the location.                                   |
+| elev      | The elevation (in meters) of the location.                                           |
+| name      | The name or description of the location or station.                                  |
+| wmo_id    | The World Meteorological Organization (WMO) identifier associated with the location. |
+| date      | The date of the recorded weather data.                                               |
+| prcp      | Precipitation amount.                                                                |
+| tmax      | Maximum temperature.                                                                 |
+| tmin      | Minimum temperature.                                                                 |
 
 ## Initial data analysis (IDA)
+
 ### Data Quality Check
+
 #### General Check
 
-- There are `r ws_raw$dataResourceName %>% n_distinct()` different data sources (based on `dataResourceName`). Upon referring to their data collection method on atlas website, it is evident that all the sightings are wild sightings.
-- `ws_event` data has the `samplingProtocol` variable which basically indicates what type of sighting or data collection method was used. Most of the values are missing for this variable, so we decided that it is not a reliable dataset to identify the type of wild sightings.
-- From `ws_assert` (assertion) data, we refer our check to the `BASIS_OF_RECORD_INVALID` column, which provide information if the occurrences are valid or invalid. Currently, there are `r ws_assert %>% filter(BASIS_OF_RECORD_INVALID == "TRUE") %>% nrow()` values recorded as TRUE indicating that they are invalid records. These invalid records will be removed to ensure the quality of the data.
+-   There are `r ws_raw$dataResourceName %>% n_distinct()` different data sources (based on `dataResourceName`). Upon referring to their data collection method on atlas website, it is evident that all the sightings are wild sightings.
+
+-   `ws_event` data has the `samplingProtocol` variable which basically indicates what type of sighting or data collection method was used. Most of the values are missing for this variable, so we decided that it is not a reliable dataset to identify the type of wild sightings.
+
+-   From `ws_assert` (assertion) data, we refer our check to the `BASIS_OF_RECORD_INVALID` column, which provide information if the occurrences are valid or invalid. Currently, there are `r ws_assert %>% filter(BASIS_OF_RECORD_INVALID == "TRUE") %>% nrow()` values recorded as TRUE indicating that they are invalid records. These invalid records will be removed to ensure the quality of the data.
 
 #### Data Type Check
-For the occurrences dataset, we are going to perform data type check, as specified below: 
+
+For the occurrences dataset, we are going to perform data type check, as specified below:
 
 ```{r IDA}
 #| label: fig-visdat
@@ -193,23 +211,25 @@ ws_raw <- ws_raw %>%
     eventDate = as.Date(eventDate)
   )
 ```
+
 From the @fig-visdat above, we can see:
 
-- The classes for all the variables in the ws_raw data set are correct except for `eventDate` which needs to be of Date type and only include dates.
+-   The classes for all the variables in the ws_raw data set are correct except for `eventDate` which needs to be of Date type and only include dates.
 
-- There are a few missing values for `decimalLatitude` and `decimalLongitude` . We can also see that if `decimalLatitude` is missing, `decimalLongitude` is also missing and vice-versa.
+-   There are a few missing values for `decimalLatitude` and `decimalLongitude` . We can also see that if `decimalLatitude` is missing, `decimalLongitude` is also missing and vice-versa.
 
-- There are `r ws_raw %>% filter(is.na(eventDate)) %>% nrow()` missing values in the `eventDate` variable out of `r ws_raw %>% nrow()` records. 
-
+-   There are `r ws_raw %>% filter(is.na(eventDate)) %>% nrow()` missing values in the `eventDate` variable out of `r ws_raw %>% nrow()` records.
 
 #### Outliers Check
+
 **Checking `eventDate` variables:**
+
 ```{r IDA2}
 #| label: fig-boxplot
 #| fig-cap: "Profile of Yearly Occurrences"
 #| fig-width: 5
 #| fig-heigth: 5
-#| echo: true
+#| echo: false
 #| warning: false
 #| message: false
 
@@ -223,25 +243,26 @@ ws_raw %>%
   theme_classic() +
   theme(plot.title = element_text(hjust = 0.5, face = "bold"))
 ```
-Based on @fig-boxplot: 
 
-- There are only a few outlier years out of which the year below 1980 is farthest from the population. 
+Based on @fig-boxplot:
 
-- There are `r ws_raw %>% filter(year(eventDate) < 1990) %>% nrow()` rows with record year less than 1990 which will be removed as they are not really reliable.
+-   There are only a few outlier years out of which the year below 1980 is farthest from the population.
 
-- The other outliers might have some valid information since they follow natural order so we won't be excluding them in clean data.
+-   There are `r ws_raw %>% filter(year(eventDate) < 1990) %>% nrow()` rows with record year less than 1990 which will be removed as they are not really reliable.
 
+-   The other outliers might have some valid information since they follow natural order so we won't be excluding them in clean data.
 
 **Checking Location of Occurrences**
+
 ```{r IDA3}
 #| label: fig-alloccu
 #| fig-cap: "All Occurrences"
-#| fig-width: 12
+#| fig-width: 8
 #| fig-heigth: 8
-#| echo: true
+#| echo: false
 #| warning: false
 #| message: false
-#| eval: false
+#| eval: true
 
 wmap <- rworldmap::getMap(resolution = "low")  %>% # this is SpatialPolygonDataFrame
           st_as_sf()
@@ -250,7 +271,7 @@ ggplot() +
   geom_sf(data = wmap) +
   #ylim(-45, -5) +
   #xlim(110, 155) +
-  geom_point(data = whale_shark, aes(x = decimalLongitude, y = decimalLatitude), color = "red3") +
+  geom_point(data = ws_raw, aes(x = decimalLongitude, y = decimalLatitude), color = "red3") +
   ggtitle(label = "Location of All Whale Sharks Occurrences",
           subtitle = "Data Period: 1993 - 2023") +
   xlab("Longitude") +
@@ -260,23 +281,23 @@ ggplot() +
         plot.subtitle = element_text(hjust=0.4, face = "italic", size = 10))
 ```
 
-- When plotting the locations of whale shark spotting, it is evident that some instances are from around the world and not just Australian waters. 
+-   When plotting the locations of whale shark spotting, it is evident that some instances are from around the world and not just Australian waters.
 
 ```{r}
 #| label: fig-auoccurr
 #| fig-cap: "Occurrences over Australia"
-#| fig-width: 12
+#| fig-width: 8
 #| fig-heigth: 8
 #| echo: false
 #| warning: false
 #| message: false
-#| eval: false
+#| eval: true
 
 ggplot() +
   geom_sf(data = wmap %>% filter(NAME == "Australia")) +
   ylim(-45, -5) +
   xlim(110, 155) +
-  geom_point(data = whale_shark, aes(x = decimalLongitude, y = decimalLatitude), color = "red3") +
+  geom_point(data = ws_raw, aes(x = decimalLongitude, y = decimalLatitude), color = "red3") +
   ggtitle(label = "Location of All Whale Sharks Occurrences",
           subtitle = "Data Period: 1993 - 2023") +
   xlab("Longitude") +
@@ -286,18 +307,18 @@ ggplot() +
         plot.subtitle = element_text(hjust=0.4, face = "italic", size = 10))
 ```
 
-- Later we will filter the location to only include sightings around Australia only.
-
+-   Later we will filter the location to only include sightings around Australia only.
 
 ### Finding nearest weather station
 
 In plotting the map, here we employ the usage of geospatial object of Australia, known as Geocentric Datum of Australia 2020 (GDA2020) that is provided by Australian Bureau of Statistics [here](https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs-edition-3/jul2021-jun2026/access-and-downloads/digital-boundary-files). By using this, we are able to plot the map of Australia with separation line of Australian Federal State (e.g. Victoria, New South Wales, Queensland, Western Australia, etc.), which later help us identify the nearest weather station.
 
-**First of all**, we plot all weather station recently active in Australia. 
+**First of all**, we plot all weather station recently active in Australia.
+
 ```{r}
 #| label: fig-allstation
 #| fig-cap: "All Weather Station"
-#| fig-width: 12
+#| fig-width: 8
 #| fig-heigth: 8
 #| echo: false
 #| warning: false
@@ -311,7 +332,7 @@ ggplot() +
   geom_sf(data = states) +
   ylim(-45, -5) +
   xlim(110, 155) +
-  geom_point(data = aus_stations, aes(x = longitude, y = latitude), color = "darkgoldenrod") +
+  geom_point(data = aus_stations, aes(x = longitude, y = latitude), color = "red3") +
   ggtitle(label = "Location of Weather Station over Australia",
             subtitle = "Data Source: NOAA") +
   xlab("Longitude") +
@@ -322,10 +343,11 @@ ggplot() +
 ```
 
 Secondly, we plot the weather station that is closest to the site with most occurrences of whale sharks, which in this case is **Learmonth Airport Weather Station**. Since we already have the site with the highest occurrences that is the Ningaloo reef, we were able to find the weather station using [this website](https://www.honeymoonguide.com.au/australia/ningaloo-reef-weather.html#:~:text=Note%3A%20Meteorological%20data%20for%20the%20Ningaloo%20Coast%20is).
+
 ```{r}
 #| label: fig-nearstation
 #| fig-cap: "Nearest Weather Station"
-#| fig-width: 12
+#| fig-width: 8
 #| fig-heigth: 8
 #| echo: false
 #| warning: false
@@ -336,8 +358,7 @@ ggplot() +
   geom_sf(data = states) +
   ylim(-45, -5) +
   xlim(110, 155) +
-  geom_point(data = (aus_stations %>% filter(name == "learmonth airport")), aes(x = longitude, y = latitude), color = "darkgoldenrod") +
-  geom_point(data = aus_stations, aes(x = longitude, y = latitude)) +
+  geom_point(data = (aus_stations %>% filter(name == "learmonth airport")), aes(x = longitude, y = latitude), color = "red3") +
   ggtitle(label = "Location of Nearest Weather Station of the Most Occurrences",
             subtitle = "Data Source: NOAA") +
   xlab("Longitude") +
@@ -347,15 +368,19 @@ ggplot() +
         plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10))
 ```
 
-
-
-
 ### Data Cleansing and Transforming
 
 In this section, before we go into the data analysis adventure we perform a bit of data cleansing and transforming. This is important to make sure we maintain the quality of the data.
 
-**Whale Shark data **
+**Whale Shark data**
+
+Here is the code that we use to clean the Whale Shark Data.
 ```{r}
+#| echo: true
+#| warning: false
+#| message: false
+#| eval: true
+
 # Getting Invalid Record
 ws_assert <- ws_assert %>%
   select(recordID, BASIS_OF_RECORD_INVALID)
@@ -380,25 +405,36 @@ whale_shark <- whale_shark %>% select(-4, -5, -7, -8, -9)
 # Saving into RDA file
 save(whale_shark, file = "data/whale_shark.rda")
 ```
-In the code above, we have performed some steps of data cleansing, which include:
-- Join the occurrence data to assertion data by `recordID` variable.
-- Taking the `BASIS_OF_RECORD_INVALID` into the occurrence data and filter out the invalid records by setting the variable value into "False".
+
+In the code above, we have performed some steps of data cleansing, which include: 
+- Join the occurrence data to assertion data by `recordID` variable. 
+
+- Taking the `BASIS_OF_RECORD_INVALID` into the occurrence data and filter out the invalid records by setting the variable value into "False". 
+
 - Filter out the occurrences that happened before 1990 as they are unreliable. 
-- Filter out the occurrences that has missing value in `decimalLatitude`.
+
+- Filter out the occurrences that has missing value in `decimalLatitude`. 
+
 - Add a new variable as identifier. Variable `season`, is an identifier for season (e.g. Summer, Fall, Winter, and Spring). These two columns are needed to perform the plot for our expectations.
 
 **Weather Data**
 
 Filtering out the variables that we don't need for our analysis using select query.
+
 ```{r}
+#| echo: true
+#| warning: false
+#| message: false
+#| eval: true
+
 narrogin_v2 <- narrogin %>%
                 select(date, prcp, tmax, tmin)
 ```
 
-
 ### Joining Whale Shark Data & Weather Data
 
 Here is the code that we use to join the whale shark data to weather station data. Basically, we join them based on the `eventDate` and `date`, because we want to analyse how was the weather condition for every sightings that was recorded.
+
 ```{r}
 whale_shark_weather <- whale_shark %>%
                          # Filter occurrence to near learmonth weather station
@@ -411,25 +447,23 @@ whale_shark_weather <- whale_shark %>%
 save(whale_shark_weather, file = "data/whale_shark_weather.rda")
 ```
 
-
 ### Why Labeling Days When Sighting Occurs is Necessary?
 
-- So, we're trying to figure out how weather conditions relate to wildlife sightings, specifically with whale sharks. We've got two main datasets: one with daily weather data from NOAA weather stations, and another with records of when and where whale shark sightings occurred.
+-   So, we're trying to figure out how weather conditions relate to wildlife sightings, specifically with whale sharks. We've got two main datasets: one with daily weather data from NOAA weather stations, and another with records of when and where whale shark sightings occurred.
 
-- Weather data is collected every day, like clockwork, but whale shark sightings don't happen every day. So, to connect the dots and see how weather affects sightings, we need a way to match up the weather conditions with whether a sighting happened on that day.
+-   Weather data is collected every day, like clockwork, but whale shark sightings don't happen every day. So, to connect the dots and see how weather affects sightings, we need a way to match up the weather conditions with whether a sighting happened on that day.
 
-- That's where this "sighting occurred" or "didn't occur" label comes in. Basically, we're creating a new variable that says "1" if there was a whale shark sighting on a particular day and "0" if there wasn't.
+-   That's where this "sighting occurred" or "didn't occur" label comes in. Basically, we're creating a new variable that says "1" if there was a whale shark sighting on a particular day and "0" if there wasn't.
 
-- This is all about making our data analysis easier. With these labels, we can do things like calculate correlations between weather factors (precipitation, temperature) and sightings. We can test hypotheses like, "Do sightings increase when there are higher chances of rain?" or "Are sightings more likely in certain temperature ranges?"
+-   This is all about making our data analysis easier. With these labels, we can do things like calculate correlations between weather factors (precipitation, temperature) and sightings. We can test hypotheses like, "Do sightings increase when there are higher chances of rain?" or "Are sightings more likely in certain temperature ranges?"
 
-- Plus, when we visualise the data, it's much clearer. We can make time series plots that show how weather conditions and sightings line up over time. And if we want to build models that predict when whale sharks might appear based on weather forecasts, these labels are essential.
-
+-   Plus, when we visualise the data, it's much clearer. We can make time series plots that show how weather conditions and sightings line up over time. And if we want to build models that predict when whale sharks might appear based on weather forecasts, these labels are essential.
 
 ## Exploratory Data Analysis (EDA)
 
-This is the part where we start our data analysis journey. In general, we are trying to prove our expectations that we have stated in the previous section. We will cover the method that we use, additional dataset that we employed, and uncover the insights that we gather from the analysis. Additional to the proving the expectations, we want to comprehend the study by utlising the weather station, where we are going to perform some correlation analysis between the whale shark sightings towards the weather condition of the local area.  
+This is the part where we start our data analysis journey. In general, we are trying to prove our expectations that we have stated in the previous section. We will cover the method that we use, additional dataset that we employed, and uncover the insights that we gather from the analysis. Additional to the proving the expectations, we want to comprehend the study by utlising the weather station, where we are going to perform some correlation analysis between the whale shark sightings towards the weather condition of the local area.
 
-### Expectation 1: We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months. 
+### Expectation 1: We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months.
 
 The @fig-countoccur below depict the number of occurrence for every season from 1993 until 2023.
 
@@ -462,9 +496,10 @@ whale_shark %>%
           plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10))
    
 ```
-- Based on the plot above, it seems that winter indeed had a substantial number of sightings (319), which kind of align with our expectation. Spring had a slightly higher number of sightings (322) than winter, but even though this contradicts with our initial expectation, it is important to note that the difference between spring and winter is relatively small. The other two season, Fall and Summer, clearly have less occurrences with 258 and 98 sightings respectively. 
 
-- Although our initial expectation was to observe higher occurrences during the winter months, the data shows that sightings were relatively evenly distributed between spring and winter, with spring has slightly more occurrences. Additionally, fall had a significant number of sightings, while summer had the fewest.
+-   Based on the plot above, it seems that winter indeed had a substantial number of sightings (319), which kind of align with our expectation. Spring had a slightly higher number of sightings (322) than winter, but even though this contradicts with our initial expectation, it is important to note that the difference between spring and winter is relatively small. The other two season, Fall and Summer, clearly have less occurrences with 258 and 98 sightings respectively.
+
+-   Although our initial expectation was to observe higher occurrences during the winter months, the data shows that sightings were relatively evenly distributed between spring and winter, with spring has slightly more occurrences. Additionally, fall had a significant number of sightings, while summer had the fewest.
 
 ### Expectation 2: We expect to see differences in the frequency of sightings between coastal areas and open ocean regions, indicating habitat preferences.
 
@@ -473,11 +508,12 @@ For this expectation, we use 2 geospatial objects about territorial sea boundary
 ```{r}
 #| label: fig-coastalboundary
 #| fig-cap: "Coastal Boundary"
-#| fig-width: 12
+#| fig-width: 8
 #| fig-heigth: 8
 #| echo: false
 #| warning: false
 #| message: false
+#| quiet: true
 
 # Checking Layers of the GDB file to figure out which files we require for our boundaries.
 st_layers(
@@ -534,18 +570,18 @@ ggplot() +
         plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10))
 ```
 
-- As we can see from the map above, there are very few observations in the open ocean area and majority of the wild sightings have been in the coastal area indicated by red dots.
+-   As we can see from the map above, there are very few observations in the open ocean area and majority of the wild sightings have been in the coastal area indicated by red dots.
 
-- Since the Geoscience Australia considers coastal waters different from territorial sea (coastal boundary), some of the points which are in the coastal waters are excluded from the plot. Also, shape file for coastal waters is not available which doesn't allow us to plot them on the map.
+-   Since the Geoscience Australia considers coastal waters different from territorial sea (coastal boundary), some of the points which are in the coastal waters are excluded from the plot. Also, shape file for coastal waters is not available which doesn't allow us to plot them on the map.
 
-- So, we can say that our expectation has been met and the chances that whale sharks appear in the coastal area is higher than the open ocean region of Australia.
+-   So, we can say that our expectation has been met and the chances that whale sharks appear in the coastal area is higher than the open ocean region of Australia.
 
 ### Expectation 3: We expect to observe declining occurrences up to this year (2023).
 
 ```{r}
 #| label: fig-occurtrend
 #| fig-cap: "Whale Shark sightings every year"
-#| fig-width: 12
+#| fig-width: 8
 #| fig-heigth: 8
 #| echo: false
 #| warning: false
@@ -574,15 +610,15 @@ whale_shark %>%
         plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10))
 ```
 
-- The plot suggests that there was a notable increase in whale shark sightings from around 2008 to 2013, with the highest number of sightings occurring in 2013. This period might represent a peak in whale shark observations.
+-   The plot suggests that there was a notable increase in whale shark sightings from around 2008 to 2013, with the highest number of sightings occurring in 2013. This period might represent a peak in whale shark observations.
 
-- After the peak, there is a decline in sightings, but the decline stabilizes after 2017. The number of sightings remains relatively consistent from 2018 to 2023, without a clear trend of continuous decline.
+-   After the peak, there is a decline in sightings, but the decline stabilizes after 2017. The number of sightings remains relatively consistent from 2018 to 2023, without a clear trend of continuous decline.
 
-- While there may be fluctuations in the number of sightings from year to year, the data does not show a significant decline in occurrences up to the year 2023. It suggests that the population of whale sharks in the observed area may have stabilized or reached a plateau, at least within the scope of the available data.
+-   While there may be fluctuations in the number of sightings from year to year, the data does not show a significant decline in occurrences up to the year 2023. It suggests that the population of whale sharks in the observed area may have stabilized or reached a plateau, at least within the scope of the available data.
 
-- Note that this interpretation is based on the available data and the assumption that the observations are representative of the entire whale shark population in the area. Factors such as changes in survey effort or environmental conditions may also influence the observed trends.
+-   Note that this interpretation is based on the available data and the assumption that the observations are representative of the entire whale shark population in the area. Factors such as changes in survey effort or environmental conditions may also influence the observed trends.
 
-- The expectation is not met according to the data.
+-   The expectation is not met according to the data.
 
 ### Expectation 4: We anticipate the sharks tend to move from east to west during fall and west to east during summer.
 
@@ -613,21 +649,22 @@ whale_shark %>% na.omit() %>%
         plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10))
 ```
 
-- Whale sharks generally prefer Western Australian waters more than Eastern waters. 
+-   Whale sharks generally prefer Western Australian waters more than Eastern waters.
 
-- They also prefer winter months over summer months in West whereas other way round in the East.
+-   They also prefer winter months over summer months in West whereas other way round in the East.
 
-- This might suggest (if we get more data about the sharks in east), Sharks travel from west to east to enjoy summer months in east and east to west to enjoy winter months in west.
+-   This might suggest (if we get more data about the sharks in east), Sharks travel from west to east to enjoy summer months in east and east to west to enjoy winter months in west.
 
-- Note: Here, 134 degrees longitude is used as reference line to separate the East from West since it equally divides the continents in two halves.
+-   Note: Here, 134 degrees longitude is used as reference line to separate the East from West since it equally divides the continents in two halves.
 
 ### Expectation 5: We expect to spot the most occurrences in the northern Western Australia.
 
 The figure @fig-aumap below shows the sightings of whale shark.
+
 ```{r}
 #| label: fig-aumap
 #| fig-cap: "Locations of Where Sightings are Recorded in Australia"
-#| fig-width: 10
+#| fig-width: 8
 #| fig-heigth: 8
 #| echo: false
 #| warning: false
@@ -647,21 +684,23 @@ ggplot() +
   theme(plot.title = element_text(face = "bold"),
         plot.subtitle = element_text(hjust=0.4, face = "italic", size = 10))
 ```
-- As can be seen from the map plot above, the sightings are spread out accross western, northern, and eastern part of Australia. We added another dimension, a size, that make some of the occurrence have bigger circle (like a bubble). This is needed because from the dataset, we identified there are so many location that have exact latitude & longitude, which will overlapping each other if we only show it as dot points, and hinder the underlying value of the plot. With this additional dimension, it is clear that most of the occurrences are recorded in the northern of Western Australia area. 
 
-- In contrast, we can see that the number of occurrences are very small in the southern part of Australia. Right now, we can only assume that Whale Shark may not prefer this area due to it is closer to the south pole, which make the sea water temperature colder compare to the other area. Unfortunately, we could not find any dataset regarding the sea water temperature that can be downloaded and plotted according to the time when the sightings happened. Otherwise, it will provide deeper understanding of whale shark behaviour.
+-   As can be seen from the map plot above, the sightings are spread out accross western, northern, and eastern part of Australia. We added another dimension, a size, that make some of the occurrence have bigger circle (like a bubble). This is needed because from the dataset, we identified there are so many location that have exact latitude & longitude, which will overlapping each other if we only show it as dot points, and hinder the underlying value of the plot. With this additional dimension, it is clear that most of the occurrences are recorded in the northern of Western Australia area.
 
-- As we have explained so far, we can conclude that our expectation is satisfied with the fact that most of occurrences happened in the northern part of Western Australia. This is align with the information that we gathered from different sources, which says whale shark usually migrate to Ningaloo Marine Park that is located in the northern Western Australia. On the other hand, the high number of occurrences could also supported by the fact that there are eco-tourism around that area, meaning more people will be around that area (on certain season) and record the sightings.   
+-   In contrast, we can see that the number of occurrences are very small in the southern part of Australia. Right now, we can only assume that Whale Shark may not prefer this area due to it is closer to the south pole, which make the sea water temperature colder compare to the other area. Unfortunately, we could not find any dataset regarding the sea water temperature that can be downloaded and plotted according to the time when the sightings happened. Otherwise, it will provide deeper understanding of whale shark behaviour.
 
-### Whale Sharks Sightings against Weather Condition 
+-   As we have explained so far, we can conclude that our expectation is satisfied with the fact that most of occurrences happened in the northern part of Western Australia. This is align with the information that we gathered from different sources, which says whale shark usually migrate to Ningaloo Marine Park that is located in the northern Western Australia. On the other hand, the high number of occurrences could also supported by the fact that there are eco-tourism around that area, meaning more people will be around that area (on certain season) and record the sightings.
+
+### Whale Sharks Sightings against Weather Condition
 
 ```{r}
 #| label: fig-learmonth
 #| fig-cap: "Locations of Where Sightings are Recorded Near Learmonth Airport Weather Station"
-#| fig-width: 10
+#| fig-width: 8
 #| fig-heigth: 8
 #| warning: false
 #| message: false
+#| echo: false
 
 ggplot() +
   geom_sf(data = states) +
@@ -683,14 +722,17 @@ ggplot() +
         plot.subtitle = element_text(hjust=0.4, face = "italic", size = 10))
 ```
 
-We plotted a map that shows the distribution of whale shark sightings surrounding the location of Learmonth Airport. The color of the points represents different seasons when the sightings occurred while the size of the points represent the number of sightings at a particular location. According to the plot, we can note that the most occurrences are in the spring season as they and they are also spread out across the coast. Next, highest occurrences are during winter season and then summer followed by fall. During winter, they appear towards north of the weather station and during summer they appear in south. 
-
+We plotted a map that shows the distribution of whale shark sightings surrounding the location of Learmonth Airport. The color of the points represents different seasons when the sightings occurred while the size of the points represent the number of sightings at a particular location. According to the plot, we can note that the most occurrences are in the spring season as they and they are also spread out across the coast. Next, highest occurrences are during winter season and then summer followed by fall. During winter, they appear towards north of the weather station and during summer they appear in south.
 
 #### Finding The Relation Between Temperature and Sightings
 
-**Profiling the Weather**
-Prior to performing the analysis for the correlation of sightings and weather, we would like to profile the weather condition around the learmonth aiport first. This will help us to get the preliminary understanding of how the condition around the area, which we will take as our ammunition to enhance the interpretation of our analysis. 
+**Profiling the Weather** Prior to performing the analysis for the correlation of sightings and weather, we would like to profile the weather condition around the learmonth aiport first. This will help us to get the preliminary understanding of how the condition around the area, which we will take as our ammunition to enhance the interpretation of our analysis.
+
 ```{r}
+#| echo: false
+#| warning: false
+#| message: false
+
 # Adding a new variable of average temperature
 whale_shark_weather <- whale_shark_weather %>%
                         mutate(avg_temp = (tmax + tmin) / 2)
@@ -725,13 +767,14 @@ p3 <- ggplot(narrogin_v2, aes(x = tmin)) +
 
 grid.arrange(p1,p2,p3,ncol = 3)
 ```
+
 Let's breakdown the distribution of each weather related variables from @fig-weatherdist. In terms of rain precipitation, it looks like the area around Learmonth Airport is mostly dry, concluded by the zero (0) precipitation throughout the year with raining happened occasionally. On the other hand, these area experienced a high variance of temperature, as can be seen, the minimum temperature was 3.5 degree celcius and maximum temperature was 48.9 degree celcius. The next paragraph will cover the profile of the weather based on their trend over the time.
 
 ```{r}
 #| label: fig-weathertrend
 #| fig-cap: "Weather Trend"
-#| fig-width: 8
-#| fig-heigth: 12
+#| fig-width: 10
+#| fig-heigth: 10
 #| echo: false
 #| warning: false
 #| message: false
@@ -751,20 +794,21 @@ p6 <- ggplot(narrogin_v2, aes(x = date)) +
         ggtitle(label = "Temperature Trend") +
         theme_classic()
 
-grid.arrange(p5,p6)  
+grid.arrange(p5,p6, ncol = 2)  
 ```
-Now, we will assess the trend of rain precipitation and temperature. From figure @fig-weathertrend, the most interesting insight from this plot is the fact that the rain starting to pour in this area more frequently from January, it continues to increase into months to come until it started to decrease from July. The rest of the year, the rain happened occasionally. Please be mindful that what we meant is not the heavyness of the rain, rather the frequency of rain pouring over the time, we assume that precipitation of more than 0 means raining. As for the temperature, it is basically a common knowledge that summer is the hottest, winter is the coldest, fall and spring are in between the prior categories, which clearly showed by the plot. 
 
-Through this weather profiling, we have got a new perspective that will help us provide better interpretation of the correlation analysis. It allows us to think why would under certain condition the sightings are more frequent. In the next section, we will incorporate this information to the actual sightings of the whale shark, and uncover the insight of whale shark behaviour.  
+Now, we will assess the trend of rain precipitation and temperature. From figure @fig-weathertrend, the most interesting insight from this plot is the fact that the rain starting to pour in this area more frequently from January, it continues to increase into months to come until it started to decrease from July. The rest of the year, the rain happened occasionally. Please be mindful that what we meant is not the heavyness of the rain, rather the frequency of rain pouring over the time, we assume that precipitation of more than 0 means raining. As for the temperature, it is basically a common knowledge that summer is the hottest, winter is the coldest, fall and spring are in between the prior categories, which clearly showed by the plot.
 
-**Whale Shark Sightings vs Temperature**
-We will start the analysis by unveiling the relationship between whale shark sightings against the average temperature. In the @fig-corrplot1 below, we grouped the observations based on the season to provide better visualisation and level of detail.
+Through this weather profiling, we have got a new perspective that will help us provide better interpretation of the correlation analysis. It allows us to think why would under certain condition the sightings are more frequent. In the next section, we will incorporate this information to the actual sightings of the whale shark, and uncover the insight of whale shark behaviour.
+
+**Whale Shark Sightings vs Temperature** We will start the analysis by unveiling the relationship between whale shark sightings against the average temperature. In the @fig-corrplot1 below, we grouped the observations based on the season to provide better visualisation and level of detail.
+
 ```{r}
 #| label: fig-corrplot1
 #| fig-cap: "Sightings to Avg. Temperature"
 #| fig-width: 12
 #| fig-heigth: 8
-#| echo: true
+#| echo: false
 #| warning: false
 #| message: false
 
@@ -784,21 +828,21 @@ whale_shark_weather %>%
     theme(plot.title = element_text(hjust=0.5, face = "bold"),
           plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10))
 ```
-- Based on the plot above, there appears to be no significant pattern or dependency between temperature and the occurrence of whale shark sightings. Unlike some species that may exhibit preferences for specific temperature ranges, whale shark, in this dataset, seem to defy such temperature-related constrains. This lack of a clear correlation between temperature and sightings suggests that whale sharks may possess a wide temperature tolerance or have a migratory behavior that is not closely tied to local temperature variations.   
 
-- Another think that worth noting is the temperature in this dataset is actually an air temperature, which may be totally different with the sea water temperature where whale shark is spotted. So, there might be a case when the air temperature is hot, the sea water temperature is mild and vice versa. Also, the depth of sightings should be considered as well, since deeper sea level may have colder temperature. 
+-   Based on the plot above, there appears to be no significant pattern or dependency between temperature and the occurrence of whale shark sightings. Unlike some species that may exhibit preferences for specific temperature ranges, whale shark, in this dataset, seem to defy such temperature-related constrains. This lack of a clear correlation between temperature and sightings suggests that whale sharks may possess a wide temperature tolerance or have a migratory behavior that is not closely tied to local temperature variations.
 
-- Further analysis might be required by utilising sea water temperature to provide a deeper understanding of the whale shark behaviour. As of now, there is no substantial pattern we can see to conclude the correlation between the air temperature surface to the whale shark sightings.
+-   Another think that worth noting is the temperature in this dataset is actually an air temperature, which may be totally different with the sea water temperature where whale shark is spotted. So, there might be a case when the air temperature is hot, the sea water temperature is mild and vice versa. Also, the depth of sightings should be considered as well, since deeper sea level may have colder temperature.
 
+-   Further analysis might be required by utilising sea water temperature to provide a deeper understanding of the whale shark behaviour. As of now, there is no substantial pattern we can see to conclude the correlation between the air temperature surface to the whale shark sightings.
 
-**Whale Shark Sightings vs Rain Precipitation**
-The next analysis will be the correlation analysis between sightings and rain precipitation. As known previously that the area is mostly dry, so this might be affecting the sightings as well. The plot will be similar as the previous analysis, where we grouped the observations based on the season to provide better visualisation and level of detail. 
+**Whale Shark Sightings vs Rain Precipitation** The next analysis will be the correlation analysis between sightings and rain precipitation. As known previously that the area is mostly dry, so this might be affecting the sightings as well. The plot will be similar as the previous analysis, where we grouped the observations based on the season to provide better visualisation and level of detail.
+
 ```{r}
 #| label: fig-corrplot2
 #| fig-cap: "Sightings to Rain Precipitation"
 #| fig-width: 12
 #| fig-heigth: 8
-#| echo: true
+#| echo: false
 #| warning: false
 #| message: false
 
@@ -818,20 +862,20 @@ whale_shark_weather %>%
     theme(plot.title = element_text(hjust=0.5, face = "bold"),
           plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10))
 ```
-- As can be seen from the @fig-corrplot2, predominantly all sightings occur in when there is not raining, while we can still see that whale shark was also spotted when it is raining. However, we thought there might be an underlying factor that could reveal the reason why whale shark spotted more in this area, particularly to the correlation with rain precipitation. If we recall our analysis from figure @fig-countoccur, we know that whale shark are spotted mostly in Winter and Spring season. Additionally, if we consider our insight from weather data profiling of figure @fig-weathertrend, we know that the rain started to pour in this area from January, it consistently happen each month until July. So, from these two insights, there is a chain reaction that might lead to whale shark migrate into this area. After doing some research, we have got the information that a rainfall is actually have an indirect impact into sea ecosystem. When raining pour down, it can lead to increased runoff from land into rivers and eventually into the sea. This runoff can carry nutrients that promotes the growth of plankton, which in turn can be consumed by other creatures in the sea such as fish, crustacean, squid, etc. (Paczkowska et al., 2020). In the end, a big fish such as whale sharks are getting the benefit as well since those are their primary food. 
 
-- So, as mentioned in the first point, the rain may not be affect the occurrence of whale shark directly in certain area, but the chain reaction of frequent raining in that area may lead to changes in the sea ecosystem, which benefitting whale shark. Hence, we conclude that there is still a indirect correlation between raining and whale shark sightings.
+-   As can be seen from the @fig-corrplot2, predominantly all sightings occur in when there is not raining, while we can still see that whale shark was also spotted when it is raining. However, we thought there might be an underlying factor that could reveal the reason why whale shark spotted more in this area, particularly to the correlation with rain precipitation. If we recall our analysis from figure @fig-countoccur, we know that whale shark are spotted mostly in Winter and Spring season. Additionally, if we consider our insight from weather data profiling of figure @fig-weathertrend, we know that the rain started to pour in this area from January, it consistently happen each month until July. So, from these two insights, there is a chain reaction that might lead to whale shark migrate into this area. After doing some research, we have got the information that a rainfall is actually have an indirect impact into sea ecosystem. When raining pour down, it can lead to increased runoff from land into rivers and eventually into the sea. This runoff can carry nutrients that promotes the growth of plankton, which in turn can be consumed by other creatures in the sea such as fish, crustacean, squid, etc. (Paczkowska et al., 2020). In the end, a big fish such as whale sharks are getting the benefit as well since those are their primary food.
 
+-   So, as mentioned in the first point, the rain may not be affect the occurrence of whale shark directly in certain area, but the chain reaction of frequent raining in that area may lead to changes in the sea ecosystem, which benefitting whale shark. Hence, we conclude that there is still a indirect correlation between raining and whale shark sightings.
 
 ## Summary
 
-- The data analysis showed that there were relatively even occurrences of whale shark sightings between spring and winter, with a slight edge for spring. Fall had a significant number of sightings, while summer had the fewest. This finding contradicted the expectation of higher occurrences during winter months. 
-- The analysis using geospatial data confirmed that most whale shark sightings occurred in coastal areas rather than open ocean regions of Australia, aligning with the expectation of differences in habitat preferences. 
-- Contrary to the expectation of declining occurrences, the data showed an increase in whale shark sightings from around 2008 to 2013, reaching a peak in 2013. Afterward, there was a decline, but it stabilized after 2017, suggesting that the population may have stabilized. 
-- The analysis also suggested that whale sharks tend to prefer Western Australian waters, with a preference for winter months in the West and summer months in the East, indicating potential seasonal movement from west to east and vice versa. 
-- The data confirmed the expectation of most occurrences in the northern part of Western Australia, particularly in the Ningaloo Marine Park area, which aligns with the known migration patterns and ecotourism activities in that region. 
-- The correlation analysis between temperature whale shark sightings showed no significant pattern or dependency between them.
-- Similarly, the correlation analysis between rain precipitation and whale shark sightings suggest that rain precipitation did not directly affect sightings. But it was noted that frequent rainfall may indirectly impact sea ecosystems by promoting plankton growth, which could benefit whale sharks.
+-   The data analysis showed that there were relatively even occurrences of whale shark sightings between spring and winter, with a slight edge for spring. Fall had a significant number of sightings, while summer had the fewest. This finding contradicted the expectation of higher occurrences during winter months.
+-   The analysis using geospatial data confirmed that most whale shark sightings occurred in coastal areas rather than open ocean regions of Australia, aligning with the expectation of differences in habitat preferences.
+-   Contrary to the expectation of declining occurrences, the data showed an increase in whale shark sightings from around 2008 to 2013, reaching a peak in 2013. Afterward, there was a decline, but it stabilized after 2017, suggesting that the population may have stabilized.
+-   The analysis also suggested that whale sharks tend to prefer Western Australian waters, with a preference for winter months in the West and summer months in the East, indicating potential seasonal movement from west to east and vice versa.
+-   The data confirmed the expectation of most occurrences in the northern part of Western Australia, particularly in the Ningaloo Marine Park area, which aligns with the known migration patterns and ecotourism activities in that region.
+-   The correlation analysis between temperature whale shark sightings showed no significant pattern or dependency between them.
+-   Similarly, the correlation analysis between rain precipitation and whale shark sightings suggest that rain precipitation did not directly affect sightings. But it was noted that frequent rainfall may indirectly impact sea ecosystems by promoting plankton growth, which could benefit whale sharks.
 
 ## References
 
@@ -845,32 +889,31 @@ French, C.J. 2006. Australia's Maritime Zones/Boundaries Map. Geoscience Austral
 
 Australian Bureau of Statistics. (2021, July). Digital Boundary Files. https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs-edition-3/jul2021-jun2026/access-and-downloads/digital-boundary-files
 
-Bowie, A. (n.d.). Best time to visit Ningaloo Reef. Honeymoon Guide. Retrieved October 5, 2023, from https://www.honeymoonguide.com.au/australia/ningaloo-reef-weather.html#:~:text=Note%3A%20Meteorological%20data%20for%20the%20Ningaloo%20Coast%20is
+Bowie, A. (n.d.). Best time to visit Ningaloo Reef. Honeymoon Guide. Retrieved October 5, 2023, from https://www.honeymoonguide.com.au/australia/ningaloo-reef-weather.html#:\~:text=Note%3A%20Meteorological%20data%20for%20the%20Ningaloo%20Coast%20is
 
 Paczkowska, J., Brügel, S., Rowe, O., Lefèbure, R., Brutemark, A., & Andersson, A. (2020). Response of coastal phytoplankton to high inflows of terrestrial matter. Frontiers in Marine Science, 7. https://doi.org/10.3389/fmars.2020.00080
 
 The following are the R-packages used in this blog-post:
 
-- **tidyverse**: Wickham H, Averick M, Bryan J, Chang W, McGowan LD, François R, Grolemund G, Hayes A, Henry L, Hester J, Kuhn M, Pedersen TL, Miller E, Bache SM, Müller K, Ooms J, Robinson D, Seidel DP, Spinu V, Takahashi K, Vaughan D, Wilke C, Woo K, Yutani H (2019). "Welcome to the tidyverse." *Journal of Open Source Software*, *4*(43), 1686. doi:10.21105/joss.01686 <https://doi.org/10.21105/joss.01686>.
+-   **tidyverse**: Wickham H, Averick M, Bryan J, Chang W, McGowan LD, François R, Grolemund G, Hayes A, Henry L, Hester J, Kuhn M, Pedersen TL, Miller E, Bache SM, Müller K, Ooms J, Robinson D, Seidel DP, Spinu V, Takahashi K, Vaughan D, Wilke C, Woo K, Yutani H (2019). "Welcome to the tidyverse." *Journal of Open Source Software*, *4*(43), 1686. doi:10.21105/joss.01686 <https://doi.org/10.21105/joss.01686>.
 
-- **dplyr**: Wickham H, François R, Henry L, Müller K, Vaughan D (2023). *dplyr: A Grammar of Data Manipulation*. R package version 1.1.1, <https://CRAN.R-project.org/package=dplyr>.
+-   **dplyr**: Wickham H, François R, Henry L, Müller K, Vaughan D (2023). *dplyr: A Grammar of Data Manipulation*. R package version 1.1.1, <https://CRAN.R-project.org/package=dplyr>.
 
-- **ggplot2**: H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016.
+-   **ggplot2**: H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016.
 
-- **sf**: Pebesma, E., & Bivand, R. (2023). Spatial Data Science: With Applications in R. Chapman and Hall/CRC.
-  https://doi.org/10.1201/9780429459016
+-   **sf**: Pebesma, E., & Bivand, R. (2023). Spatial Data Science: With Applications in R. Chapman and Hall/CRC. https://doi.org/10.1201/9780429459016
 
-- **here**: Müller K (2020). _here: A Simpler Way to Find Your Files_. R package version 1.0.1, <https://CRAN.R-project.org/package=here>.
+-   **here**: Müller K (2020). *here: A Simpler Way to Find Your Files*. R package version 1.0.1, <https://CRAN.R-project.org/package=here>.
 
-- **galah**: Westgate M, Kellie D, Stevenson M, Newman P (2023). _galah: Biodiversity Data from the Living Atlas Community_. R package version 1.5.3, <https://CRAN.R-project.org/package=galah>.
+-   **galah**: Westgate M, Kellie D, Stevenson M, Newman P (2023). *galah: Biodiversity Data from the Living Atlas Community*. R package version 1.5.3, <https://CRAN.R-project.org/package=galah>.
 
-- **visdat**: Tierney N (2017). “visdat: Visualising Whole Data Frames.” _JOSS_, *2*(16), 355. doi:10.21105/joss.00355
-  <https://doi.org/10.21105/joss.00355>, <http://dx.doi.org/10.21105/joss.00355>.
-  
-- **leaflet**: Cheng J, Schloerke B, Karambelkar B, Xie Y (2023). _leaflet: Create Interactive Web Maps with the JavaScript 'Leaflet' Library_. R package version 2.2.0, <https://CRAN.R-project.org/package=leaflet>.
+-   **visdat**: Tierney N (2017). "visdat: Visualising Whole Data Frames." *JOSS*, *2*(16), 355. doi:10.21105/joss.00355 <https://doi.org/10.21105/joss.00355>, <http://dx.doi.org/10.21105/joss.00355>.
 
-- **rnoaa**: Chamberlain S, Hocking D (2023). _rnoaa: 'NOAA' Weather Data from R_. R package version 1.4.0, <https://CRAN.R-project.org/package=rnoaa>.
+-   **leaflet**: Cheng J, Schloerke B, Karambelkar B, Xie Y (2023). *leaflet: Create Interactive Web Maps with the JavaScript 'Leaflet' Library*. R package version 2.2.0, <https://CRAN.R-project.org/package=leaflet>.
 
-- **gridExtra**: Auguie B (2017). _gridExtra: Miscellaneous Functions for "Grid" Graphics_. R package version 2.3, <https://CRAN.R-project.org/package=gridExtra>.
+-   **rnoaa**: Chamberlain S, Hocking D (2023). *rnoaa: 'NOAA' Weather Data from R*. R package version 1.4.0, <https://CRAN.R-project.org/package=rnoaa>.
 
+-   **gridExtra**: Auguie B (2017). *gridExtra: Miscellaneous Functions for "Grid" Graphics*. R package version 2.3, <https://CRAN.R-project.org/package=gridExtra>.
+
+- **rworlddmap**: South, Andy 2011 rworldmap: A New R package for Mapping Global Data. The R Journal Vol. 3/1 : 35-43.
 :::

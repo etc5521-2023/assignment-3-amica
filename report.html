@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.353">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -105,7 +105,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
 <div style="text-align: justify;">
 <p>Whale Shark (Rhincodon typus) is the largest of all fishes alive. It may grow up to 18 metres (m) in length, but commonly seen between 4 m to 12 m. It is typically blue-grey or brownish in color with a pattern of white spots and vertical lines on its body. In terms of the diet, they feed on plankton, small crustaceans, squid, and fishes. The main feature of their food processing tools are their filtering screens on the gills and their tiny, more than 300 hooked teeth in both jaws. They are found on all the tropical oceans of the world where the water temperatures are ranging from 21 to 25 degrees Celsius and typically at depths of up to 1000 meters. Whale sharks are generally known to be active swimmers, and their activity can vary throughout the day and night. They do not exhibit diurnal (daytime) or seasonal (summer/winter) patterns of activity in the same way that some other species do. However, they seasonally come close to inshore areas, especially at plankton-rich locations. In Australia, it is found primarily in northern Western Australia, the Northern Territory, and Queensland. Whale sharks are known to migrate to the Ningaloo Marine park during specific times of the year, usually between March and July which is associated with the availability of plankton and other food sources in the area. During this time, there is usually a big ecotourism activity happening here for the chance to swim with them. Sadly, now, their status is an endangered species due to massive hunt of parts of their bodies. Hence, Conservation measures, including protections and regulations, are being implemented to safeguard this species in Australia and many other countries.</p>
-<p>In this study, We expect to encounter these with our data analysis:</p>
+<p>In this study, We expect to encounter these events with our data analysis:</p>
 <ul>
 <li>We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months.</li>
 <li>We expect to see differences in the frequency of sightings between coastal areas and open ocean regions, indicating habitat preferences.</li>
@@ -119,18 +119,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="whale-shark-data">Whale-shark Data</h3>
 <p>This dataset contains the information about the occurrence of Whale Shark (Rhincodon Typus) in Australia at a certain time and place. The data is retrieved from the <a href="https://www.ala.org.au/">Atlas of Living Australia (ALA) Website</a>. ALA is a collaborative, digital, open infrastructure that pulls together Australian biodiversity data from multiple sources, making it accessible and reusable.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extracting the occurrence data from ALA Website</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">galah_config</span>(<span class="at">email =</span> <span class="st">"egin0003@student.monash.edu"</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>ws_raw <span class="ot">&lt;-</span> <span class="fu">galah_call</span>() <span class="sc">|&gt;</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">galah_identify</span>(<span class="st">"Rhincodon typus"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">atlas_occurrences</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Checking queue
 Current queue size: 1 inqueue  running </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Saving the raw data</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ws_raw, <span class="at">file =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data-raw/ws_raw.rda"</span>)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The data is located in folder <code>data-raw</code> named as <code>ws_raw.rda</code>. It contains these variables:</p>
 <table class="table">
@@ -180,51 +173,22 @@ Current queue size: 1 inqueue  running </code></pre>
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extracting the assertion data from ALA Website </span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>ws_assert <span class="ot">&lt;-</span> <span class="fu">galah_call</span>() <span class="sc">|&gt;</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">galah_identify</span>(<span class="st">"Rhincodon typus"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">galah_select</span>(<span class="at">group =</span> <span class="st">"assertions"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">atlas_occurrences</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Checking queue
 Current queue size: 1 inqueue  running </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Saving the assertion data</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ws_raw, <span class="at">file =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data-raw/ws_assertion.rda"</span>))</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Extracting the event data from ALA Website</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>ws_event <span class="ot">&lt;-</span> <span class="fu">galah_call</span>() <span class="sc">|&gt;</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">galah_identify</span>(<span class="st">"Rhincodon typus"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">galah_select</span>(<span class="at">group =</span> <span class="st">"event"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">atlas_occurrences</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Checking queue
 Current queue size: 1 inqueue  running </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Saving the event data</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ws_raw, <span class="at">file =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data-raw/ws_event.rda"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Additionally, for data quality check, we also populate the <code>assertion</code> and <code>events</code> dataset, but ended up only using assertion. The reason for this will be explained in the <strong>General Check</strong> section.</p>
 </section>
 <section id="weather-stations-data" class="level3">
 <h3 class="anchored" data-anchor-id="weather-stations-data">Weather stations data</h3>
 <p>The dataset contains the information about Weather station locations which can be found in a Global Historical Climatology Network (GHCN) database maintained by the National Oceanic and Atmospheric Administration. This data is downloaded using the rnoaa package.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rnoaa)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>aus_stations <span class="ot">&lt;-</span> <span class="fu">ghcnd_stations</span>() <span class="sc">|&gt;</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_starts</span>(id, <span class="st">"ASN"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(last_year <span class="sc">&gt;=</span> <span class="dv">2020</span>) <span class="sc">|&gt;</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">wmo_id =</span> <span class="fu">as.numeric</span>(wmo_id),</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">name =</span> <span class="fu">str_to_lower</span>(name)) <span class="sc">|&gt;</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>state, <span class="sc">-</span>gsn_flag) <span class="sc">|&gt;</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(element <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"PRCP"</span>, <span class="st">"TMAX"</span>, <span class="st">"TMIN"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nest</span>(element<span class="sc">:</span> last_year) <span class="sc">|&gt;</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">|&gt;</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">nrow</span>(data) <span class="sc">==</span> <span class="dv">3</span>) <span class="sc">|&gt;</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>data) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 <table class="table">
 <colgroup>
 <col style="width: 50%">
@@ -264,22 +228,9 @@ Current queue size: 1 inqueue  running </code></pre>
 </tbody>
 </table>
 </section>
-<section id="downloading-weather-data-from-the-nearest-weather-station-learmonth-station" class="level3">
-<h3 class="anchored" data-anchor-id="downloading-weather-data-from-the-nearest-weather-station-learmonth-station">Downloading weather data from the nearest weather station (Learmonth Station)</h3>
+<section id="downloading-weather-data-from-the-nearest-weather-station" class="level3">
+<h3 class="anchored" data-anchor-id="downloading-weather-data-from-the-nearest-weather-station">Downloading weather data from the nearest weather station</h3>
 <p>This dataset contains the information about the weather(Precipitation, Minimum and Maximum temperature) recorded by the selected station.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>narrogin <span class="ot">&lt;-</span> aus_stations <span class="sc">|&gt;</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(id <span class="sc">==</span> <span class="st">"ASN00005007"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">|&gt;</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ts =</span> <span class="fu">list</span>(<span class="fu">meteo_pull_monitors</span>(</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">monitors =</span> id, <span class="at">var =</span> <span class="fu">c</span>(<span class="st">"PRCP"</span>, <span class="st">"TMAX"</span>, <span class="st">"TMIN"</span>),</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">date_min =</span> <span class="st">"2004-01-01"</span>,</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">date_max =</span> <span class="st">"2023-09-13"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="sc">-</span>id))) <span class="sc">|&gt;</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">lat =</span> latitude, <span class="at">long =</span> longitude, <span class="at">elev =</span> elevation) <span class="sc">|&gt;</span> <span class="fu">select</span>(id, long, lat, elev, name, wmo_id, ts) <span class="sc">%&gt;%</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(ts) <span class="sc">|&gt;</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tmax =</span> tmax<span class="sc">/</span><span class="dv">10</span>, <span class="at">tmin =</span> tmin<span class="sc">/</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 <table class="table">
 <colgroup>
 <col style="width: 50%">
@@ -343,9 +294,9 @@ Current queue size: 1 inqueue  running </code></pre>
 <section id="general-check" class="level4">
 <h4 class="anchored" data-anchor-id="general-check">General Check</h4>
 <ul>
-<li>There are 20 different data sources (based on <code>dataResourceName</code>). Upon referring to their data collection method on atlas website, it is evident that all the sightings are wild sightings.</li>
-<li><code>ws_event</code> data has the <code>samplingProtocol</code> variable which basically indicates what type of sighting or data collection method was used. Most of the values are missing for this variable, so we decided that it is not a reliable dataset to identify the type of wild sightings.</li>
-<li>From <code>ws_assert</code> (assertion) data, we refer our check to the <code>BASIS_OF_RECORD_INVALID</code> column, which provide information if the occurrences are valid or invalid. Currently, there are 32 values recorded as TRUE indicating that they are invalid records. These invalid records will be removed to ensure the quality of the data.</li>
+<li><p>There are 20 different data sources (based on <code>dataResourceName</code>). Upon referring to their data collection method on atlas website, it is evident that all the sightings are wild sightings.</p></li>
+<li><p><code>ws_event</code> data has the <code>samplingProtocol</code> variable which basically indicates what type of sighting or data collection method was used. Most of the values are missing for this variable, so we decided that it is not a reliable dataset to identify the type of wild sightings.</p></li>
+<li><p>From <code>ws_assert</code> (assertion) data, we refer our check to the <code>BASIS_OF_RECORD_INVALID</code> column, which provide information if the occurrences are valid or invalid. Currently, there are 32 values recorded as TRUE indicating that they are invalid records. These invalid records will be removed to ensure the quality of the data.</p></li>
 </ul>
 </section>
 <section id="data-type-check" class="level4">
@@ -372,15 +323,6 @@ Current queue size: 1 inqueue  running </code></pre>
 <h4 class="anchored" data-anchor-id="outliers-check">Outliers Check</h4>
 <p><strong>Checking <code>eventDate</code> variables:</strong></p>
 <div class="cell" data-fig-heigth="5">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ws_raw <span class="sc">%&gt;%</span> </span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(eventDate)) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">year</span>(eventDate))) <span class="sc">+</span> </span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="at">label =</span> <span class="st">"Profile of Yearly Occurrences"</span>) <span class="sc">+</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Number of Occurrences"</span>) <span class="sc">+</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Year"</span>) <span class="sc">+</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">face =</span> <span class="st">"bold"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-boxplot" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
@@ -398,25 +340,28 @@ Current queue size: 1 inqueue  running </code></pre>
 </ul>
 <p><strong>Checking Location of Occurrences</strong></p>
 <div class="cell" data-fig-heigth="8">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>wmap <span class="ot">&lt;-</span> rworldmap<span class="sc">::</span><span class="fu">getMap</span>(<span class="at">resolution =</span> <span class="st">"low"</span>)  <span class="sc">%&gt;%</span> <span class="co"># this is SpatialPolygonDataFrame</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>          <span class="fu">st_as_sf</span>()</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> wmap) <span class="sc">+</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">#ylim(-45, -5) +</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">#xlim(110, 155) +</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> whale_shark, <span class="fu">aes</span>(<span class="at">x =</span> decimalLongitude, <span class="at">y =</span> decimalLatitude), <span class="at">color =</span> <span class="st">"red3"</span>) <span class="sc">+</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="at">label =</span> <span class="st">"Location of All Whale Sharks Occurrences"</span>,</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>          <span class="at">subtitle =</span> <span class="st">"Data Period: 1993 - 2023"</span>) <span class="sc">+</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Longitude"</span>) <span class="sc">+</span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Latitude"</span>) <span class="sc">+</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">hjust=</span><span class="fl">0.4</span>, <span class="at">face =</span> <span class="st">"italic"</span>, <span class="at">size =</span> <span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-alloccu" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="report_files/figure-html/fig-alloccu-1.png" class="img-fluid figure-img" width="768"></p>
+<figcaption class="figure-caption">Figure&nbsp;3: All Occurrences</figcaption>
+</figure>
+</div>
+</div>
 </div>
 <ul>
 <li>When plotting the locations of whale shark spotting, it is evident that some instances are from around the world and not just Australian waters.</li>
 </ul>
+<div class="cell" data-fig-heigth="8">
+<div class="cell-output-display">
+<div id="fig-auoccurr" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="report_files/figure-html/fig-auoccurr-1.png" class="img-fluid figure-img" width="768"></p>
+<figcaption class="figure-caption">Figure&nbsp;4: Occurrences over Australia</figcaption>
+</figure>
+</div>
+</div>
+</div>
 <ul>
 <li>Later we will filter the location to only include sightings around Australia only.</li>
 </ul>
@@ -430,8 +375,8 @@ Current queue size: 1 inqueue  running </code></pre>
 <div class="cell-output-display">
 <div id="fig-allstation" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="report_files/figure-html/fig-allstation-1.png" class="img-fluid figure-img" width="1152"></p>
-<figcaption class="figure-caption">Figure&nbsp;3: All Weather Station</figcaption>
+<p><img src="report_files/figure-html/fig-allstation-1.png" class="img-fluid figure-img" width="768"></p>
+<figcaption class="figure-caption">Figure&nbsp;5: All Weather Station</figcaption>
 </figure>
 </div>
 </div>
@@ -441,8 +386,8 @@ Current queue size: 1 inqueue  running </code></pre>
 <div class="cell-output-display">
 <div id="fig-nearstation" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="report_files/figure-html/fig-nearstation-1.png" class="img-fluid figure-img" width="1152"></p>
-<figcaption class="figure-caption">Figure&nbsp;4: Nearest Weather Station</figcaption>
+<p><img src="report_files/figure-html/fig-nearstation-1.png" class="img-fluid figure-img" width="768"></p>
+<figcaption class="figure-caption">Figure&nbsp;6: Nearest Weather Station</figcaption>
 </figure>
 </div>
 </div>
@@ -451,53 +396,60 @@ Current queue size: 1 inqueue  running </code></pre>
 <section id="data-cleansing-and-transforming" class="level3">
 <h3 class="anchored" data-anchor-id="data-cleansing-and-transforming">Data Cleansing and Transforming</h3>
 <p>In this section, before we go into the data analysis adventure we perform a bit of data cleansing and transforming. This is important to make sure we maintain the quality of the data.</p>
-<p><strong>Whale Shark data </strong></p>
+<p><strong>Whale Shark data</strong></p>
+<p>Here is the code that we use to clean the Whale Shark Data.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Getting Invalid Record</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>ws_assert <span class="ot">&lt;-</span> ws_assert <span class="sc">%&gt;%</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(recordID, BASIS_OF_RECORD_INVALID)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Joining Raw Occurrence data to Assert data to filter out the invalid records</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Performing further data cleansing &amp; manipulating</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>whale_shark <span class="ot">&lt;-</span> ws_raw <span class="sc">%&gt;%</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>                <span class="fu">left_join</span>(ws_assert, <span class="at">by =</span> <span class="st">"recordID"</span>) <span class="sc">%&gt;%</span> <span class="co">#1281 rows</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>                <span class="fu">filter</span>(BASIS_OF_RECORD_INVALID <span class="sc">==</span> <span class="cn">FALSE</span>, <span class="co">#1249 rows</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">is.na</span>(eventDate) <span class="sc">|</span> <span class="fu">year</span>(eventDate) <span class="sc">&gt;</span> <span class="dv">1990</span>, <span class="co">#1247 rows</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">is.na</span>(decimalLatitude) <span class="sc">==</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="co">#1241 rows</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>                <span class="fu">mutate</span>(<span class="at">season =</span> <span class="fu">case_when</span>(<span class="fu">month</span>(eventDate) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">1</span>, <span class="dv">2</span>) <span class="sc">~</span> <span class="st">'Summer'</span>,</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>                                          <span class="fu">month</span>(eventDate) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>) <span class="sc">~</span> <span class="st">'Fall'</span>,</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>                                          <span class="fu">month</span>(eventDate) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>) <span class="sc">~</span> <span class="st">'Winter'</span>,</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>                                          <span class="fu">month</span>(eventDate) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">9</span>, <span class="dv">10</span>, <span class="dv">11</span>) <span class="sc">~</span> <span class="st">'Spring'</span>,</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>                                          <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA</span>))</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>                       </span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Removing unnecessary columns from data</span></span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>whale_shark <span class="ot">&lt;-</span> whale_shark <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="sc">-</span><span class="dv">5</span>, <span class="sc">-</span><span class="dv">7</span>, <span class="sc">-</span><span class="dv">8</span>, <span class="sc">-</span><span class="dv">9</span>)</span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Saving into RDA file</span></span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(whale_shark, <span class="at">file =</span> <span class="st">"data/whale_shark.rda"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Getting Invalid Record</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>ws_assert <span class="ot">&lt;-</span> ws_assert <span class="sc">%&gt;%</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(recordID, BASIS_OF_RECORD_INVALID)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Joining Raw Occurrence data to Assert data to filter out the invalid records</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Performing further data cleansing &amp; manipulating</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>whale_shark <span class="ot">&lt;-</span> ws_raw <span class="sc">%&gt;%</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>                <span class="fu">left_join</span>(ws_assert, <span class="at">by =</span> <span class="st">"recordID"</span>) <span class="sc">%&gt;%</span> <span class="co">#1281 rows</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                <span class="fu">filter</span>(BASIS_OF_RECORD_INVALID <span class="sc">==</span> <span class="cn">FALSE</span>, <span class="co">#1249 rows</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">is.na</span>(eventDate) <span class="sc">|</span> <span class="fu">year</span>(eventDate) <span class="sc">&gt;</span> <span class="dv">1990</span>, <span class="co">#1247 rows</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">is.na</span>(decimalLatitude) <span class="sc">==</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="co">#1241 rows</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                <span class="fu">mutate</span>(<span class="at">season =</span> <span class="fu">case_when</span>(<span class="fu">month</span>(eventDate) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">1</span>, <span class="dv">2</span>) <span class="sc">~</span> <span class="st">'Summer'</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                                          <span class="fu">month</span>(eventDate) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>) <span class="sc">~</span> <span class="st">'Fall'</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>                                          <span class="fu">month</span>(eventDate) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>) <span class="sc">~</span> <span class="st">'Winter'</span>,</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>                                          <span class="fu">month</span>(eventDate) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">9</span>, <span class="dv">10</span>, <span class="dv">11</span>) <span class="sc">~</span> <span class="st">'Spring'</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>                                          <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA</span>))</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>                       </span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Removing unnecessary columns from data</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>whale_shark <span class="ot">&lt;-</span> whale_shark <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="sc">-</span><span class="dv">5</span>, <span class="sc">-</span><span class="dv">7</span>, <span class="sc">-</span><span class="dv">8</span>, <span class="sc">-</span><span class="dv">9</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Saving into RDA file</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(whale_shark, <span class="at">file =</span> <span class="st">"data/whale_shark.rda"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>In the code above, we have performed some steps of data cleansing, which include: - Join the occurrence data to assertion data by <code>recordID</code> variable. - Taking the <code>BASIS_OF_RECORD_INVALID</code> into the occurrence data and filter out the invalid records by setting the variable value into “False”. - Filter out the occurrences that happened before 1990 as they are unreliable. - Filter out the occurrences that has missing value in <code>decimalLatitude</code>. - Add a new variable as identifier. Variable <code>season</code>, is an identifier for season (e.g.&nbsp;Summer, Fall, Winter, and Spring). These two columns are needed to perform the plot for our expectations.</p>
+<p>In the code above, we have performed some steps of data cleansing, which include: - Join the occurrence data to assertion data by <code>recordID</code> variable.</p>
+<ul>
+<li><p>Taking the <code>BASIS_OF_RECORD_INVALID</code> into the occurrence data and filter out the invalid records by setting the variable value into “False”.</p></li>
+<li><p>Filter out the occurrences that happened before 1990 as they are unreliable.</p></li>
+<li><p>Filter out the occurrences that has missing value in <code>decimalLatitude</code>.</p></li>
+<li><p>Add a new variable as identifier. Variable <code>season</code>, is an identifier for season (e.g.&nbsp;Summer, Fall, Winter, and Spring). These two columns are needed to perform the plot for our expectations.</p></li>
+</ul>
 <p><strong>Weather Data</strong></p>
 <p>Filtering out the variables that we don’t need for our analysis using select query.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>narrogin_v2 <span class="ot">&lt;-</span> narrogin <span class="sc">%&gt;%</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                <span class="fu">select</span>(date, prcp, tmax, tmin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>narrogin_v2 <span class="ot">&lt;-</span> narrogin <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                <span class="fu">select</span>(date, prcp, tmax, tmin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="joining-whale-shark-data-weather-data" class="level3">
 <h3 class="anchored" data-anchor-id="joining-whale-shark-data-weather-data">Joining Whale Shark Data &amp; Weather Data</h3>
 <p>Here is the code that we use to join the whale shark data to weather station data. Basically, we join them based on the <code>eventDate</code> and <code>date</code>, because we want to analyse how was the weather condition for every sightings that was recorded.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>whale_shark_weather <span class="ot">&lt;-</span> whale_shark <span class="sc">%&gt;%</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                         <span class="co"># Filter occurrence to near learmonth weather station</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">filter</span>(decimalLatitude <span class="sc">&lt;</span> <span class="sc">-</span><span class="dv">20</span>, decimalLatitude <span class="sc">&gt;</span> <span class="sc">-</span><span class="dv">24</span>,</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                                decimalLongitude <span class="sc">&gt;</span> <span class="dv">112</span>, decimalLongitude <span class="sc">&lt;</span> <span class="dv">115</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">left_join</span>(narrogin_v2, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"eventDate"</span> <span class="ot">=</span> <span class="st">"date"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">mutate</span>(<span class="at">sighting =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(tmin) <span class="sc">&amp;</span> <span class="fu">is.na</span>(tmax), <span class="dv">0</span>, <span class="dv">1</span>))</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Saving into RDA file</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(whale_shark_weather, <span class="at">file =</span> <span class="st">"data/whale_shark_weather.rda"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>whale_shark_weather <span class="ot">&lt;-</span> whale_shark <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                         <span class="co"># Filter occurrence to near learmonth weather station</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">filter</span>(decimalLatitude <span class="sc">&lt;</span> <span class="sc">-</span><span class="dv">20</span>, decimalLatitude <span class="sc">&gt;</span> <span class="sc">-</span><span class="dv">24</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                                decimalLongitude <span class="sc">&gt;</span> <span class="dv">112</span>, decimalLongitude <span class="sc">&lt;</span> <span class="dv">115</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">left_join</span>(narrogin_v2, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"eventDate"</span> <span class="ot">=</span> <span class="st">"date"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">mutate</span>(<span class="at">sighting =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(tmin) <span class="sc">&amp;</span> <span class="fu">is.na</span>(tmax), <span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Saving into RDA file</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(whale_shark_weather, <span class="at">file =</span> <span class="st">"data/whale_shark_weather.rda"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="why-labeling-days-when-sighting-occurs-is-necessary" class="level3">
@@ -516,13 +468,13 @@ Current queue size: 1 inqueue  running </code></pre>
 <p>This is the part where we start our data analysis journey. In general, we are trying to prove our expectations that we have stated in the previous section. We will cover the method that we use, additional dataset that we employed, and uncover the insights that we gather from the analysis. Additional to the proving the expectations, we want to comprehend the study by utlising the weather station, where we are going to perform some correlation analysis between the whale shark sightings towards the weather condition of the local area.</p>
 <section id="expectation-1-we-expect-to-observe-seasonal-patterns-in-whale-shark-sightings-with-higher-occurrences-during-winter-months." class="level3">
 <h3 class="anchored" data-anchor-id="expectation-1-we-expect-to-observe-seasonal-patterns-in-whale-shark-sightings-with-higher-occurrences-during-winter-months.">Expectation 1: We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months.</h3>
-<p>The <a href="#fig-countoccur">Figure&nbsp;5</a> below depict the number of occurrence for every season from 1993 until 2023.</p>
+<p>The <a href="#fig-countoccur">Figure&nbsp;7</a> below depict the number of occurrence for every season from 1993 until 2023.</p>
 <div class="cell" data-fig-heigth="8">
 <div class="cell-output-display">
 <div id="fig-countoccur" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="report_files/figure-html/fig-countoccur-1.png" class="img-fluid figure-img" width="768"></p>
-<figcaption class="figure-caption">Figure&nbsp;5: Number of Occurrences per Season</figcaption>
+<figcaption class="figure-caption">Figure&nbsp;7: Number of Occurrences per Season</figcaption>
 </figure>
 </div>
 </div>
@@ -535,7 +487,7 @@ Current queue size: 1 inqueue  running </code></pre>
 <section id="expectation-2-we-expect-to-see-differences-in-the-frequency-of-sightings-between-coastal-areas-and-open-ocean-regions-indicating-habitat-preferences." class="level3">
 <h3 class="anchored" data-anchor-id="expectation-2-we-expect-to-see-differences-in-the-frequency-of-sightings-between-coastal-areas-and-open-ocean-regions-indicating-habitat-preferences.">Expectation 2: We expect to see differences in the frequency of sightings between coastal areas and open ocean regions, indicating habitat preferences.</h3>
 <p>For this expectation, we use 2 geospatial objects about territorial sea boundary and exclusive economic zone of Australia. These maps have been derived from Geoscience Australia’s Australian Maritime Boundaries (AMB) version 2.0 data which is a digital representation of Australia’s territorial sea baseline and the maritime limits and boundaries as established under the Sea and Submerged Lands Act 1973. The map describes the different maritime zones, explains how Australia defines and updates its maritime boundaries, and lists the different maritime boundary arrangements with Indonesia, Papua New Guinea, Solomon Islands, France (New Calendonia and Kerguelen) and New Zealand. Their gdb file can be found <a href="https://ecat.ga.gov.au/geonetwork/srv/eng/catalog.search#/metadata/63690">here</a>. Since our expectation requires coastline and open ocean region for Australia, we have used these boundary files.</p>
-<div class="cell" data-fig-heigth="8">
+<div class="cell" data-fig-heigth="8" data-quiet="true">
 <div class="cell-output cell-output-stdout">
 <pre><code>Driver: OpenFileGDB 
 Available layers:
@@ -571,8 +523,8 @@ Available layers:
 <div class="cell-output-display">
 <div id="fig-coastalboundary" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="report_files/figure-html/fig-coastalboundary-1.png" class="img-fluid figure-img" width="1152"></p>
-<figcaption class="figure-caption">Figure&nbsp;6: Coastal Boundary</figcaption>
+<p><img src="report_files/figure-html/fig-coastalboundary-1.png" class="img-fluid figure-img" width="768"></p>
+<figcaption class="figure-caption">Figure&nbsp;8: Coastal Boundary</figcaption>
 </figure>
 </div>
 </div>
@@ -589,8 +541,8 @@ Available layers:
 <div class="cell-output-display">
 <div id="fig-occurtrend" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="report_files/figure-html/fig-occurtrend-1.png" class="img-fluid figure-img" width="1152"></p>
-<figcaption class="figure-caption">Figure&nbsp;7: Whale Shark sightings every year</figcaption>
+<p><img src="report_files/figure-html/fig-occurtrend-1.png" class="img-fluid figure-img" width="768"></p>
+<figcaption class="figure-caption">Figure&nbsp;9: Whale Shark sightings every year</figcaption>
 </figure>
 </div>
 </div>
@@ -610,7 +562,7 @@ Available layers:
 <div id="fig-eastwest" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="report_files/figure-html/fig-eastwest-1.png" class="img-fluid figure-img" width="960"></p>
-<figcaption class="figure-caption">Figure&nbsp;8: Sightings East v/s West season wise</figcaption>
+<figcaption class="figure-caption">Figure&nbsp;10: Sightings East v/s West season wise</figcaption>
 </figure>
 </div>
 </div>
@@ -624,13 +576,13 @@ Available layers:
 </section>
 <section id="expectation-5-we-expect-to-spot-the-most-occurrences-in-the-northern-western-australia." class="level3">
 <h3 class="anchored" data-anchor-id="expectation-5-we-expect-to-spot-the-most-occurrences-in-the-northern-western-australia.">Expectation 5: We expect to spot the most occurrences in the northern Western Australia.</h3>
-<p>The figure <a href="#fig-aumap">Figure&nbsp;9</a> below shows the sightings of whale shark.</p>
+<p>The figure <a href="#fig-aumap">Figure&nbsp;11</a> below shows the sightings of whale shark.</p>
 <div class="cell" data-fig-heigth="8">
 <div class="cell-output-display">
 <div id="fig-aumap" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="report_files/figure-html/fig-aumap-1.png" class="img-fluid figure-img" width="960"></p>
-<figcaption class="figure-caption">Figure&nbsp;9: Locations of Where Sightings are Recorded in Australia</figcaption>
+<p><img src="report_files/figure-html/fig-aumap-1.png" class="img-fluid figure-img" width="768"></p>
+<figcaption class="figure-caption">Figure&nbsp;11: Locations of Where Sightings are Recorded in Australia</figcaption>
 </figure>
 </div>
 </div>
@@ -644,29 +596,11 @@ Available layers:
 <section id="whale-sharks-sightings-against-weather-condition" class="level3">
 <h3 class="anchored" data-anchor-id="whale-sharks-sightings-against-weather-condition">Whale Sharks Sightings against Weather Condition</h3>
 <div class="cell" data-fig-heigth="8">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> states) <span class="sc">+</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="sc">-</span><span class="fl">23.5</span>, <span class="sc">-</span><span class="dv">21</span>) <span class="sc">+</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="fl">112.5</span>, <span class="fl">115.5</span>) <span class="sc">+</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_count</span>(<span class="at">data =</span> whale_shark_weather, <span class="fu">aes</span>(<span class="at">x =</span> decimalLongitude, <span class="at">y =</span> decimalLatitude, <span class="at">color =</span> season)) <span class="sc">+</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> (aus_stations <span class="sc">%&gt;%</span> <span class="fu">filter</span>(name <span class="sc">==</span> <span class="st">"learmonth airport"</span>)), <span class="fu">aes</span>(<span class="at">x =</span> longitude, <span class="at">y =</span> latitude, <span class="at">label =</span> name)) <span class="sc">+</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="at">data =</span> (aus_stations <span class="sc">%&gt;%</span> <span class="fu">filter</span>(name <span class="sc">==</span> <span class="st">"learmonth airport"</span>)), <span class="fu">aes</span>(<span class="at">label =</span> name, <span class="at">x =</span> longitude, <span class="at">y =</span> latitude),</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>                              <span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="at">width =</span> <span class="fl">0.9</span>),</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>                              <span class="at">vjust =</span> <span class="fl">0.5</span>,</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>                              <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.05</span>,</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>                              <span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="at">label =</span> <span class="st">"Location of Sightings near Learmonth Airport Weather Station"</span>,</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">subtitle =</span> <span class="st">"Data Period: 1993 - 2023"</span>) <span class="sc">+</span></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Longitude"</span>) <span class="sc">+</span></span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Latitude"</span>) <span class="sc">+</span></span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust=</span><span class="fl">0.4</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">hjust=</span><span class="fl">0.4</span>, <span class="at">face =</span> <span class="st">"italic"</span>, <span class="at">size =</span> <span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-learmonth" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="report_files/figure-html/fig-learmonth-1.png" class="img-fluid figure-img" width="960"></p>
-<figcaption class="figure-caption">Figure&nbsp;10: Locations of Where Sightings are Recorded Near Learmonth Airport Weather Station</figcaption>
+<p><img src="report_files/figure-html/fig-learmonth-1.png" class="img-fluid figure-img" width="768"></p>
+<figcaption class="figure-caption">Figure&nbsp;12: Locations of Where Sightings are Recorded Near Learmonth Airport Weather Station</figcaption>
 </figure>
 </div>
 </div>
@@ -675,74 +609,36 @@ Available layers:
 <section id="finding-the-relation-between-temperature-and-sightings" class="level4">
 <h4 class="anchored" data-anchor-id="finding-the-relation-between-temperature-and-sightings">Finding The Relation Between Temperature and Sightings</h4>
 <p><strong>Profiling the Weather</strong> Prior to performing the analysis for the correlation of sightings and weather, we would like to profile the weather condition around the learmonth aiport first. This will help us to get the preliminary understanding of how the condition around the area, which we will take as our ammunition to enhance the interpretation of our analysis.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Adding a new variable of average temperature</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>whale_shark_weather <span class="ot">&lt;-</span> whale_shark_weather <span class="sc">%&gt;%</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">mutate</span>(<span class="at">avg_temp =</span> (tmax <span class="sc">+</span> tmin) <span class="sc">/</span> <span class="dv">2</span>)</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Rain Precipitation Distribution</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(narrogin_v2, <span class="fu">aes</span>(<span class="at">x =</span> prcp)) <span class="sc">+</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ggtitle</span>(<span class="at">label =</span> <span class="st">"Rain Precipitation Distribution"</span>) <span class="sc">+</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_classic</span>()</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Max Temperature Distribution            </span></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(narrogin_v2, <span class="fu">aes</span>(<span class="at">x =</span> tmax)) <span class="sc">+</span></span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ggtitle</span>(<span class="at">label =</span> <span class="st">"Max Temperature Distribution"</span>) <span class="sc">+</span></span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_classic</span>()</span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Min Temperature Distribution            </span></span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(narrogin_v2, <span class="fu">aes</span>(<span class="at">x =</span> tmin)) <span class="sc">+</span></span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ggtitle</span>(<span class="at">label =</span> <span class="st">"Min Temperature Distribution"</span>) <span class="sc">+</span></span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_classic</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 <div class="cell" data-fig-heigth="8">
 <div class="cell-output-display">
 <div id="fig-weatherdist" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="report_files/figure-html/fig-weatherdist-1.png" class="img-fluid figure-img" width="1152"></p>
-<figcaption class="figure-caption">Figure&nbsp;11: Weather Distribution</figcaption>
+<figcaption class="figure-caption">Figure&nbsp;13: Weather Distribution</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>Let’s breakdown the distribution of each weather related variables from <a href="#fig-weatherdist">Figure&nbsp;11</a>. In terms of rain precipitation, it looks like the area around Learmonth Airport is mostly dry, concluded by the zero (0) precipitation throughout the year with raining happened occasionally. On the other hand, these area experienced a high variance of temperature, as can be seen, the minimum temperature was 3.5 degree celcius and maximum temperature was 48.9 degree celcius. The next paragraph will cover the profile of the weather based on their trend over the time.</p>
-<div class="cell" data-fig-heigth="12">
+<p>Let’s breakdown the distribution of each weather related variables from <a href="#fig-weatherdist">Figure&nbsp;13</a>. In terms of rain precipitation, it looks like the area around Learmonth Airport is mostly dry, concluded by the zero (0) precipitation throughout the year with raining happened occasionally. On the other hand, these area experienced a high variance of temperature, as can be seen, the minimum temperature was 3.5 degree celcius and maximum temperature was 48.9 degree celcius. The next paragraph will cover the profile of the weather based on their trend over the time.</p>
+<div class="cell" data-fig-heigth="10">
 <div class="cell-output-display">
 <div id="fig-weathertrend" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="report_files/figure-html/fig-weathertrend-1.png" class="img-fluid figure-img" width="768"></p>
-<figcaption class="figure-caption">Figure&nbsp;12: Weather Trend</figcaption>
+<p><img src="report_files/figure-html/fig-weathertrend-1.png" class="img-fluid figure-img" width="960"></p>
+<figcaption class="figure-caption">Figure&nbsp;14: Weather Trend</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>Now, we will assess the trend of rain precipitation and temperature. From figure <a href="#fig-weathertrend">Figure&nbsp;12</a>, the most interesting insight from this plot is the fact that the rain starting to pour in this area more frequently from January, it continues to increase into months to come until it started to decrease from July. The rest of the year, the rain happened occasionally. Please be mindful that what we meant is not the heavyness of the rain, rather the frequency of rain pouring over the time, we assume that precipitation of more than 0 means raining. As for the temperature, it is basically a common knowledge that summer is the hottest, winter is the coldest, fall and spring are in between the prior categories, which clearly showed by the plot.</p>
+<p>Now, we will assess the trend of rain precipitation and temperature. From figure <a href="#fig-weathertrend">Figure&nbsp;14</a>, the most interesting insight from this plot is the fact that the rain starting to pour in this area more frequently from January, it continues to increase into months to come until it started to decrease from July. The rest of the year, the rain happened occasionally. Please be mindful that what we meant is not the heavyness of the rain, rather the frequency of rain pouring over the time, we assume that precipitation of more than 0 means raining. As for the temperature, it is basically a common knowledge that summer is the hottest, winter is the coldest, fall and spring are in between the prior categories, which clearly showed by the plot.</p>
 <p>Through this weather profiling, we have got a new perspective that will help us provide better interpretation of the correlation analysis. It allows us to think why would under certain condition the sightings are more frequent. In the next section, we will incorporate this information to the actual sightings of the whale shark, and uncover the insight of whale shark behaviour.</p>
-<p><strong>Whale Shark Sightings vs Temperature</strong> We will start the analysis by unveiling the relationship between whale shark sightings against the average temperature. In the <a href="#fig-corrplot1">Figure&nbsp;13</a> below, we grouped the observations based on the season to provide better visualisation and level of detail.</p>
+<p><strong>Whale Shark Sightings vs Temperature</strong> We will start the analysis by unveiling the relationship between whale shark sightings against the average temperature. In the <a href="#fig-corrplot1">Figure&nbsp;15</a> below, we grouped the observations based on the season to provide better visualisation and level of detail.</p>
 <div class="cell" data-fig-heigth="8">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>whale_shark_weather <span class="sc">%&gt;%</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sighting <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(eventDate, season) <span class="sc">%&gt;%</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">sightings =</span> <span class="fu">sum</span>(sighting),</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">avg_temp =</span> <span class="fu">mean</span>(avg_temp)) <span class="sc">%&gt;%</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> sightings, <span class="at">y =</span> avg_temp, <span class="at">color =</span> season)) <span class="sc">+</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span> season) <span class="sc">+</span></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="at">label =</span> <span class="st">"Correlation of Sightings to Average Temperature"</span>,</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">subtitle =</span> <span class="st">"Around Learmonth Airport Weather Station"</span>) <span class="sc">+</span></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">"Sightings"</span>) <span class="sc">+</span></span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">"Average Temperature (Celcius)"</span>) <span class="sc">+</span></span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust=</span><span class="fl">0.5</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">hjust=</span><span class="fl">0.5</span>, <span class="at">face =</span> <span class="st">"italic"</span>, <span class="at">size =</span> <span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-corrplot1" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="report_files/figure-html/fig-corrplot1-1.png" class="img-fluid figure-img" width="1152"></p>
-<figcaption class="figure-caption">Figure&nbsp;13: Sightings to Avg. Temperature</figcaption>
+<figcaption class="figure-caption">Figure&nbsp;15: Sightings to Avg. Temperature</figcaption>
 </figure>
 </div>
 </div>
@@ -754,32 +650,17 @@ Available layers:
 </ul>
 <p><strong>Whale Shark Sightings vs Rain Precipitation</strong> The next analysis will be the correlation analysis between sightings and rain precipitation. As known previously that the area is mostly dry, so this might be affecting the sightings as well. The plot will be similar as the previous analysis, where we grouped the observations based on the season to provide better visualisation and level of detail.</p>
 <div class="cell" data-fig-heigth="8">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>whale_shark_weather <span class="sc">%&gt;%</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sighting <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(eventDate, season) <span class="sc">%&gt;%</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">sightings =</span> <span class="fu">sum</span>(sighting),</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">prcp =</span> <span class="fu">mean</span>(prcp)) <span class="sc">%&gt;%</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> sightings, <span class="at">y =</span> prcp, <span class="at">color =</span> season)) <span class="sc">+</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span> season) <span class="sc">+</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="at">label =</span> <span class="st">"Correlation of Sightings to Rain Precipitation"</span>,</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">subtitle =</span> <span class="st">"Around Learmonth Airport Weather Station"</span>) <span class="sc">+</span></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xlab</span>(<span class="st">"Sightings"</span>) <span class="sc">+</span></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">"Rain Precipitation"</span>) <span class="sc">+</span></span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust=</span><span class="fl">0.5</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">hjust=</span><span class="fl">0.5</span>, <span class="at">face =</span> <span class="st">"italic"</span>, <span class="at">size =</span> <span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-corrplot2" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="report_files/figure-html/fig-corrplot2-1.png" class="img-fluid figure-img" width="1152"></p>
-<figcaption class="figure-caption">Figure&nbsp;14: Sightings to Rain Precipitation</figcaption>
+<figcaption class="figure-caption">Figure&nbsp;16: Sightings to Rain Precipitation</figcaption>
 </figure>
 </div>
 </div>
 </div>
 <ul>
-<li><p>As can be seen from the <a href="#fig-corrplot2">Figure&nbsp;14</a>, predominantly all sightings occur in when there is not raining, while we can still see that whale shark was also spotted when it is raining. However, we thought there might be an underlying factor that could reveal the reason why whale shark spotted more in this area, particularly to the correlation with rain precipitation. If we recall our analysis from figure <a href="#fig-countoccur">Figure&nbsp;5</a>, we know that whale shark are spotted mostly in Winter and Spring season. Additionally, if we consider our insight from weather data profiling of figure <a href="#fig-weathertrend">Figure&nbsp;12</a>, we know that the rain started to pour in this area from January, it consistently happen each month until July. So, from these two insights, there is a chain reaction that might lead to whale shark migrate into this area. After doing some research, we have got the information that a rainfall is actually have an indirect impact into sea ecosystem. When raining pour down, it can lead to increased runoff from land into rivers and eventually into the sea. This runoff can carry nutrients that promotes the growth of plankton, which in turn can be consumed by other creatures in the sea such as fish, crustacean, squid, etc. (Paczkowska et al., 2020). In the end, a big fish such as whale sharks are getting the benefit as well since those are their primary food.</p></li>
+<li><p>As can be seen from the <a href="#fig-corrplot2">Figure&nbsp;16</a>, predominantly all sightings occur in when there is not raining, while we can still see that whale shark was also spotted when it is raining. However, we thought there might be an underlying factor that could reveal the reason why whale shark spotted more in this area, particularly to the correlation with rain precipitation. If we recall our analysis from figure <a href="#fig-countoccur">Figure&nbsp;7</a>, we know that whale shark are spotted mostly in Winter and Spring season. Additionally, if we consider our insight from weather data profiling of figure <a href="#fig-weathertrend">Figure&nbsp;14</a>, we know that the rain started to pour in this area from January, it consistently happen each month until July. So, from these two insights, there is a chain reaction that might lead to whale shark migrate into this area. After doing some research, we have got the information that a rainfall is actually have an indirect impact into sea ecosystem. When raining pour down, it can lead to increased runoff from land into rivers and eventually into the sea. This runoff can carry nutrients that promotes the growth of plankton, which in turn can be consumed by other creatures in the sea such as fish, crustacean, squid, etc. (Paczkowska et al., 2020). In the end, a big fish such as whale sharks are getting the benefit as well since those are their primary food.</p></li>
 <li><p>So, as mentioned in the first point, the rain may not be affect the occurrence of whale shark directly in certain area, but the chain reaction of frequent raining in that area may lead to changes in the sea ecosystem, which benefitting whale shark. Hence, we conclude that there is still a indirect correlation between raining and whale shark sightings.</p></li>
 </ul>
 </section>
@@ -818,6 +699,7 @@ Available layers:
 <li><p><strong>leaflet</strong>: Cheng J, Schloerke B, Karambelkar B, Xie Y (2023). <em>leaflet: Create Interactive Web Maps with the JavaScript ‘Leaflet’ Library</em>. R package version 2.2.0, <a href="https://CRAN.R-project.org/package=leaflet" class="uri">https://CRAN.R-project.org/package=leaflet</a>.</p></li>
 <li><p><strong>rnoaa</strong>: Chamberlain S, Hocking D (2023). <em>rnoaa: ‘NOAA’ Weather Data from R</em>. R package version 1.4.0, <a href="https://CRAN.R-project.org/package=rnoaa" class="uri">https://CRAN.R-project.org/package=rnoaa</a>.</p></li>
 <li><p><strong>gridExtra</strong>: Auguie B (2017). <em>gridExtra: Miscellaneous Functions for “Grid” Graphics</em>. R package version 2.3, <a href="https://CRAN.R-project.org/package=gridExtra" class="uri">https://CRAN.R-project.org/package=gridExtra</a>.</p></li>
+<li><p><strong>rworlddmap</strong>: South, Andy 2011 rworldmap: A New R package for Mapping Global Data. The R Journal Vol. 3/1 : 35-43.</p></li>
 </ul>
 </section>
 </div>
