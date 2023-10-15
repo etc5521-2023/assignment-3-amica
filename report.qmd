@@ -694,6 +694,12 @@ ggplot() +
 ### Whale Sharks Sightings against Weather Condition
 
 ```{r}
+# Read the tourism dataset 
+load(file='data/tourism.rda')
+```
+
+
+```{r}
 #| label: fig-learmonth
 #| fig-cap: "Locations of Where Sightings are Recorded Near Learmonth Airport Weather Station"
 #| fig-width: 8
