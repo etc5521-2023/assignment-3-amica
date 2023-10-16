@@ -877,6 +877,23 @@ whale_shark_weather %>%
 -   The correlation analysis between temperature whale shark sightings showed no significant pattern or dependency between them.
 -   Similarly, the correlation analysis between rain precipitation and whale shark sightings suggest that rain precipitation did not directly affect sightings. But it was noted that frequent rainfall may indirectly impact sea ecosystems by promoting plankton growth, which could benefit whale sharks.
 
+
+
+```{r}
+tourism
+
+
+holiday_data <- tourism %>% filter(Purpose == 'Holiday')
+
+holiday_data <- holiday_data %>%  group_by_key() %>%
+  index_by(year_quarter = Quarter) %>% # monthly aggregates
+  summarise(
+    avg_trips = sum(Trips, na.rm = TRUE)
+  )
+```
+
+
+
 ## References
 
 Department of Fisheries, Government of Western Australia. (2011, September). Fisheries Fact Sheet: Whale Shark. https://www.fish.wa.gov.au/documents/recreational_fishing/fact_sheets/fact_sheet_whale_shark.pdf
