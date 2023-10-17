@@ -928,10 +928,19 @@ pt_sf_region <- left_join(
 ```
 ```{r}
 #taking the highest sighting region
-max_sighting$region <- pt_sf_region %>% filter(sighting == 120) %>% select(region)
+max_sighting <- pt_sf_region %>% filter(sighting == 120)
 
 
-highest_sightings <- holiday_data %>% filter(Region %in% max_sighting$region)
+highest_sightings <- holiday_data %>% filter(Region == 'Exmouth')
+```
+
+```{r}
+ggplot(highest_sightings, aes(x = year_quarter, y = avg_trips)) +
+  geom_line() +
+  labs(title = "Animal Sightings Over Time",
+       x = "Quarter",
+       y = "Number of Sightings") +
+  theme_classic()
 ```
 
 
