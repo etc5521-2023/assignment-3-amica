@@ -694,12 +694,6 @@ ggplot() +
 ### Whale Sharks Sightings against Weather Condition
 
 ```{r}
-# Read the tourism dataset 
-load(file='data/tourism.rda')
-```
-
-
-```{r}
 #| label: fig-learmonth
 #| fig-cap: "Locations of Where Sightings are Recorded Near Learmonth Airport Weather Station"
 #| fig-width: 8
@@ -892,10 +886,52 @@ tourism
 holiday_data <- tourism %>% filter(Purpose == 'Holiday')
 
 holiday_data <- holiday_data %>%  group_by_key() %>%
-  index_by(year_quarter = Quarter) %>% # monthly aggregates
+  index_by(year_quarter = Quarter) %>% # quarterly aggregates
   summarise(
     avg_trips = sum(Trips, na.rm = TRUE)
   )
+```
+
+
+```{r}
+library(rmapshaper)
+t_region <- st_read(here::here("data/SA2_2021_AUST_SHP_GDA2020/SA2_2021_AUST_GDA2020.shp")) |>
+  ms_simplify(keep = 0.1) |>
+  st_transform(crs = st_crs("WGS84")) |>
+  st_make_valid() |>
+  select(STE_NAME21, SA2_NAME21, SA2_CODE21, geometry) |>
+  rename("state" = STE_NAME21,
+         "region" = SA2_NAME21,
+         "sa2_code21" = SA2_CODE21)
+
+# Convert Sighting data to a sf object
+whale_shark_sf <- whale_shark_weather |>
+  select(-c(recordID)) |>
+  st_as_sf(coords = c("decimalLongitude", "decimalLatitude"),
+  crs = st_crs("WGS84"))
+
+# Join
+# some points are out of the polygon, lets filter out so we get only points in the polygon
+pt_sf <-
+  st_join(t_region, whale_shark_sf, left = TRUE) %>%  # spatial join to get intersection of points and poly
+  filter(!is.na(region)) # get only the points (sightings) that fall in the polygon (tourism region)
+
+# Aggregate by Region, Year
+pt_sf_region <- left_join(
+  t_region |> select(region, geometry),
+  pt_sf |>
+    as_tibble() |>
+    group_by(region) |>
+    summarise(sighting = n()),
+  by = c("region" = "region")
+)
+```
+```{r}
+#taking the highest sighting region
+max_sighting$region <- pt_sf_region %>% filter(sighting == 120) %>% select(region)
+
+
+highest_sightings <- holiday_data %>% filter(Region %in% max_sighting$region)
 ```
 
 
