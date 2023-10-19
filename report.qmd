@@ -31,6 +31,7 @@ library(gridExtra)
 library(rworldmap)
 library(tsibble) # update
 library(lubridate) # update
+library(rmapshaper) # update
 ```
 
 ## Introduction
@@ -224,7 +225,7 @@ qtr_data <- long_data %>%
 # convert to tsibble
 tourism <- qtr_data %>%
   as_tsibble(key = c(Region, Purpose), index = Quarter)
-usethis::use_data(tourism, overwrite = TRUE, compress = "xz")
+# usethis::use_data(tourism, overwrite = TRUE, compress = "xz") Commented due to error
 ```
 
 | Variables | Description                                                                          |
@@ -429,6 +430,46 @@ ggplot() +
         plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10))
 ```
 
+
+### Finding nearest tourist destination
+
+Similarly to weather stations, we make use of the same geospatial object of Australia to plot all available tourist destinations in Australia at first from which we will then identify the tourist spot required.
+
+```{r}
+#| label: fig-alltourism
+#| fig-cap: "All Tourist Destinations"
+#| fig-width: 8
+#| fig-heigth: 8
+#| echo: false
+#| warning: false
+#| message: false
+
+t_region <- st_read(here::here("data/SA2_2021_AUST_SHP_GDA2020/SA2_2021_AUST_GDA2020.shp")) |>
+  ms_simplify(keep = 0.1) |>
+  st_transform(crs = st_crs("WGS84")) |>
+  st_make_valid() |>
+  select(STE_NAME21, SA2_NAME21, SA2_CODE21, geometry) |>
+  rename("state" = STE_NAME21,
+         "region" = SA2_NAME21,
+         "sa2_code21" = SA2_CODE21)
+
+polygon_geometry <- st_geometry(t_region)[1]
+
+coordinates <- st_coordinates(polygon_geometry) |>
+  as_tibble()
+
+
+states %>%
+  ggplot() +
+  geom_sf(aes(geometry = geometry)) +
+  geom_point(data = coordinates, aes(x=X,y=Y), color = "red", size = 0.1) +
+  ggtitle("Tourism Spots in Entire Australia") 
+
+```
+
+
+
+
 ### Data Cleansing and Transforming
 
 In this section, before we go into the data analysis adventure we perform a bit of data cleansing and transforming. This is important to make sure we maintain the quality of the data.
@@ -519,6 +560,73 @@ save(whale_shark_weather, file = "data/whale_shark_weather.rda")
 -   This is all about making our data analysis easier. With these labels, we can do things like calculate correlations between weather factors (precipitation, temperature) and sightings. We can test hypotheses like, "Do sightings increase when there are higher chances of rain?" or "Are sightings more likely in certain temperature ranges?"
 
 -   Plus, when we visualise the data, it's much clearer. We can make time series plots that show how weather conditions and sightings line up over time. And if we want to build models that predict when whale sharks might appear based on weather forecasts, these labels are essential.
+
+**Tourism Data**
+
+Before we can combine the joined weather and sighting dataset, we must first convert `the whale_shark_weather.rda` into a sf object which is then joined with the tourism dataset. 
+
+```{r}
+#| echo: true
+#| warning: false
+#| message: false
+#| eval: true
+
+# Convert Sighting data to a sf object
+whale_shark_sf <- whale_shark_weather |>
+  select(-c(recordID)) |>
+  st_as_sf(coords = c("decimalLongitude", "decimalLatitude"),
+  crs = st_crs("WGS84"))
+```
+
+### Joining Combined Whale Shark Data & Weather Data With Tourism Data
+
+Below is the code to combine both the whale_weather data with the tourism data. The merging of the datasets is done by 
+
+```{r}
+#| echo: true
+#| warning: false
+#| message: false
+#| eval: true
+
+
+# Join
+# some points are out of the polygon, lets filter out so we get only points in the polygon
+pt_sf <-
+  st_join(t_region, whale_shark_sf, left = TRUE) %>%  # spatial join to get intersection of points and poly
+  filter(!is.na(region)) # get only the points (sightings) that fall in the polygon (tourism region)
+```
+
+From the plot above showing all tourist spots, we plot the tourist spot which contains the weather station and the sightings with the most occurrences of whale sharks which in this case is **Exmouth** which we were able to figure out by.... We also filtered out the Purpose of tourism visit of Holiday since.....
+
+```{r}
+#| echo: true
+#| warning: false
+#| message: false
+#| eval: true
+
+# Aggregate by Region, Year
+pt_sf_region <- left_join(
+  t_region |> select(region, geometry),
+  pt_sf |>
+    as_tibble() |>
+    group_by(region) |>
+    summarise(sighting = n()),
+  by = c("region" = "region")
+)
+
+holiday_data <- tourism %>% filter(Purpose == 'Holiday')
+
+holiday_data <- holiday_data %>%  group_by_key() %>%
+  index_by(year_quarter = Quarter) %>% # quarterly aggregates
+  summarise(
+    avg_trips = sum(Trips, na.rm = TRUE)
+  )
+#taking the highest sighting region
+max_sighting <- pt_sf_region %>% filter(sighting == 120)
+
+
+highest_sightings <- holiday_data %>% filter(Region == 'Exmouth')
+```
 
 ## Exploratory Data Analysis (EDA)
 
@@ -928,72 +1036,10 @@ whale_shark_weather %>%
 
 -   So, as mentioned in the first point, the rain may not be affect the occurrence of whale shark directly in certain area, but the chain reaction of frequent raining in that area may lead to changes in the sea ecosystem, which benefitting whale shark. Hence, we conclude that there is still a indirect correlation between raining and whale shark sightings.
 
-## Summary
 
--   The data analysis showed that there were relatively even occurrences of whale shark sightings between spring and winter, with a slight edge for spring. Fall had a significant number of sightings, while summer had the fewest. This finding contradicted the expectation of higher occurrences during winter months.
--   The analysis using geospatial data confirmed that most whale shark sightings occurred in coastal areas rather than open ocean regions of Australia, aligning with the expectation of differences in habitat preferences.
--   Contrary to the expectation of declining occurrences, the data showed an increase in whale shark sightings from around 2008 to 2013, reaching a peak in 2013. Afterward, there was a decline, but it stabilized after 2017, suggesting that the population may have stabilized.
--   The analysis also suggested that whale sharks tend to prefer Western Australian waters, with a preference for winter months in the West and summer months in the East, indicating potential seasonal movement from west to east and vice versa.
--   The data confirmed the expectation of most occurrences in the northern part of Western Australia, particularly in the Ningaloo Marine Park area, which aligns with the known migration patterns and ecotourism activities in that region.
--   The correlation analysis between temperature whale shark sightings showed no significant pattern or dependency between them.
--   Similarly, the correlation analysis between rain precipitation and whale shark sightings suggest that rain precipitation did not directly affect sightings. But it was noted that frequent rainfall may indirectly impact sea ecosystems by promoting plankton growth, which could benefit whale sharks.
+### Whale Sharks Sightings For a Weather Station Against Tourism Visits
 
-
-
-```{r}
-tourism
-
-
-holiday_data <- tourism %>% filter(Purpose == 'Holiday')
-
-holiday_data <- holiday_data %>%  group_by_key() %>%
-  index_by(year_quarter = Quarter) %>% # quarterly aggregates
-  summarise(
-    avg_trips = sum(Trips, na.rm = TRUE)
-  )
-```
-
-
-```{r}
-library(rmapshaper)
-t_region <- st_read(here::here("data/SA2_2021_AUST_SHP_GDA2020/SA2_2021_AUST_GDA2020.shp")) |>
-  ms_simplify(keep = 0.1) |>
-  st_transform(crs = st_crs("WGS84")) |>
-  st_make_valid() |>
-  select(STE_NAME21, SA2_NAME21, SA2_CODE21, geometry) |>
-  rename("state" = STE_NAME21,
-         "region" = SA2_NAME21,
-         "sa2_code21" = SA2_CODE21)
-
-# Convert Sighting data to a sf object
-whale_shark_sf <- whale_shark_weather |>
-  select(-c(recordID)) |>
-  st_as_sf(coords = c("decimalLongitude", "decimalLatitude"),
-  crs = st_crs("WGS84"))
-
-# Join
-# some points are out of the polygon, lets filter out so we get only points in the polygon
-pt_sf <-
-  st_join(t_region, whale_shark_sf, left = TRUE) %>%  # spatial join to get intersection of points and poly
-  filter(!is.na(region)) # get only the points (sightings) that fall in the polygon (tourism region)
-
-# Aggregate by Region, Year
-pt_sf_region <- left_join(
-  t_region |> select(region, geometry),
-  pt_sf |>
-    as_tibble() |>
-    group_by(region) |>
-    summarise(sighting = n()),
-  by = c("region" = "region")
-)
-```
-```{r}
-#taking the highest sighting region
-max_sighting <- pt_sf_region %>% filter(sighting == 120)
-
-
-highest_sightings <- holiday_data %>% filter(Region == 'Exmouth')
-```
+We first start off by visualizing how the overall tourist visits were per quarter for each years by the figure below.
 
 ```{r}
 ggplot(highest_sightings, aes(x = year_quarter, y = avg_trips)) +
@@ -1003,6 +1049,27 @@ ggplot(highest_sightings, aes(x = year_quarter, y = avg_trips)) +
        y = "Number of Sightings") +
   theme_classic()
 ```
+
+
+```{r}
+highest_sightings %>%
+  mutate(quarter = substr(year_quarter, nchar(year_quarter), nchar(year_quarter) + 2),
+         year = substr(year_quarter, nchar(year_quarter)-1, nchar(year_quarter) )) %>%
+  ggplot(aes(x=year_quarter,y=avg_trips)) +
+  geom_line(aes(group=year),alpha=0.3) +
+              geom_smooth(se=FALSE)
+```
+
+
+## Summary
+
+-   The data analysis showed that there were relatively even occurrences of whale shark sightings between spring and winter, with a slight edge for spring. Fall had a significant number of sightings, while summer had the fewest. This finding contradicted the expectation of higher occurrences during winter months.
+-   The analysis using geospatial data confirmed that most whale shark sightings occurred in coastal areas rather than open ocean regions of Australia, aligning with the expectation of differences in habitat preferences.
+-   Contrary to the expectation of declining occurrences, the data showed an increase in whale shark sightings from around 2008 to 2013, reaching a peak in 2013. Afterward, there was a decline, but it stabilized after 2017, suggesting that the population may have stabilized.
+-   The analysis also suggested that whale sharks tend to prefer Western Australian waters, with a preference for winter months in the West and summer months in the East, indicating potential seasonal movement from west to east and vice versa.
+-   The data confirmed the expectation of most occurrences in the northern part of Western Australia, particularly in the Ningaloo Marine Park area, which aligns with the known migration patterns and ecotourism activities in that region.
+-   The correlation analysis between temperature whale shark sightings showed no significant pattern or dependency between them.
+-   Similarly, the correlation analysis between rain precipitation and whale shark sightings suggest that rain precipitation did not directly affect sightings. But it was noted that frequent rainfall may indirectly impact sea ecosystems by promoting plankton growth, which could benefit whale sharks.
 
 
 
