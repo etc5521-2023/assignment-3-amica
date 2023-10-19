@@ -1,6 +1,6 @@
 ---
 title: "Whale Shark Observations: A Comprehensive Study"
-author: "AMICA - Evan Hadinata Ginting (33477558) & Harsh Jain (33397058)"
+author: "Evan Hadinata Ginting (33477558), Harsh Jain (33397058), Aishwarya Anil Kumar (32644329), Chih Hui Wang (33209006) and Shreyansh Mahtolia (33509115)"
 format: html
 ---
 
@@ -32,12 +32,16 @@ library(rworldmap)
 library(tsibble) # update
 library(lubridate) # update
 library(rmapshaper) # update
+library(zoo) # update
 ```
 
 ## Introduction
 
 ::: {style="text-align: justify;"}
 Whale Shark (Rhincodon typus) is the largest of all fishes alive. It may grow up to 18 metres (m) in length, but commonly seen between 4 m to 12 m. It is typically blue-grey or brownish in color with a pattern of white spots and vertical lines on its body. In terms of the diet, they feed on plankton, small crustaceans, squid, and fishes. The main feature of their food processing tools are their filtering screens on the gills and their tiny, more than 300 hooked teeth in both jaws. They are found on all the tropical oceans of the world where the water temperatures are ranging from 21 to 25 degrees Celsius and typically at depths of up to 1000 meters. Whale sharks are generally known to be active swimmers, and their activity can vary throughout the day and night. They do not exhibit diurnal (daytime) or seasonal (summer/winter) patterns of activity in the same way that some other species do. However, they seasonally come close to inshore areas, especially at plankton-rich locations. In Australia, it is found primarily in northern Western Australia, the Northern Territory, and Queensland. Whale sharks are known to migrate to the Ningaloo Marine park during specific times of the year, usually between March and July which is associated with the availability of plankton and other food sources in the area. During this time, there is usually a big ecotourism activity happening here for the chance to swim with them. Sadly, now, their status is an endangered species due to massive hunt of parts of their bodies. Hence, Conservation measures, including protections and regulations, are being implemented to safeguard this species in Australia and many other countries.
+
+![Whale Shark](fig/jeremy-bishop-q9c4xqf80Y4-unsplash.jpg){#fig-whaleshark}
+Photo by [Jeremy Bishop](https://unsplash.com/@jeremybishop?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) on [Unsplash](https://unsplash.com/photos/black-whale-on-sea-q9c4xqf80Y4?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)
 
 In this study, We expect to encounter these events with our data analysis:
 
@@ -230,14 +234,10 @@ tourism <- qtr_data %>%
 
 | Variables | Description                                                                          |
 |------------------------------------|------------------------------------|
-| Quarter   | Quarterly information, representing each quarter within a year.                  
-|
-| Region    | Records of various regions or cities within Australia.        
-|
-| purpose   | The purpose of the trip contains holiday, visiting, business and other.
-|
-| Trips     | The number of trips ('000).  
-
+| Quarter   | Quarterly information, representing each quarter within a year.                      |
+| Region    | Records of various regions or cities within Australia.                               |
+| Purpose   | The purpose of the trip contains holiday, visiting, business and other.              |
+| Trips     | The number of trips ('000).                                                          |
 
 ## Initial data analysis (IDA)
 
@@ -1059,6 +1059,48 @@ highest_sightings %>%
   geom_line(aes(group=year),alpha=0.3) +
               geom_smooth(se=FALSE)
 ```
+
+
+In Exmouth, there are various types of tourism available. Most of the visitors who come here are interested in having a closer interaction with nature. One of the most popular activities is swimming with whale sharks. These gentle giants are abundant in this region, making it a popular destination for people wanting to experience this unique adventure.
+
+```{r}
+# Focus on whale sharks found in the Cape Range National Park area.
+# Set the latitude and longitude range for Cape Range National Park within Exmouth.
+whale_shark_Exmouth <- whale_shark %>% 
+  filter(decimalLatitude < -21, decimalLatitude > -22.5,
+         decimalLongitude > 113.5, decimalLongitude < 114.25) %>%
+  filter(!is.na(eventDate) ) %>%
+   mutate(year_quarter = yearquarter(eventDate)) %>%
+  group_by(year_quarter) %>% 
+  count()
+
+# Merge the tourist travel data with the observed whale shark occurrence data within the range
+exmouth <- left_join(highest_sightings, whale_shark_Exmouth, 
+                             by = "year_quarter") 
+
+# Focus on observing information from 2010 onwards 
+# as there were almost no recorded whale shark sightings in the area before 2010, rendering any comparison non-comparable
+exmouth_2010 <- exmouth[exmouth$year_quarter >= as.yearqtr("2010 Q1"), ]
+
+# Convert the columns for year and quarter to characters for ease of plotting
+exmouth_2010$year_quarter <- as.character(exmouth_2010$year_quarter)
+
+
+# Combine a bar chart and a line chart to observe the trends between the two
+ggplot(exmouth_2010) +
+  geom_col(aes(x = year_quarter, y = n, fill = "Occurrences"), color = "lightblue") +
+  geom_line(aes(x = year_quarter, y = avg_trips, color = "Trips", group=1), size = 0.5) +
+  labs(x = "Time (Quarterly)", 
+       title = "The Relationship between Tourism and Whale Shark in Exmouth") +
+  theme_bw() +
+  scale_fill_manual(values = "lightblue", name = "Occurrences", labels = c("The Number of Whale Shark")) +
+  scale_color_manual(values = "darkblue", name = "Trips (in thousand)", labels = c("The Number of Tourists")) +
+   scale_x_discrete(breaks = exmouth$year_quarter) +
+   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
 
 
 ## Summary
