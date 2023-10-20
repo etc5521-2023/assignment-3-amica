@@ -1063,6 +1063,7 @@ highest_sightings %>%
               geom_smooth(se=FALSE)
 ```
 ---------Ash's code----------------------
+
 Analysis using scagnostics
 
 
@@ -1088,8 +1089,7 @@ ggplot(highest_sightings, aes(x = year_quarter, y = avg_trips, color = avg_trips
 ```
 
 ```{r}
-# Assuming the required libraries have been loaded and the dataset is present
-library(ggplot2)
+
 library(alphahull)
 library(igraph)
 
