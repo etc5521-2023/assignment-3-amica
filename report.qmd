@@ -1036,6 +1036,8 @@ whale_shark_weather %>%
 
 -   So, as mentioned in the first point, the rain may not be affect the occurrence of whale shark directly in certain area, but the chain reaction of frequent raining in that area may lead to changes in the sea ecosystem, which benefitting whale shark. Hence, we conclude that there is still a indirect correlation between raining and whale shark sightings.
 
+## Temporal analysis on tourism
+
 
 ### Whale Sharks Sightings For a Weather Station Against Tourism Visits
 
@@ -1044,6 +1046,7 @@ We first start off by visualizing how the overall tourist visits were per quarte
 ```{r}
 ggplot(highest_sightings, aes(x = year_quarter, y = avg_trips)) +
   geom_line() +
+  geom_point() +
   labs(title = "Animal Sightings Over Time",
        x = "Quarter",
        y = "Number of Sightings") +
@@ -1059,7 +1062,122 @@ highest_sightings %>%
   geom_line(aes(group=year),alpha=0.3) +
               geom_smooth(se=FALSE)
 ```
+---------Ash's code----------------------
+Analysis using scagnostics
 
+
+```{r}
+
+library(binostics)
+library(ggplot2)
+
+# Compute Scagnostics
+scagnostics_results <- scagnostics(highest_sightings$year_quarter, highest_sightings$avg_trips)
+
+# Print results
+print(scagnostics_results)
+
+# Visualize the relationship with a scatterplot
+ggplot(highest_sightings, aes(x = year_quarter, y = avg_trips, color = avg_trips)) +
+  geom_point() +
+  labs(title = "Scatterplot of year_quarter vs avg_trips",
+       x = "Year Quarter",
+       y = "Average Trips") +
+  theme_classic()
+
+```
+
+```{r}
+# Assuming the required libraries have been loaded and the dataset is present
+library(ggplot2)
+library(alphahull)
+library(igraph)
+
+# Extract relevant columns from highest_sightings
+data <- as.matrix(highest_sightings[, c("year_quarter", "avg_trips")])
+
+# Convex hull
+convex_indices <- chull(data)
+convex_data <- data[convex_indices, ]
+
+# Plotting
+plot(data, pch=19, col="blue", xlab="Year Quarter", ylab="Average Trips")
+polygon(convex_data, col=NA, border="red")
+
+# Alpha hull
+alpha_obj <- ashape(data, alpha=1)
+plot(alpha_obj, add=TRUE, lwd=2)
+
+# MST
+distances <- dist(data)
+graph <- graph_from_adjacency_matrix(as.matrix(distances), mode="undirected", weighted=TRUE, diag=FALSE)
+mst_graph <- mst(graph)
+plot(mst_graph, layout=layout.auto(mst_graph))
+
+
+```
+
+```{r}
+library(binostics)
+
+scags_res <- scagnostics(highest_sightings$year_quarter, highest_sightings$avg_trips)
+print(scags_res)
+
+```
+```{r}
+library(dplyr)
+library(ggplot2)
+library(tibble)
+
+# Convert to a data frame for easier handling
+scagnostics_df <- data.frame(Metric = names(scags_res$s), Value = as.numeric(scags_res$s))
+
+# Sort by "Outlying"
+outlying_sorted <- scagnostics_df %>% arrange(desc(Value[Metric == "Outlying"]))
+
+# Sort by "Skewed"
+skewed_sorted <- scagnostics_df %>% arrange(desc(Value[Metric == "Skewed"]))
+
+# Sort by "Clumpy"
+clumpy_sorted <- scagnostics_df %>% arrange(desc(Value[Metric == "Clumpy"]))
+
+```
+
+
+Analysing seasonal trend with forecasting
+
+```{r}
+
+library(forecast)
+library(ggplot2)
+
+
+
+# Convert data to a ts object 
+ts_data_trips <- ts(highest_sightings$avg_trips, frequency=4)
+
+# Decompose the time series for average trips
+decomposition_trips <- stl(ts_data_trips, s.window="periodic")
+
+# Plot the decomposition
+autoplot(decomposition_trips) + labs(title = "Seasonal Decomposition of Average Trips")
+
+
+```
+
+Trend analysis to understand number of people travelling to Exmouth for holidays.
+
+```{r}
+library(Kendall)
+
+result <- trend::mk.test(highest_sightings$avg_trips)
+
+# Print the result
+print(result)
+
+```
+
+-------------Ash's code ends--------------
 
 In Exmouth, there are various types of tourism available. Most of the visitors who come here are interested in having a closer interaction with nature. One of the most popular activities is swimming with whale sharks. These gentle giants are abundant in this region, making it a popular destination for people wanting to experience this unique adventure.
 
