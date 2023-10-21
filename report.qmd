@@ -622,7 +622,7 @@ pt_sf_region <- left_join(
 tourism_quarterly <- tourism %>%  group_by_key() %>%
   index_by(year_quarter = Quarter) %>% # quarterly aggregates
   summarise(
-    avg_trips = sum(Trips, na.rm = TRUE)
+    total_trips = sum(Trips, na.rm = TRUE)
   )
 #taking the highest sighting region
 max_sighting <- pt_sf_region %>% filter(sighting == 120)
@@ -1053,10 +1053,10 @@ tourism_shared <- highest_sightings %>%
   as_shared_tsibble(spec = (Purpose) / Region)
 
 tourism_feat <- tourism_shared %>%
-  features(avg_trips, feat_stl)
+  features(total_trips, feat_stl)
 
 p1 <- tourism_shared %>%
-  ggplot(aes(x = year_quarter, y = avg_trips)) +
+  ggplot(aes(x = year_quarter, y = total_trips)) +
   geom_line(aes(group = Region), alpha = 0.5) +
   facet_wrap(~ Purpose, scales = "free_y") 
 p2 <- tourism_feat %>%
@@ -1065,7 +1065,7 @@ p2 <- tourism_feat %>%
 
   subplot(
     ggplotly(p1, tooltip = "Region", width = 700),
-    ggplotly(p2, tooltip = "Region", width = 600),
+    ggplotly(p2, tooltip = "Purpose", width = 600),
     nrows = 2) %>%
   highlight(dynamic = FALSE)
 ```
@@ -1096,12 +1096,12 @@ highest_sightings <- highest_sightings %>% filter(Purpose == 'Holiday')
 We first start off by visualizing how the overall tourist visits were per quarter for each years by the figure below.
 
 ```{r}
-ggplot(highest_sightings, aes(x = year_quarter, y = avg_trips)) +
+ggplot(highest_sightings, aes(x = year_quarter, y = total_trips)) +
   geom_line() +
   geom_point() +
-  labs(title = "Average Trips Over Time",
+  labs(title = "Total Trips Over Time",
        x = "Quarter",
-       y = "Average trips") +
+       y = "Total trips") +
   theme_classic()
 ```
 
@@ -1110,7 +1110,7 @@ ggplot(highest_sightings, aes(x = year_quarter, y = avg_trips)) +
 highest_sightings %>%
   mutate(quarter = substr(year_quarter, nchar(year_quarter), nchar(year_quarter) + 2),
          year = substr(year_quarter, nchar(year_quarter)-1, nchar(year_quarter) )) %>%
-  ggplot(aes(x=year_quarter,y=avg_trips)) +
+  ggplot(aes(x=year_quarter,y=total_trips)) +
   geom_line(aes(group=year),alpha=0.3) +
               geom_smooth(se=FALSE)
 ```
@@ -1119,11 +1119,11 @@ Analysis using scagnostics
 
 ```{r}
 
-ggplot(highest_sightings, aes(x = year_quarter, y = avg_trips, color = avg_trips)) +
+ggplot(highest_sightings, aes(x = year_quarter, y = total_trips, color = total_trips)) +
   geom_point() +
-  labs(title = "Scatterplot of year_quarter vs avg_trips",
+  labs(title = "Scatterplot of year_quarter vs total_trips",
        x = "Year Quarter",
-       y = "Average Trips") +
+       y = "Total Trips in a Quarter") +
   theme_classic()
 
 ```
@@ -1132,7 +1132,7 @@ ggplot(highest_sightings, aes(x = year_quarter, y = avg_trips, color = avg_trips
 ```{r}
 library(binostics)
 
-scags_res <- scagnostics(highest_sightings$year_quarter, highest_sightings$avg_trips)
+scags_res <- scagnostics(highest_sightings$year_quarter, highest_sightings$total_trips)
 print(scags_res)
 
 ```
@@ -1159,13 +1159,13 @@ Analysing seasonal trend with forecasting
 
 
 # Convert data to a ts object 
-ts_data_trips <- ts(highest_sightings$avg_trips, frequency=4)
+ts_data_trips <- ts(highest_sightings$total_trips, frequency=4)
 
 # Decompose the time series for average trips
 decomposition_trips <- stl(ts_data_trips, s.window="periodic")
 
 # Plot the decomposition
-autoplot(decomposition_trips) + labs(title = "Seasonal Decomposition of Average Trips")
+autoplot(decomposition_trips) + labs(title = "Seasonal Decomposition of Total Trips")
 
 
 ```
@@ -1175,7 +1175,7 @@ Trend analysis to understand number of people travelling to Exmouth for holidays
 ```{r}
 library(Kendall)
 
-result <- trend::mk.test(highest_sightings$avg_trips)
+result <- trend::mk.test(highest_sightings$total_trips)
 
 print(result)
 
@@ -1241,7 +1241,7 @@ exmouth_2010$year_quarter <- as.character(exmouth_2010$year_quarter)
 # Combine a bar chart and a line chart to observe the trends between the two
 ggplot(exmouth_2010) +
   geom_col(aes(x = year_quarter, y = n, fill = "Occurrences"), color = "lightblue") +
-  geom_line(aes(x = year_quarter, y = avg_trips, color = "Trips", group=1), size = 0.5) +
+  geom_line(aes(x = year_quarter, y = total_trips, color = "Trips", group=1), size = 0.5) +
   labs(x = "Time (Quarterly)", 
        title = "The Relationship between Tourism and Whale Shark in Exmouth") +
   theme_bw() +
