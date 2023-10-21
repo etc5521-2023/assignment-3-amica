@@ -33,6 +33,11 @@ library(tsibble) # update
 library(lubridate) # update
 library(rmapshaper) # update
 library(zoo) # update
+library(tsibbletalk) # update
+library(feasts) # update
+library(plotly) # update
+library(tibble) # update
+library(forecast) # update
 ```
 
 ## Introduction
@@ -614,9 +619,7 @@ pt_sf_region <- left_join(
   by = c("region" = "region")
 )
 
-holiday_data <- tourism %>% filter(Purpose == 'Holiday')
-
-holiday_data <- holiday_data %>%  group_by_key() %>%
+tourism_quarterly <- tourism %>%  group_by_key() %>%
   index_by(year_quarter = Quarter) %>% # quarterly aggregates
   summarise(
     avg_trips = sum(Trips, na.rm = TRUE)
@@ -625,8 +628,10 @@ holiday_data <- holiday_data %>%  group_by_key() %>%
 max_sighting <- pt_sf_region %>% filter(sighting == 120)
 
 
-highest_sightings <- holiday_data %>% filter(Region == 'Exmouth')
+highest_sightings <- tourism_quarterly %>% filter(Region == 'Exmouth' & Purpose != 'Total')
+
 ```
+
 
 ## Exploratory Data Analysis (EDA)
 
@@ -1039,7 +1044,54 @@ whale_shark_weather %>%
 ## Temporal analysis on tourism
 
 
-### Whale Sharks Sightings For a Weather Station Against Tourism Visits
+Tignostic analysis for tourism data to understand average trips taken by people to "Exmouth" for for various reasons.
+
+```{r}
+
+
+tourism_shared <- highest_sightings %>%
+  as_shared_tsibble(spec = (Purpose) / Region)
+
+tourism_feat <- tourism_shared %>%
+  features(avg_trips, feat_stl)
+
+p1 <- tourism_shared %>%
+  ggplot(aes(x = year_quarter, y = avg_trips)) +
+  geom_line(aes(group = Region), alpha = 0.5) +
+  facet_wrap(~ Purpose, scales = "free_y") 
+p2 <- tourism_feat %>%
+  ggplot(aes(x = trend_strength, y = seasonal_strength_year)) +
+  geom_point(aes(group = Region))
+
+  subplot(
+    ggplotly(p1, tooltip = "Region", width = 700),
+    ggplotly(p2, tooltip = "Region", width = 600),
+    nrows = 2) %>%
+  highlight(dynamic = FALSE)
+```
+
+The visualized analysis provides a comprehensive insight into the tourism trends in Exmouth, segmented by the purpose of visitation.
+
+Tourism Over Time by Purpose:
+
+The first graph displays the tourism trends in Exmouth across different quarters since 1998, stratified by the purpose of the visit.
+One striking observation from this is the consistent rise in tourists visiting Exmouth for holidays. This increasing trend underscores Exmouth's growing appeal as a vacation destination.
+While there are visitors coming to Exmouth for other reasons, such as business and visiting friends or relatives, their volume is relatively subdued when juxtaposed against the holidaymakers.
+
+Seasonal versus Trend Strength:
+
+The second graph contrasts the strength of the seasonal pattern against the trend for different regions.
+
+Regions clustering together in this plot share similar seasonal and trend dynamics, making it an effective tool to understand patterns and anomalies at a glance.
+
+Focusing on Exmouth, the analysis underscores its prominence as a holiday destination. The number of holiday tourists has been on a consistent uptick, underlining its allure. On the contrary, while there are other motivators bringing people to Exmouth, like business or visits to friends and family, their numbers pale in comparison to those coming for leisure. Hence, we will be focusing on "Holiday" data for further analysis.
+
+
+```{r}
+highest_sightings <- highest_sightings %>% filter(Purpose == 'Holiday')
+```
+
+### Understanding tourism trends in our region of interest
 
 We first start off by visualizing how the overall tourist visits were per quarter for each years by the figure below.
 
@@ -1047,9 +1099,9 @@ We first start off by visualizing how the overall tourist visits were per quarte
 ggplot(highest_sightings, aes(x = year_quarter, y = avg_trips)) +
   geom_line() +
   geom_point() +
-  labs(title = "Animal Sightings Over Time",
+  labs(title = "Average Trips Over Time",
        x = "Quarter",
-       y = "Number of Sightings") +
+       y = "Average trips") +
   theme_classic()
 ```
 
@@ -1062,23 +1114,11 @@ highest_sightings %>%
   geom_line(aes(group=year),alpha=0.3) +
               geom_smooth(se=FALSE)
 ```
----------Ash's code----------------------
-
 Analysis using scagnostics
 
 
 ```{r}
 
-library(binostics)
-library(ggplot2)
-
-# Compute Scagnostics
-scagnostics_results <- scagnostics(highest_sightings$year_quarter, highest_sightings$avg_trips)
-
-# Print results
-print(scagnostics_results)
-
-# Visualize the relationship with a scatterplot
 ggplot(highest_sightings, aes(x = year_quarter, y = avg_trips, color = avg_trips)) +
   geom_point() +
   labs(title = "Scatterplot of year_quarter vs avg_trips",
@@ -1088,34 +1128,6 @@ ggplot(highest_sightings, aes(x = year_quarter, y = avg_trips, color = avg_trips
 
 ```
 
-```{r}
-
-library(alphahull)
-library(igraph)
-
-# Extract relevant columns from highest_sightings
-data <- as.matrix(highest_sightings[, c("year_quarter", "avg_trips")])
-
-# Convex hull
-convex_indices <- chull(data)
-convex_data <- data[convex_indices, ]
-
-# Plotting
-plot(data, pch=19, col="blue", xlab="Year Quarter", ylab="Average Trips")
-polygon(convex_data, col=NA, border="red")
-
-# Alpha hull
-alpha_obj <- ashape(data, alpha=1)
-plot(alpha_obj, add=TRUE, lwd=2)
-
-# MST
-distances <- dist(data)
-graph <- graph_from_adjacency_matrix(as.matrix(distances), mode="undirected", weighted=TRUE, diag=FALSE)
-mst_graph <- mst(graph)
-plot(mst_graph, layout=layout.auto(mst_graph))
-
-
-```
 
 ```{r}
 library(binostics)
@@ -1125,9 +1137,6 @@ print(scags_res)
 
 ```
 ```{r}
-library(dplyr)
-library(ggplot2)
-library(tibble)
 
 # Convert to a data frame for easier handling
 scagnostics_df <- data.frame(Metric = names(scags_res$s), Value = as.numeric(scags_res$s))
@@ -1147,10 +1156,6 @@ clumpy_sorted <- scagnostics_df %>% arrange(desc(Value[Metric == "Clumpy"]))
 Analysing seasonal trend with forecasting
 
 ```{r}
-
-library(forecast)
-library(ggplot2)
-
 
 
 # Convert data to a ts object 
@@ -1172,12 +1177,41 @@ library(Kendall)
 
 result <- trend::mk.test(highest_sightings$avg_trips)
 
-# Print the result
 print(result)
 
 ```
 
--------------Ash's code ends--------------
+**Analysis of the Mann-Kendall Test on the Time Series Data for Trips to Exmouth**:
+
+After applying the Mann-Kendall test to our dataset for trips to Exmouth, we've obtained the following insights:
+
+1. **z-value (2.7131)**: 
+   - Our z-value is positive, which typically points to an increasing trend. The larger the absolute value of z, the stronger the trend. Here, 2.7131 indicates a notable increasing trend in our dataset.
+
+2. **Sample Size (n = 100)**: 
+   - We have used a considerable sample size of 100 data points, which grants more confidence in the statistical robustness of our results.
+
+3. **Significance (p-value = 0.006666)**: 
+   - The p-value is a fundamental measure in hypothesis testing. In our analysis, a p-value of 0.006666, which is considerably less than the 0.05 threshold, suggests that the trend we've observed in the data is statistically significant.
+
+4. **Alternative Hypothesis**: 
+   - Our test has been formulated around the hypothesis that the trend in the dataset (measured by S) isn't zero. Given our results, we have sufficient evidence to accept this alternative hypothesis.
+
+5. **Sample Estimates**:
+   - **S (912)**: 
+     - The value of the S statistic further corroborates the upward trend in our dataset, given its positive value.
+   - **Variance of S (varS = 112750)**: 
+     - This measure gives us an idea about the dispersion or variability in our trend statistics.
+   - **Tau (τ = 0.1842424)**: 
+     - The Tau statistic, a type of correlation coefficient, confirms the increasing trend. Being a positive value (though not very close to 1), it suggests a moderately strong upward trend.
+
+**Concluding Thoughts**: 
+
+From our analysis, it's evident that there's a statistically significant increase in the number of trips to Exmouth over the time frame captured in the dataset. This trend underscores the potential growing interest of tourists in Exmouth, and as stewards of this region, it's crucial for us to understand and manage this growth responsibly.
+
+However, while statistics provide a quantifiable measure, it's equally important to delve into qualitative aspects, external variables, and other factors that might influence this trend.
+
+## Ecotourism
 
 In Exmouth, there are various types of tourism available. Most of the visitors who come here are interested in having a closer interaction with nature. One of the most popular activities is swimming with whale sharks. These gentle giants are abundant in this region, making it a popular destination for people wanting to experience this unique adventure.
 
