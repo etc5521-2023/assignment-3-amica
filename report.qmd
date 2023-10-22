@@ -1062,7 +1062,7 @@ whale_shark_weather %>%
 ## Temporal analysis on tourism
 
 
-Tignostic analysis for tourism data to understand average trips taken by people to "Exmouth" for for various reasons.
+Tignostic analysis for tourism data to understand average trips taken by people to "Exmouth" for various reasons.
 
 ```{r}
 
@@ -1109,7 +1109,7 @@ Focusing on Exmouth, the analysis underscores its prominence as a holiday destin
 highest_sightings <- highest_sightings %>% filter(Purpose == 'Holiday')
 ```
 
-### Understanding tourism trends in our region of interest
+#### Understanding tourism trends in our region of interest
 
 ```{r}
 ggplot(highest_sightings, aes(x = year_quarter, y = total_trips)) +
@@ -1142,6 +1142,7 @@ highest_sightings %>%
   theme_classic() +
   guides(color = "none")
 ```
+<<<<<<< Updated upstream
 
 
 As we can see from the above plot, the thick blue line does indicate that the overall tourist trips have increased over the years, especially after 2010. However, it we look at the quarter lines themselves, we notice that the teal colored line is way higher than the rest. Could this be due to the quarter being a either spring or winter where whale sharks are prominent as depicted  from our previous analysis on the sightings by seasons.
@@ -1163,45 +1164,24 @@ highest_sightings %>%
 ```
 
 Analysis using scagnostics
+=======
+>>>>>>> Stashed changes
 
 
-```{r}
+#### Analysing seasonal trend with forecasting
 
-ggplot(highest_sightings, aes(x = year_quarter, y = total_trips, color = total_trips)) +
-  geom_point() +
-  labs(title = "Scatterplot of year_quarter vs total_trips",
-       x = "Year Quarter",
-       y = "Total Trips in a Quarter") +
-  theme_classic()
+Trend Component:
 
-```
+The trend component reflects long-term progression in the time series data. It provides a smoothed version of the series where short-term fluctuations and seasonality are filtered out.
 
+Seasonal Component:
 
-```{r}
-library(binostics)
+This component captures the regular pattern caused by seasonal factors, which repeats over a specific period - in this case, quarterly, as the frequency is set to 4.
 
-scags_res <- scagnostics(highest_sightings$year_quarter, highest_sightings$total_trips)
-print(scags_res)
+Remainder Component:
 
-```
-```{r}
+After the trend and seasonal components are extracted from the original series, what remains is the remainder (often referred to as the residual or irregular component). This component captures the random, irregular influences and potential outliers in the data.
 
-# Convert to a data frame for easier handling
-scagnostics_df <- data.frame(Metric = names(scags_res$s), Value = as.numeric(scags_res$s))
-
-# Sort by "Outlying"
-outlying_sorted <- scagnostics_df %>% arrange(desc(Value[Metric == "Outlying"]))
-
-# Sort by "Skewed"
-skewed_sorted <- scagnostics_df %>% arrange(desc(Value[Metric == "Skewed"]))
-
-# Sort by "Clumpy"
-clumpy_sorted <- scagnostics_df %>% arrange(desc(Value[Metric == "Clumpy"]))
-
-```
-
-
-Analysing seasonal trend with forecasting
 
 ```{r}
 
@@ -1218,7 +1198,9 @@ autoplot(decomposition_trips) + labs(title = "Seasonal Decomposition of Total Tr
 
 ```
 
-Trend analysis to understand number of people travelling to Exmouth for holidays.
+
+
+#### Trend analysis to understand number of people travelling to Exmouth for holidays.
 
 ```{r}
 library(Kendall)
