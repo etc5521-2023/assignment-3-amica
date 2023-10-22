@@ -1264,17 +1264,18 @@ exmouth_2010$year_quarter <- as.character(exmouth_2010$year_quarter)
 
 
 # Combine a bar chart and a line chart to observe the trends between the two
-ggplot(exmouth_2010) +
+exmouth_2010_plotly <- ggplot(exmouth_2010) +
   geom_col(aes(x = year_quarter, y = n, fill = "Occurrences"), color = "lightblue") +
   geom_line(aes(x = year_quarter, y = total_trips, color = "Trips", group=1), size = 0.5) +
   labs(x = "Time (Quarterly)", 
        title = "The Relationship between Tourism and Whale Shark in Exmouth") +
   theme_bw() +
-  scale_fill_manual(values = "lightblue", name = "Occurrences", labels = c("The Number of Whale Shark")) +
-  scale_color_manual(values = "darkblue", name = "Trips (in thousand)", labels = c("The Number of Tourists")) +
+  scale_fill_manual(values = "lightblue", name = "Occurrences", labels = c("Whale Shark")) +
+  scale_color_manual(values = "darkblue", name = "Trips (in thousand)", labels = c("Tourists")) +
    scale_x_discrete(breaks = exmouth$year_quarter) +
    theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+ggplotly(exmouth_2010_plotly , tooltip = c("x", "y"))
 ```
 
 
