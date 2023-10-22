@@ -1112,6 +1112,13 @@ highest_sightings <- highest_sightings %>% filter(Purpose == 'Holiday')
 #### Understanding tourism trends in our region of interest
 
 ```{r}
+#| label: fig-tourismregion
+#| fig-cap: "Total trips over night in Exmouth"
+#| fig-width: 12
+#| fig-heigth: 8
+#| echo: false
+#| warning: false
+#| message: false
 ggplot(highest_sightings, aes(x = year_quarter, y = total_trips)) +
   geom_line() +
   geom_point() +
@@ -1179,7 +1186,13 @@ After the trend and seasonal components are extracted from the original series, 
 
 
 ```{r}
-
+#| label: fig-seasonaltrend
+#| fig-cap: "Seasonal and Trend Analysis Plot"
+#| fig-width: 12
+#| fig-heigth: 8
+#| echo: false
+#| warning: false
+#| message: false
 
 # Convert data to a ts object 
 ts_data_trips <- ts(highest_sightings$total_trips, frequency=4)
@@ -1193,7 +1206,9 @@ autoplot(decomposition_trips) + labs(title = "Seasonal Decomposition of Total Tr
 
 ```
 
+However, we can observe from @fig-seasonaltrend that tourism in Exmouth exhibits significant seasonal patterns. According to information from other sources, the most suitable seasons for tourism are July and October. If you examine the weather plots @fig-weathertrend, you will notice that the region remains relatively mild even during the winter, allowing for various engaging outdoor activities such as swimming, marine life observation, and the wildflower season. These factors contribute to the highest number of tourists in Q3, followed by a slight decline in Q4. Q1, on the other hand, experiences a decrease in tourist activity, marking the off-peak season for tourism.
 
+In recent years, there has been a rise in tourism in Exmouth. According to @fig-tourismregion and @fig-seasonaltrend, the overall trend shows a steady increase, with the peak observed after 2014 Q3 occurring in 2021 Q3. Additionally, we have noticed that the remainder plot fluctuation has become larger, indicating that non-seasonal factors play a significant role in the number of tourists. These factors may include promotional activities, local events, policy changes, or other tourism-related factors.
 
 #### Trend analysis to understand number of people travelling to Exmouth for holidays.
 
