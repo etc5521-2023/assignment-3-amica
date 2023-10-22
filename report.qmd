@@ -1136,7 +1136,7 @@ highest_sightings %>%
   ggplot(aes(x=year_quarter,y=total_trips)) +
   geom_line(aes(group=quarter,color=quarter)) +
               geom_smooth(se=FALSE) +
-  labs(title = "Total Trips Over Time By Quarter",
+  labs(title = "Total Trips Over Time",
        x = "Year",
        y = "Total Trips") +
   theme_classic() +
@@ -1146,7 +1146,21 @@ highest_sightings %>%
 
 As we can see from the above plot, the thick blue line does indicate that the overall tourist trips have increased over the years, especially after 2010. However, it we look at the quarter lines themselves, we notice that the teal colored line is way higher than the rest. Could this be due to the quarter being a either spring or winter where whale sharks are prominent as depicted  from our previous analysis on the sightings by seasons.
 
-
+```{r}
+highest_sightings %>%
+  index_by(year_quarter) %>%
+  summarise(total_trips = mean(total_trips)) %>%
+    mutate(quarter = substr(year_quarter, nchar(year_quarter), nchar(year_quarter) + 2),
+         year = substr(year_quarter, nchar(year_quarter)-4, nchar(year_quarter) )) %>%
+  ggplot(aes(x=year_quarter,y=total_trips)) +
+  geom_line(aes(group=quarter,color=quarter)) +
+  facet_wrap(~quarter) +
+  labs(title = "Total Trips Over Time By Quarter",   #Added Possible Analysis We could do for season-wise since each quarter is technically a season
+       x = "Year",
+       y = "Total Trips") +
+  theme_classic() +
+  guides(color = "none")
+```
 
 Analysis using scagnostics
 
