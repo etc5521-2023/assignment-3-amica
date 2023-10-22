@@ -1142,7 +1142,6 @@ highest_sightings %>%
   theme_classic() +
   guides(color = "none")
 ```
-<<<<<<< Updated upstream
 
 
 As we can see from the above plot, the thick blue line does indicate that the overall tourist trips have increased over the years, especially after 2010. However, it we look at the quarter lines themselves, we notice that the teal colored line is way higher than the rest. Could this be due to the quarter being a either spring or winter where whale sharks are prominent as depicted  from our previous analysis on the sightings by seasons.
@@ -1162,10 +1161,6 @@ highest_sightings %>%
   theme_classic() +
   guides(color = "none")
 ```
-
-Analysis using scagnostics
-=======
->>>>>>> Stashed changes
 
 
 #### Analysing seasonal trend with forecasting
