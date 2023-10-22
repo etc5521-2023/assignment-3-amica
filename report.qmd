@@ -1111,8 +1111,6 @@ highest_sightings <- highest_sightings %>% filter(Purpose == 'Holiday')
 
 ### Understanding tourism trends in our region of interest
 
-We first start off by visualizing how the overall tourist visits were per quarter for each years by the figure below.
-
 ```{r}
 ggplot(highest_sightings, aes(x = year_quarter, y = total_trips)) +
   geom_line() +
@@ -1124,14 +1122,32 @@ ggplot(highest_sightings, aes(x = year_quarter, y = total_trips)) +
 ```
 
 
+- We first start off by visualizing the overall tourist visits for each year in the Exmouth region. From the plot above, we gain two valuable insights. The first being that the average number of trips fluctuate frequently during a year which could be due to the quarter. The second one being that the peaks of the trips seems to be more in the second half of the plot. 
+
+- But is this actually the case? Let's visualize the number of trips in a different way to see how the trips fared overall throughout the years.
+
+
 ```{r}
 highest_sightings %>%
-  mutate(quarter = substr(year_quarter, nchar(year_quarter), nchar(year_quarter) + 2),
-         year = substr(year_quarter, nchar(year_quarter)-1, nchar(year_quarter) )) %>%
+  index_by(year_quarter) %>%
+  summarise(total_trips = mean(total_trips)) %>%
+    mutate(quarter = substr(year_quarter, nchar(year_quarter), nchar(year_quarter) + 2),
+         year = substr(year_quarter, nchar(year_quarter)-4, nchar(year_quarter) )) %>%
   ggplot(aes(x=year_quarter,y=total_trips)) +
-  geom_line(aes(group=year),alpha=0.3) +
-              geom_smooth(se=FALSE)
+  geom_line(aes(group=quarter,color=quarter)) +
+              geom_smooth(se=FALSE) +
+  labs(title = "Total Trips Over Time By Quarter",
+       x = "Year",
+       y = "Total Trips") +
+  theme_classic() +
+  guides(color = "none")
 ```
+
+
+As we can see from the above plot, the thick blue line does indicate that the overall tourist trips have increased over the years, especially after 2010. However, it we look at the quarter lines themselves, we notice that the teal colored line is way higher than the rest. Could this be due to the quarter being a either spring or winter where whale sharks are prominent as depicted  from our previous analysis on the sightings by seasons.
+
+
+
 Analysis using scagnostics
 
 
