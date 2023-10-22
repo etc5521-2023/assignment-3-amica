@@ -601,7 +601,7 @@ pt_sf <-
   filter(!is.na(region)) # get only the points (sightings) that fall in the polygon (tourism region)
 ```
 
-From the plot above showing all tourist spots, we plot the tourist spot which contains the weather station and the sightings with the most occurrences of whale sharks which in this case is **Exmouth** which we were able to figure out by.... We also filtered out the Purpose of tourism visit of Holiday since.....
+From the plot above showing all tourist spots, we chose the tourist spot which contains the weather station which is **Learmonth Airport Weather Station**, and the sightings with the most occurrences of whale sharks which in this case is **Exmouth** which we were able to figure out by.... We also filtered out the Purpose of tourism with 'Total' since we it will just overlap the other purposes and provide inaccurate results while analyzing the results.
 
 ```{r}
 #| echo: true
@@ -629,6 +629,24 @@ max_sighting <- pt_sf_region %>% filter(sighting == 120)
 
 
 highest_sightings <- tourism_quarterly %>% filter(Region == 'Exmouth' & Purpose != 'Total')
+
+polygon_geometry <- st_geometry(max_sighting)[1]  #Getting Latitude & Longitude for Exmouth
+
+coordinates <- st_coordinates(polygon_geometry) |>
+  as_tibble()
+
+
+states %>%
+  ggplot() +
+  geom_sf(aes(geometry = geometry)) + #Showing Tourist Region for Subset Weather Station & Sightings
+  geom_point(data = coordinates, aes(x=X,y=Y), color = "red", size = 0.1)  +
+  ggtitle(label = "Area of Tourist Destination In Accordance To Weather Station",
+            subtitle = "Location: Exmouth") +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  theme_classic() +
+  theme(plot.title = element_text(hjust=0.5, face = "bold"),
+        plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10)) 
 
 ```
 
