@@ -1,7 +1,9 @@
 ---
 title: "Whale Shark Observations: A Comprehensive Study"
 author: "Evan Hadinata Ginting (33477558), Harsh Jain (33397058), Aishwarya Anil Kumar (32644329), Chih Hui Wang (33209006) and Shreyansh Mahtolia (33509115)"
-format: html
+format: 
+  html:
+    code-fold: true
 ---
 
 ```{r setup, include=FALSE}
@@ -284,7 +286,7 @@ From the @fig-visdat above, we can see:
 
 -   The classes for all the variables in the ws_raw data set are correct except for `eventDate` which needs to be of Date type and only include dates.
 
--   There are a few missing values for `decimalLatitude` and `decimalLongitude` . We can also see that if `decimalLatitude` is missing, `decimalLongitude` is also missing and vice-versa.
+-   There are few missing values for `decimalLatitude` and `decimalLongitude` . We can also see that if `decimalLatitude` is missing, `decimalLongitude` is also missing and vice-versa.
 
 -   There are `r ws_raw %>% filter(is.na(eventDate)) %>% nrow()` missing values in the `eventDate` variable out of `r ws_raw %>% nrow()` records.
 
@@ -314,7 +316,7 @@ ws_raw %>%
 
 Based on @fig-boxplot:
 
--   There are only a few outlier years out of which the year below 1980 is farthest from the population.
+-   There are only few outlier years out of which the year below 1980 is farthest from the population.
 
 -   There are `r ws_raw %>% filter(year(eventDate) < 1990) %>% nrow()` rows with record year less than 1990 which will be removed as they are not really reliable.
 
@@ -482,7 +484,7 @@ In this section, before we go into the data analysis adventure we perform a bit 
 
 **Whale Shark data**
 
-Here is the code that we use to clean the Whale Shark Data.
+The following code was used to clean the Whale Shark Data.
 ```{r}
 #| echo: true
 #| warning: false
@@ -654,7 +656,7 @@ states %>%
 
 ## Exploratory Data Analysis (EDA)
 
-This is the part where we start our data analysis journey. In general, we are trying to prove our expectations that we have stated in the previous section. We will cover the method that we use, additional dataset that we employed, and uncover the insights that we gather from the analysis. Additional to the proving the expectations, we want to comprehend the study by utlising the weather station, where we are going to perform some correlation analysis between the whale shark sightings towards the weather condition of the local area.
+This is the part where we start our data analysis journey. In general, we are trying to prove our expectations that we have stated in the previous section. We will cover the method that we use, additional dataset that we employed, and uncover the insights that we gather from the analysis. Additional to the proving the expectations, we want to comprehend the study by utilising the weather station, where we are going to perform some correlation analysis between the whale shark sightings towards the weather condition of the local area.
 
 ### Expectation 1: We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months.
 
@@ -690,7 +692,7 @@ whale_shark %>%
    
 ```
 
--   Based on the plot above, it seems that winter indeed had a substantial number of sightings (319), which kind of align with our expectation. Spring had a slightly higher number of sightings (322) than winter, but even though this contradicts with our initial expectation, it is important to note that the difference between spring and winter is relatively small. The other two season, Fall and Summer, clearly have less occurrences with 258 and 98 sightings respectively.
+-   Based on the plot above, it seems that winter indeed had a substantial number of sightings (319), which closely align with our expectation. Spring had a slightly higher number of sightings (322) than winter, but even though this contradicts with our initial expectation, it is important to note that the difference between spring and winter is relatively small. The other two season, Fall and Summer, clearly has less occurrences, with 258 and 98 sightings, respectively.
 
 -   Although our initial expectation was to observe higher occurrences during the winter months, the data shows that sightings were relatively evenly distributed between spring and winter, with spring has slightly more occurrences. Additionally, fall had a significant number of sightings, while summer had the fewest.
 
@@ -915,7 +917,7 @@ ggplot() +
         plot.subtitle = element_text(hjust=0.4, face = "italic", size = 10))
 ```
 
-We plotted a map that shows the distribution of whale shark sightings surrounding the location of Learmonth Airport. The color of the points represents different seasons when the sightings occurred while the size of the points represent the number of sightings at a particular location. According to the plot, we can note that the most occurrences are in the spring season as they and they are also spread out across the coast. Next, highest occurrences are during winter season and then summer followed by fall. During winter, they appear towards north of the weather station and during summer they appear in south.
+We plotted a map that shows the distribution of whale shark sightings surrounding the location of `Learmonth Airport`. The color of the points represents different seasons when the sightings occurred while the size of the points represent the number of sightings at a particular location. According to the plot, we can note that the most occurrences are in the spring season as they and they are also spread out across the coast. Next, highest occurrences are during winter season and then summer followed by fall. During winter, they appear towards north of the weather station and during summer they appear in south.
 
 #### Finding The Relation Between Temperature and Sightings
 
@@ -990,7 +992,7 @@ p6 <- ggplot(narrogin_v2, aes(x = date)) +
 grid.arrange(p5,p6, ncol = 2)  
 ```
 
-Now, we will assess the trend of rain precipitation and temperature. From figure @fig-weathertrend, the most interesting insight from this plot is the fact that the rain starting to pour in this area more frequently from January, it continues to increase into months to come until it started to decrease from July. The rest of the year, the rain happened occasionally. Please be mindful that what we meant is not the heavyness of the rain, rather the frequency of rain pouring over the time, we assume that precipitation of more than 0 means raining. As for the temperature, it is basically a common knowledge that summer is the hottest, winter is the coldest, fall and spring are in between the prior categories, which clearly showed by the plot.
+Now, we will assess the trend of rain precipitation and temperature. From figure @fig-weathertrend, the most interesting insight from this plot is the fact that the rain starting to pour in this area more frequently from January, continues to increase into months to come until it started to decrease from July. The rest of the year, the rain happened occasionally. Please be mindful that what we meant is not the heaviness of the rain, rather the frequency of rain pouring over the time, we assume that precipitation of more than 0 means raining. As for the temperature, it is basically a common knowledge that summer is the hottest, winter is the coldest, fall and spring are in between the prior categories, which clearly shown by the plot.
 
 Through this weather profiling, we have got a new perspective that will help us provide better interpretation of the correlation analysis. It allows us to think why would under certain condition the sightings are more frequent. In the next section, we will incorporate this information to the actual sightings of the whale shark, and uncover the insight of whale shark behaviour.
 
@@ -1024,9 +1026,9 @@ whale_shark_weather %>%
 
 -   Based on the plot above, there appears to be no significant pattern or dependency between temperature and the occurrence of whale shark sightings. Unlike some species that may exhibit preferences for specific temperature ranges, whale shark, in this dataset, seem to defy such temperature-related constrains. This lack of a clear correlation between temperature and sightings suggests that whale sharks may possess a wide temperature tolerance or have a migratory behavior that is not closely tied to local temperature variations.
 
--   Another think that worth noting is the temperature in this dataset is actually an air temperature, which may be totally different with the sea water temperature where whale shark is spotted. So, there might be a case when the air temperature is hot, the sea water temperature is mild and vice versa. Also, the depth of sightings should be considered as well, since deeper sea level may have colder temperature.
+-   Another thing worth noting is the temperature in this dataset is actually an air temperature, which may be totally different with the sea water temperature where whale shark is spotted. So, there might be a case when the air temperature is hot, the sea water temperature is mild and vice versa. Also, the depth of sightings should be considered as well, since deeper sea level may have colder temperature.
 
--   Further analysis might be required by utilising sea water temperature to provide a deeper understanding of the whale shark behaviour. As of now, there is no substantial pattern we can see to conclude the correlation between the air temperature surface to the whale shark sightings.
+-   Further analysis might be required by utilising sea water temperature to provide a deeper understanding of the whale shark behaviour. As of now, there is no substantial pattern we can see to conclude the correlation between the air temperature surface and the whale shark sightings.
 
 **Whale Shark Sightings vs Rain Precipitation** The next analysis will be the correlation analysis between sightings and rain precipitation. As known previously that the area is mostly dry, so this might be affecting the sightings as well. The plot will be similar as the previous analysis, where we grouped the observations based on the season to provide better visualisation and level of detail.
 
@@ -1056,11 +1058,11 @@ whale_shark_weather %>%
           plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10))
 ```
 
--   As can be seen from the @fig-corrplot2, predominantly all sightings occur in when there is not raining, while we can still see that whale shark was also spotted when it is raining. However, we thought there might be an underlying factor that could reveal the reason why whale shark spotted more in this area, particularly to the correlation with rain precipitation. If we recall our analysis from figure @fig-countoccur, we know that whale shark are spotted mostly in Winter and Spring season. Additionally, if we consider our insight from weather data profiling of figure @fig-weathertrend, we know that the rain started to pour in this area from January, it consistently happen each month until July. So, from these two insights, there is a chain reaction that might lead to whale shark migrate into this area. After doing some research, we have got the information that a rainfall is actually have an indirect impact into sea ecosystem. When raining pour down, it can lead to increased runoff from land into rivers and eventually into the sea. This runoff can carry nutrients that promotes the growth of plankton, which in turn can be consumed by other creatures in the sea such as fish, crustacean, squid, etc. (Paczkowska et al., 2020). In the end, a big fish such as whale sharks are getting the benefit as well since those are their primary food.
+-   As can be seen from the @fig-corrplot2, predominantly all sightings occur in when there is not raining, while we can still see that whale shark was also spotted when it is raining. However, we thought there might be an underlying factor that could reveal the reason why whale shark spotted more in this area, particularly to the correlation with rain precipitation. If we recall our analysis from figure @fig-countoccur, we know that whale shark are spotted mostly in Winter and Spring season. Additionally, if we consider our insight from weather data profiling of figure @fig-weathertrend, we know that the rain started to pour in this area from January, it consistently happen each month until July. So, from these two insights, there is a chain reaction that might lead to whale shark migrate into this area. After doing some research, we have got the information that a rainfall is actually have an indirect impact into sea ecosystem. When raining pour down, it can lead to increased runoff from land into rivers and eventually into the sea. This runoff can carry nutrients that promotes the growth of plankton, which in turn can be consumed by other creatures in the sea such as fish, crustacean, squid, etc. (Paczkowska et al., 2020). In the end, a big fish such as whale sharks are getting the benefits as well since those are their primary food.
 
 -   So, as mentioned in the first point, the rain may not be affect the occurrence of whale shark directly in certain area, but the chain reaction of frequent raining in that area may lead to changes in the sea ecosystem, which benefitting whale shark. Hence, we conclude that there is still a indirect correlation between raining and whale shark sightings.
 
-## Temporal analysis on tourism
+### Temporal analysis on tourism data
 
 
 Tignostic analysis for tourism data to understand average trips taken by people to "Exmouth" for various reasons.
@@ -1252,7 +1254,7 @@ From our analysis, it's evident that there's a statistically significant increas
 
 However, while statistics provide a quantifiable measure, it's equally important to delve into qualitative aspects, external variables, and other factors that might influence this trend.
 
-## Ecotourism
+### Ecotourism
 
 In Exmouth, there are various types of tourism available. Most of the visitors who come here are interested in having a closer interaction with nature. One of the most popular activities is swimming with whale sharks. These gentle giants are abundant in this region, making it a popular destination for people wanting to experience this unique adventure. Due to severe missing data before 2010, our focus is on 2010-2023.
 
@@ -1370,6 +1372,33 @@ Based on our data, you can provide the following advice to ecotourists:
 - **Preservation of Natural Resources:** Remind them to conserve energy and water resources during their trip and reduce their impact on the local environment to help preserve natural resources.
 
 Through these suggestions, ecotourists can better understand how to respect and protect the ecological environment of the places they visit, while enjoying a meaningful and responsible travel experience.
+
+
+
+```{r}
+# Creating groups for mean_prcp
+weather_tourism_exmouth_2010$mean_prcp_group <- cut(weather_tourism_exmouth_2010$mean_prcp, breaks=seq(0,max(weather_tourism_exmouth_2010$mean_prcp)+10, by=10), labels=FALSE, include.lowest = TRUE)
+weather_tourism_exmouth_2010$mean_prcp_group <- paste((weather_tourism_exmouth_2010$mean_prcp_group-1)*10, weather_tourism_exmouth_2010$mean_prcp_group*10-1, sep="-")
+
+# Printing the dataframe
+print(weather_tourism_exmouth_2010)
+```
+
+```{r}
+
+prcp_sighting <- ggplot(weather_tourism_exmouth_2010, aes(x = n, y = total_trips)) +
+  geom_point(aes(color = mean_prcp_group), size=3, alpha=0.7) +
+  facet_wrap(~ mean_prcp_group, scales="free", ncol=3) +
+  labs(title = "Sighting vs Trips by Precipitation Group",
+       x = "Sighting", y = "Trips") +
+  theme_classic() 
+
+ggplotly(prcp_sighting, tooltip = c("x", "y"))
+
+```
+
+
+The visual representation depicts the relationship between sightings, trips, and precipitation levels. A striking observation is that the majority of sightings and holiday trips coincide with periods of low rainfall, predominantly in the 0-20mm range. This suggests that tourists generally prefer conditions with minimal rainfall for their trips, and interestingly, the sightings also seem to be more prevalent during these times. It's essential to understand that just because these events happen concurrently doesn't necessarily mean one causes the other. The data, in its current form, hints that rainfall might not be a significant factor influencing both sightings and holiday trips. Both events might be happening independently of each other, driven by other factors not captured in this dataset.
 
 
 ## Summary
