@@ -1256,6 +1256,14 @@ However, while statistics provide a quantifiable measure, it's equally important
 In Exmouth, there are various types of tourism available. Most of the visitors who come here are interested in having a closer interaction with nature. One of the most popular activities is swimming with whale sharks. These gentle giants are abundant in this region, making it a popular destination for people wanting to experience this unique adventure.
 
 ```{r}
+#| label: fig-compare
+#| fig-cap: "The Relationship between Tourism and Whale Shark in Exmouth"
+#| fig-width: 12
+#| fig-heigth: 8
+#| echo: false
+#| warning: false
+#| message: false
+
 # Focus on whale sharks found in the Cape Range National Park area.
 # Set the latitude and longitude range for Cape Range National Park within Exmouth.
 whale_shark_Exmouth <- whale_shark %>% 
@@ -1272,29 +1280,37 @@ exmouth <- left_join(highest_sightings, whale_shark_Exmouth,
 
 # Focus on observing information from 2010 onwards 
 # as there were almost no recorded whale shark sightings in the area before 2010, rendering any comparison non-comparable
-exmouth_2010 <- exmouth[exmouth$year_quarter >= as.yearqtr("2010 Q1"), ]
+exmouth_2010 <- exmouth %>%
+  filter(as.Date(paste(substr(as.character(year_quarter), 1, 4),
+                       "-01-01", sep = "")) >= as.Date("2010-01-01"))
 
-# Convert the columns for year and quarter to characters for ease of plotting
-exmouth_2010$year_quarter <- as.character(exmouth_2010$year_quarter)
+# Turn all NA to 0 
+exmouth_2010$n <- ifelse(is.na(exmouth_2010$n), 0, exmouth_2010$n)
 
 
 # Combine a bar chart and a line chart to observe the trends between the two
 exmouth_2010_plotly <- ggplot(exmouth_2010) +
-  geom_col(aes(x = year_quarter, y = n, fill = "Occurrences"), color = "lightblue") +
-  geom_line(aes(x = year_quarter, y = total_trips, color = "Trips", group=1), size = 0.5) +
+  geom_area(aes(x = year_quarter, y = n, fill = "Occurrences (in thousand)", group = 1), alpha = 0.6) +
+  geom_line(aes(x = year_quarter, y = total_trips, fill = "Trips", group = 1), alpha = 0.8) +
   labs(x = "Time (Quarterly)", 
-       title = "The Relationship between Tourism and Whale Shark in Exmouth") +
+       title = "The Relationship between Tourism and Whale Shark in Exmouth", 
+       fill = "The number of") +
+  scale_fill_manual(values = c("Occurrences (in thousand)" = "lightblue", "Trips" = "darkblue")) +
   theme_bw() +
-  scale_fill_manual(values = "lightblue", name = "Occurrences", labels = c("Whale Shark")) +
-  scale_color_manual(values = "darkblue", name = "Trips (in thousand)", labels = c("Tourists")) +
-   scale_x_discrete(breaks = exmouth$year_quarter) +
-   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 
 ggplotly(exmouth_2010_plotly , tooltip = c("x", "y"))
 ```
 
 
+In @fig-compare, we have combined the number of tourists and the number of whale sharks to observe the relationship between them visually. The strong relationship between the number of travelers and the sighting of a whale shark cannot be perfectly explained due to a few possible reasons. 
 
+- Firstly, a whale shark sighting could be an attraction for travelers, but since the movement of wildlife is difficult to track, there is no guarantee that travelers will be able to see a whale shark every time they go out for it. 
+
+- Secondly, the data coverage is not comprehensive enough, and the process of observing and recording whale sharks is not easy.
+
+We have noticed a significant pattern for travelers in Exmouth, as previously mentioned in @fig-seasonaltrend. They tend to travel between Q2 - Q4, with the highest number of travelers in Q3 - the most important season for sightseeing. It's worth noting that 2021 was a successful year for tourism in Australia. Would the COVID-19 pandemic have a negative impact on tourism? However, in December 2020, Australia Government launched its COVID-19 vaccination program. People are more willing to travel after getting vaccinated. Additionally, the Australian Tourism Board's website outlines a [2021-2022 Australian Tourism Promotion Plan](https://www.transparency.gov.au/sites/default/files/reports/2021-22_corporate_plan_tourism_australia.pdf), which includes a range of promotional measures launched by the Australian government in 2021. These measures have also contributed to the growth of the Australian tourism industry.
 
 ## Summary
 
