@@ -31,16 +31,16 @@ library(leaflet)
 library(rnoaa)
 library(gridExtra)
 library(rworldmap)
-library(tsibble) # update
-library(lubridate) # update
-library(rmapshaper) # update
-library(zoo) # update
-library(tsibbletalk) # update
-library(feasts) # update
-library(plotly) # update
-library(tibble) # update
-library(forecast) # update
-library(GGally) # update
+library(tsibble) # update #added
+library(lubridate) # update #added
+library(rmapshaper) # update #added
+library(zoo) # update #added
+library(tsibbletalk) # update #added
+library(feasts) # update #added
+library(plotly) # update #added
+library(tibble) # update #added
+library(forecast) # update #added
+library(GGally) # update #added
 ```
 
 ## Introduction
@@ -1451,5 +1451,29 @@ The following are the R-packages used in this blog-post:
 
 -   **gridExtra**: Auguie B (2017). *gridExtra: Miscellaneous Functions for "Grid" Graphics*. R package version 2.3, <https://CRAN.R-project.org/package=gridExtra>.
 
-- **rworlddmap**: South, Andy 2011 rworldmap: A New R package for Mapping Global Data. The R Journal Vol. 3/1 : 35-43.
+-   **rworlddmap**: South, Andy 2011 rworldmap: A New R package for Mapping Global Data. The R Journal Vol. 3/1 : 35-43.
+
+-   **tsibble**: Wang, E, D Cook, and RJ Hyndman (2020). A new tidy data structure to support exploration and modeling of temporal data, Journal of Computational and Graphical Statistics, 29:3, 466-478, doi:10.1080/10618600.2019.1695624.
+
+-   **lubridate**:  Garrett Grolemund, Hadley Wickham (2011). Dates and Times Made Easy with lubridate. 
+
+-   **rmapshaper**:  Teucher A, Russell K (2023). _rmapshaper: Client for 'mapshaper' for 'Geospatial' Operations_. R package version 0.5.0, <https://CRAN.R-project.org/package=rmapshaper>.
+
+-   **zoo**: eileis A, Grothendieck G (2005). “zoo: S3 Infrastructure for Regular and Irregular Time Series.” _Journal of Statistical Software_, *14*(6), 1-27. doi:10.18637/jss.v014.i06
+  <https://doi.org/10.18637/jss.v014.i06>.
+
+-   **tsibbletalk**: Wang E, Cook D (2020). _tsibbletalk: Interactive Graphics for Tsibble Objects_. R package version 0.1.0, <https://CRAN.R-project.org/package=tsibbletalk>.
+
+-   **feasts**: O'Hara-Wild M, Hyndman R, Wang E (2023). _feasts: Feature Extraction and Statistics for Time Series_. R package version 0.3.1, <https://CRAN.R-project.org/package=feasts>.
+
+-   **plotly**:  C. Sievert. Interactive Web-Based Data Visualization with R, plotly, and shiny. Chapman and Hall/CRC Florida, 2020.
+
+-   **tibble**: Müller K, Wickham H (2023). _tibble: Simple Data Frames_. R package version 3.2.1, <https://CRAN.R-project.org/package=tibble>.
+
+-   **forecast**: Hyndman R, Athanasopoulos G, Bergmeir C, Caceres G, Chhay L, O'Hara-Wild M, Petropoulos F, Razbash S, Wang E, Yasmeen F (2023). _forecast: Forecasting functions for time series and linear models_. R package version 8.21, <https://pkg.robjhyndman.com/forecast/>.
+
+Hyndman RJ, Khandakar Y (2008). “Automatic time series forecasting: the forecast package for R.” _Journal of Statistical Software_, *26*(3), 1-22. doi:10.18637/jss.v027.i03 <https://doi.org/10.18637/jss.v027.i03>.
+
+-   **GGally**:   Schloerke B, Cook D, Larmarange J, Briatte F, Marbach M, Thoen E, Elberg A, Crowley J (2021). _GGally: Extension to 'ggplot2'_. R package version 2.1.2,
+  <https://CRAN.R-project.org/package=GGally>.
 :::
