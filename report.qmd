@@ -1312,6 +1312,41 @@ In @fig-compare, we have combined the number of tourists and the number of whale
 
 We have noticed a significant pattern for travelers in Exmouth, as previously mentioned in @fig-seasonaltrend. They tend to travel between Q2 - Q4, with the highest number of travelers in Q3 - the most important season for sightseeing. It's worth noting that 2021 was a successful year for tourism in Australia. Would the COVID-19 pandemic have a negative impact on tourism? However, in December 2020, Australia Government launched its COVID-19 vaccination program. People are more willing to travel after getting vaccinated. Additionally, the Australian Tourism Board's website outlines a [2021-2022 Australian Tourism Promotion Plan](https://www.transparency.gov.au/sites/default/files/reports/2021-22_corporate_plan_tourism_australia.pdf), which includes a range of promotional measures launched by the Australian government in 2021. These measures have also contributed to the growth of the Australian tourism industry.
 
+## Tourism and Weather 
+
+In this section, we combine the weather, previous traveler information from @fig-compare, and Whale Shark data to determine if any correlations exist among them.
+
+```{r}
+
+# Calculate the weather information for the Ecotourism area
+whale_shark_weather_exmouth <- narrogin %>%
+  filter(!is.na(date)) %>%
+  mutate(year_quarter = yearquarter(date)) %>%
+  select(year_quarter, prcp, tmax, tmin) %>%
+  group_by(year_quarter) %>%
+  summarise(mean_prcp = mean(prcp, na.rm = TRUE),
+            mean_tmax = mean(tmax, na.rm = TRUE),
+            mean_tmin = mean(tmin, na.rm = TRUE),
+            avg_temp = (mean_tmax + mean_tmin) / 2) %>%
+  filter(as.Date(paste(substr(as.character(year_quarter), 1, 4),
+                       "-01-01", sep = "")) >= as.Date("2010-01-01"))
+  
+# Combine two dataset together
+weather_tourism_exmouth_2010 <- left_join(exmouth_2010, 
+                                          whale_shark_weather_exmouth, by = "year_quarter")
+```
+
+```{r}
+ggplot(weather_tourism_exmouth_2010, aes(x = year_quarter)) +
+  geom_line(aes(y = total_trips, color = "Total Trips"), linetype = "solid") +
+  geom_smooth(aes(y = avg_temp, linetype = "Avg Temp"), color = "darkgreen", fill = "darkgreen") +
+  geom_smooth(aes(y = mean_prcp, linetype = "Mean Precip"), color = "lightblue", fill = "lightblue") +
+  labs(color = "Data", fill = "Data") +
+  theme_bw()
+
+```
+
+
 ## Summary
 
 -   The data analysis showed that there were relatively even occurrences of whale shark sightings between spring and winter, with a slight edge for spring. Fall had a significant number of sightings, while summer had the fewest. This finding contradicted the expectation of higher occurrences during winter months.
