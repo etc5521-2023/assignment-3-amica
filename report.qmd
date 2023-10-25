@@ -38,6 +38,7 @@ library(feasts) # update
 library(plotly) # update
 library(tibble) # update
 library(forecast) # update
+library(GGally) # update
 ```
 
 ## Introduction
@@ -1253,7 +1254,7 @@ However, while statistics provide a quantifiable measure, it's equally important
 
 ## Ecotourism
 
-In Exmouth, there are various types of tourism available. Most of the visitors who come here are interested in having a closer interaction with nature. One of the most popular activities is swimming with whale sharks. These gentle giants are abundant in this region, making it a popular destination for people wanting to experience this unique adventure.
+In Exmouth, there are various types of tourism available. Most of the visitors who come here are interested in having a closer interaction with nature. One of the most popular activities is swimming with whale sharks. These gentle giants are abundant in this region, making it a popular destination for people wanting to experience this unique adventure. Due to severe missing data before 2010, our focus is on 2010-2023.
 
 ```{r}
 #| label: fig-compare
@@ -1299,10 +1300,8 @@ exmouth_2010_plotly <- ggplot(exmouth_2010) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-
 ggplotly(exmouth_2010_plotly , tooltip = c("x", "y"))
 ```
-
 
 In @fig-compare, we have combined the number of tourists and the number of whale sharks to observe the relationship between them visually. The strong relationship between the number of travelers and the sighting of a whale shark cannot be perfectly explained due to a few possible reasons. 
 
@@ -1312,12 +1311,9 @@ In @fig-compare, we have combined the number of tourists and the number of whale
 
 We have noticed a significant pattern for travelers in Exmouth, as previously mentioned in @fig-seasonaltrend. They tend to travel between Q2 - Q4, with the highest number of travelers in Q3 - the most important season for sightseeing. It's worth noting that 2021 was a successful year for tourism in Australia. Would the COVID-19 pandemic have a negative impact on tourism? However, in December 2020, Australia Government launched its COVID-19 vaccination program. People are more willing to travel after getting vaccinated. Additionally, the Australian Tourism Board's website outlines a [2021-2022 Australian Tourism Promotion Plan](https://www.transparency.gov.au/sites/default/files/reports/2021-22_corporate_plan_tourism_australia.pdf), which includes a range of promotional measures launched by the Australian government in 2021. These measures have also contributed to the growth of the Australian tourism industry.
 
-## Tourism and Weather 
-
 In this section, we combine the weather, previous traveler information from @fig-compare, and Whale Shark data to determine if any correlations exist among them.
 
 ```{r}
-
 # Calculate the weather information for the Ecotourism area
 whale_shark_weather_exmouth <- narrogin %>%
   filter(!is.na(date)) %>%
@@ -1329,22 +1325,51 @@ whale_shark_weather_exmouth <- narrogin %>%
             mean_tmin = mean(tmin, na.rm = TRUE),
             avg_temp = (mean_tmax + mean_tmin) / 2) %>%
   filter(as.Date(paste(substr(as.character(year_quarter), 1, 4),
-                       "-01-01", sep = "")) >= as.Date("2010-01-01"))
-  
+                       "-01-01", sep = "")) >= as.Date("2010-01-01")) %>%
+  mutate(quarter_group = case_when( 
+    # We clustered together identical quarters to simplify subsequent analysis of their relationship.
+    grepl("Q1", year_quarter) ~ 1,
+    grepl("Q2", year_quarter) ~ 2,
+    grepl("Q3", year_quarter) ~ 3,
+    grepl("Q4", year_quarter) ~ 4,
+    TRUE ~ NA_integer_
+  )) 
+
+# Transfer quarter into character
+whale_shark_weather_exmouth$quarter_group <- as.character(whale_shark_weather_exmouth$quarter_group)
+
+
 # Combine two dataset together
 weather_tourism_exmouth_2010 <- left_join(exmouth_2010, 
                                           whale_shark_weather_exmouth, by = "year_quarter")
 ```
 
 ```{r}
-ggplot(weather_tourism_exmouth_2010, aes(x = year_quarter)) +
-  geom_line(aes(y = total_trips, color = "Total Trips"), linetype = "solid") +
-  geom_smooth(aes(y = avg_temp, linetype = "Avg Temp"), color = "darkgreen", fill = "darkgreen") +
-  geom_smooth(aes(y = mean_prcp, linetype = "Mean Precip"), color = "lightblue", fill = "lightblue") +
-  labs(color = "Data", fill = "Data") +
-  theme_bw()
-
+ggpairs(weather_tourism_exmouth_2010, 
+        columns = c("year_quarter", "total_trips", "avg_temp", "mean_prcp", "n"),
+        mapping = aes(color = quarter_group),
+        lower = list(continuous = "smooth"),
+        upper = "blank",
+        axisLabels = "show"
+        ) %>%
+    ggplotly()
 ```
+
+In terms of weather, the average temperature of the place remains normal with seasonal variations. However, there are occasional higher temperature anomalies in rainfall, mostly in Q2. As for whale shark sightings, there has been a decline in recent years. On the other hand, the number of tourists visiting the place is increasing and shows seasonal distribution that corresponds with the average temperature. 
+
+Based on the information provided, it is difficult to gather strong evidence supporting the correlation between weather conditions and the number of whale sharks or tourists. There are numerous factors that can affect the behavior of tourists, such as the season and individual travel preferences. It's challenging to attribute tourist behavior solely to one variable.
+
+Based on our data, you can provide the following advice to ecotourists:
+
+- **Best Time to Travel:** It is advisable for ecotourists to plan their trips during Q2 and Q4 when the weather is moderate and rainfall is lower, which is conducive to the development and observation of the ecosystem.
+
+- **Marine Ecological Conservation:** Despite the decline in the number of whale shark sightings, it is still recommended for them to participate in whale shark watching activities that comply with conservation standards and to learn about protecting the marine ecosystem.
+
+- **Sustainable Travel Choices:** Provide information about sustainable accommodation and travel options, and encourage them to choose eco-friendly accommodations and travel activities.
+
+- **Preservation of Natural Resources:** Remind them to conserve energy and water resources during their trip and reduce their impact on the local environment to help preserve natural resources.
+
+Through these suggestions, ecotourists can better understand how to respect and protect the ecological environment of the places they visit, while enjoying a meaningful and responsible travel experience.
 
 
 ## Summary
