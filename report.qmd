@@ -1035,34 +1035,6 @@ Now, juxtaposing this with the weather profile in figure @fig-weathertrend, it _
 
 </div>
 
-```{r}
-#| echo: false
-#| warning: false
-#| message: false
-cat("
-<style>
-.interesting {
-  background-color: #e6f7ff; /* Light blue to signify importance */
-  border-left: 5px solid #2196F3; /* Blue border to the left */
-  padding: 10px;
-  margin: 20px 0;
-}
-</style>
-")
-
-```
-
-```{r}
-cat("
-<div class='interesting'>
-This overlap sparks an intriguing hypothesis: could the rainfall indirectly catalyze a sequence of events leading to an influx of whale sharks in this region? Delving into research, we uncovered that rain does indeed play a pivotal role in shaping marine ecosystems. Rainfall increases land runoff which, upon merging with rivers, eventually flows into the sea. This influx often carries with it an abundance of nutrients, which can stimulate plankton growth. As these plankton proliferate, they become a food source for an array of marine creatures such as fish, crustaceans, and squids. Whale sharks, being apex feeders in this chain, thus indirectly benefit from this surge in food availability (Paczkowska et al., 2020). 
-
-- In essence, while rainfall might not directly influence whale shark presence in a particular region, its cascading impact on the marine food web potentially creates conditions conducive for these gentle giants. Consequently, we can infer that an indirect correlation likely exists between rainfall patterns and whale shark sightings.
-</div>
-")
-
-```
-
 
 ### Temporal analysis on tourism data
 
@@ -1137,7 +1109,7 @@ tourismoverall <- ggplot(highest_sightings, aes(x = year_quarter, y = total_trip
   geom_point(color = "navy") +
   labs(title = "Total Trips Over Time",
        x = "Quarter",
-       y = "Total trips") +
+       y = "Total trips (k)") +
   theme_classic()
 
 ggplotly(tourismoverall , tooltip = c("x", "y"))
@@ -1180,7 +1152,7 @@ tourismquart <- highest_sightings %>%
   facet_wrap(~quarter) +
   labs(title = "Total Trips Over Time By Quarter",   #Added Possible Analysis We could do for season-wise since each quarter is technically a season
        x = "Year",
-       y = "Total Trips") +
+       y = "Total Trips (k)") +
   theme_classic() +
   guides(color = "none")
 
@@ -1287,6 +1259,7 @@ exmouth_2010_plotly <- ggplot(exmouth_2010) +
   geom_area(aes(x = year_quarter, y = n, fill = "Occurrences (in thousand)", group = 1), alpha = 0.6) +
   geom_line(aes(x = year_quarter, y = total_trips, fill = "Trips", group = 1), alpha = 0.8) +
   labs(x = "Time (Quarterly)", 
+       y = "Trips (k)",
        title = "The Relationship between Tourism and Whale Shark in Exmouth", 
        fill = "The number of") +
   scale_fill_manual(values = c("Occurrences (in thousand)" = "lightblue", "Trips" = "darkblue")) +
