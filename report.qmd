@@ -1154,18 +1154,11 @@ highest_sightings %>%
 
 #### Analysing seasonal trend with forecasting
 
-Trend Component:
+- Trend Component: The trend component reflects long-term progression in the time series data. It provides a smoothed version of the series where short-term fluctuations and seasonality are filtered out.
 
-The trend component reflects long-term progression in the time series data. It provides a smoothed version of the series where short-term fluctuations and seasonality are filtered out.
+- Seasonal Component: This component captures the regular pattern caused by seasonal factors, which repeats over a specific period - in this case, quarterly, as the frequency is set to 4.
 
-Seasonal Component:
-
-This component captures the regular pattern caused by seasonal factors, which repeats over a specific period - in this case, quarterly, as the frequency is set to 4.
-
-Remainder Component:
-
-After the trend and seasonal components are extracted from the original series, what remains is the remainder (often referred to as the residual or irregular component). This component captures the random, irregular influences and potential outliers in the data.
-
+- Remainder Component: After the trend and seasonal components are extracted from the original series, what remains is the remainder (often referred to as the residual or irregular component). This component captures the random, irregular influences and potential outliers in the data.
 
 ```{r}
 #| label: fig-seasonaltrend
@@ -1340,7 +1333,7 @@ In terms of weather, the average temperature of the place remains normal with se
 
 Based on the information provided, it is difficult to gather strong evidence supporting the correlation between weather conditions and the number of whale sharks or tourists. There are numerous factors that can affect the behavior of tourists, such as the season and individual travel preferences. It's challenging to attribute tourist behavior solely to one variable.
 
-Based on our data, you can provide the following advice to ecotourists:
+Based on our data, we can provide the following advice to ecotourists:
 
 - **Best Time to Travel:** It is advisable for ecotourists to plan their trips during Q2 and Q4 when the weather is moderate and rainfall is lower, which is conducive to the development and observation of the ecosystem.
 
@@ -1351,7 +1344,6 @@ Based on our data, you can provide the following advice to ecotourists:
 - **Preservation of Natural Resources:** Remind them to conserve energy and water resources during their trip and reduce their impact on the local environment to help preserve natural resources.
 
 Through these suggestions, ecotourists can better understand how to respect and protect the ecological environment of the places they visit, while enjoying a meaningful and responsible travel experience.
-
 
 
 ```{r}
