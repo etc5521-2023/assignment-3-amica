@@ -542,7 +542,7 @@ save(whale_shark_weather, file = "data/whale_shark_weather.rda")
 
 **Tourism Data**
 
-Before we can combine the joined weather and sighting dataset, we must first convert `the whale_shark_weather.rda` into a sf object which is then joined with the tourism dataset. 
+Before we can combine the joined weather and sighting dataset, we must first convert `the whale_shark_weather.rda` into a sf object so that there will be a common variable to join with the tourism dataset. 
 
 ```{r}
 #| echo: true
@@ -559,7 +559,7 @@ whale_shark_sf <- whale_shark_weather |>
 
 ### Joining Combined Whale Shark Data & Weather Data With Tourism Data
 
-Below is the code to combine both the whale_weather data with the tourism data. The merging of the datasets is done by 
+Below is the code to combine both the whale_weather data with the tourism data. The merging of the datasets is done by joining them by polygon coordinates.
 
 ```{r}
 #| echo: true
@@ -581,11 +581,11 @@ t_region <- st_read(here::here("data/SA2_2021_AUST_SHP_GDA2020/SA2_2021_AUST_GDA
 # Join
 # some points are out of the polygon, lets filter out so we get only points in the polygon
 pt_sf <-
-  st_join(t_region, whale_shark_sf, left = TRUE) %>%  # spatial join to get intersection of points and poly
+  st_join(t_region, whale_shark_sf, left = FALSE) %>%  # spatial join to get intersection of points and poly
   filter(!is.na(region)) # get only the points (sightings) that fall in the polygon (tourism region)
 ```
 
-From the plot above showing all tourist spots, we chose the tourist spot which contains the weather station which is **Learmonth Airport Weather Station**, and the sightings with the most occurrences of whale sharks which in this case is **Exmouth** which we were able to figure out by.... We also filtered out the Purpose of tourism with 'Total' since we it will just overlap the other purposes and provide inaccurate results while analyzing the results.
+From all the tourist spots in Australia, we chose the tourist spot which contains the weather station **Learmonth Airport Weather Station**, and the sightings with the most occurrences of whale sharks which in this case is **Exmouth** which we were able to figure out after merging the two datasets. We also filtered out the Purpose of tourism with 'Total' since we it will just overlap the other purposes and provide inaccurate results while analyzing the results.
 
 ```{r}
 #| echo: true
@@ -637,7 +637,7 @@ states %>%
 
 ## Exploratory Data Analysis (EDA)
 
-This is the part where we start our data analysis journey. In general, we are trying to prove our expectations that we have stated in the previous section. We will cover the method that we use, additional dataset that we employed, and uncover the insights that we gather from the analysis. Additional to the proving the expectations, we want to comprehend the study by utilising the weather station, where we are going to perform some correlation analysis between the whale shark sightings towards the weather condition of the local area.
+This is the part where we start our data analysis journey. In general, we are trying to prove our expectations that we have stated in the previous section. We will cover the method that we use, additional dataset that we employed, and uncover the insights that we gather from the analysis. Additional to the proving the expectations, we want to comprehend the study by utilizing the weather station, where we are going to perform some correlation analysis between the whale shark sightings towards the weather condition of the local area.
 
 ### Expectation 1: We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months.
 
@@ -819,7 +819,7 @@ whale_shark %>% na.omit() %>%
   group_by(season, Direction, year(eventDate)) %>%
   summarise(sum = n_distinct(recordID)) %>%
   ggplot(aes(x = season, y = sum)) +
-  geom_col() +
+  geom_col(fill = "skyblue") +
   facet_grid( ~ Direction) +
   coord_flip() +
   ggtitle(label = "Sightings Eastern Part v/s Western Part season wise",
@@ -961,7 +961,7 @@ Referring to Figure @fig-weathertrend, __a striking observation is the pronounce
 
 Understanding these meteorological nuances affords us a richer lens to interpret the forthcoming correlation analyses. It equips us with the context to hypothesize why certain weather conditions might correlate with heightened whale shark sightings. Moving forward, this climatic backdrop will be juxtaposed against whale shark sightings, aiming to glean insights into their behavioral patterns in relation to the prevailing weather conditions.
 
-<div>
+</div>
 
 > **Note:** This observation is centered around the frequency of the rain events, rather than their intensity - any non-zero precipitation is interpreted as rainfall. As for the temperature variations, they follow the anticipated seasonal fluctuations: scorching summers, chilly winters, with spring and autumn offering moderate climes.
 
@@ -996,7 +996,7 @@ whale_shark_weather %>%
 
 <div style="background-color: #FFFFCC; padding: 10px;">
 -   The above plot indicates that there's no clear relationship between temperature and whale shark sightings. While many species have specific temperature preferences, in this dataset, whale sharks don't seem to show a strong temperature-based behavior. This absence of correlation might imply that whale sharks either have a broad range of temperature tolerance or their migratory patterns aren't majorly influenced by local temperature shifts.
-<div>
+</div>
 
 > **Note:**  It's essential to underscore that the temperatures in this dataset reflect atmospheric readings, which can diverge considerably from the sea water temperatures where whale sharks are often observed. A high atmospheric temperature, for instance, doesn't guarantee a corresponding warm sea temperature, and vice versa. The depth of sightings can further complicate this, as deeper marine environments are typically cooler. For a comprehensive understanding of the nexus between temperature and whale shark behavior, an integration of sea water temperature data is imperative. Currently, with just atmospheric temperature data at our disposal, drawing any definitive correlation between temperature and whale shark sightings remains elusive.
 
@@ -1078,11 +1078,13 @@ tourism_feat <- tourism_shared %>%
 
 p1 <- tourism_shared %>%
   ggplot(aes(x = year_quarter, y = total_trips)) +
-  geom_line(aes(group = Region), alpha = 0.5) +
-  facet_wrap(~ Purpose, scales = "free_y") 
+  geom_line(aes(group = Region), alpha = 0.5, color = "skyblue") +
+  facet_wrap(~ Purpose, scales = "free_y") +
+  theme_classic()
 p2 <- tourism_feat %>%
   ggplot(aes(x = trend_strength, y = seasonal_strength_year)) +
-  geom_point(aes(group = Region))
+  geom_point(aes(group = Region)) +
+  theme_classic()
 
   subplot(
     ggplotly(p1, tooltip = "Region", width = 700),
@@ -1125,13 +1127,16 @@ highest_sightings <- highest_sightings %>% filter(Purpose == 'Holiday')
 #| echo: false
 #| warning: false
 #| message: false
-ggplot(highest_sightings, aes(x = year_quarter, y = total_trips)) +
-  geom_line() +
-  geom_point() +
+
+tourismoverall <- ggplot(highest_sightings, aes(x = year_quarter, y = total_trips)) +
+  geom_line(color = "skyblue") +
+  geom_point(color = "navy") +
   labs(title = "Total Trips Over Time",
        x = "Quarter",
        y = "Total trips") +
   theme_classic()
+
+ggplotly(tourismoverall , tooltip = c("x", "y"))
 ```
 
 **Overall tourism trends in Exmouth**
@@ -1151,24 +1156,34 @@ ggplot(highest_sightings, aes(x = year_quarter, y = total_trips)) +
 
 
 ```{r}
-highest_sightings %>%
+#| label: fig-tourismqua
+#| fig-cap: "Total Trips in Exmouth By Quarter"
+#| fig-width: 12
+#| fig-height: 11
+#| echo: false
+#| warning: false
+#| message: false
+
+
+tourismquart <- highest_sightings %>%
   index_by(year_quarter) %>%
   summarise(total_trips = mean(total_trips)) %>%
     mutate(quarter = substr(year_quarter, nchar(year_quarter), nchar(year_quarter) + 2),
          year = substr(year_quarter, nchar(year_quarter)-4, nchar(year_quarter) )) %>%
   ggplot(aes(x=year_quarter,y=total_trips)) +
   geom_line(aes(group=quarter,color=quarter)) +
+  geom_point(size=0.5) +
   facet_wrap(~quarter) +
   labs(title = "Total Trips Over Time By Quarter",   #Added Possible Analysis We could do for season-wise since each quarter is technically a season
        x = "Year",
        y = "Total Trips") +
   theme_classic() +
   guides(color = "none")
+
+ggplotly(tourismquart , tooltip = c("x", "y"))
 ```
 
-As we can see from the above:
-
-- The thick blue line in the plot indicates an overall increase in tourist trips over the years, notably after 2010.
+As we can see from the above @fig-tourismqua:
 
 - Observing the individual quarter lines, it becomes apparent that the teal colored line is significantly higher than the others.
 
@@ -1204,7 +1219,7 @@ ts_data_trips <- ts(highest_sightings$total_trips, frequency=4)
 decomposition_trips <- stl(ts_data_trips, s.window="periodic")
 
 # Plot the decomposition
-autoplot(decomposition_trips) + labs(title = "Seasonal Decomposition of Total Trips")
+autoplot(decomposition_trips) + labs(title = "Seasonal Decomposition of Total Trips") 
 
 ```
 
@@ -1354,11 +1369,9 @@ Through these suggestions, we hope ecotourists can better understand how to resp
 
 
 
-## Summary
+## Summary💡💡
 
 <div style="border: 2px solid black; padding: 10px; background-color: lightyellow; font-family: serif;">
-
-💡💡
 
 -   The data analysis showed that there were relatively even occurrences of whale shark sightings between spring and winter, with a slight edge for spring. Fall had a significant number of sightings, while summer had the fewest. This finding contradicted the expectation of higher occurrences during winter months.
 -   The analysis using geospatial data confirmed that most whale shark sightings occurred in coastal areas rather than open ocean regions of Australia, aligning with the expectation of differences in habitat preferences.
