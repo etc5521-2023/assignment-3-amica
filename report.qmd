@@ -1101,7 +1101,9 @@ The visualized analysis provides a comprehensive insight into the tourism trends
 
 - A significant observation is the continual increase in tourists visiting Exmouth for holidays, highlighting its growing status as a favored vacation spot.
 
+<div style="background-color: #FFFFCC; padding: 10px;"> 
 - Tourism attracts a significantly larger number of visitors compared to business travelers and other visitors.
+</div>
 
 **Seasonal versus Trend Strength**
 
@@ -1109,7 +1111,9 @@ The visualized analysis provides a comprehensive insight into the tourism trends
 
 - Exmouth's analysis emphasizes its status as a popular holiday destination, with a consistent rise in vacationers, overshadowing business and family visitors.
 
+<div style="background-color: #FFFFCC; padding: 10px;"> 
 - Further analysis will concentrate on "Holiday" data to delve deeper into Exmouth's vacation trends.
+</div>
 
 #### Understanding tourism trends in our region of interest
 
@@ -1185,9 +1189,9 @@ ggplotly(tourismquart , tooltip = c("x", "y"))
 
 As we can see from the above @fig-tourismqua:
 
-- Observing the individual quarter lines, it becomes apparent that the teal colored line is significantly higher than the others.
-
-- This could potentially be attributed to the particular quarter being either spring or winter, a time when whale sharks are prominent, as previously depicted in our analysis of sightings by seasons.
+<div style="background-color: #FFFFCC; padding: 10px;"> 
+The most visited season by tourists is Q3 (winter to spring) , followed by Q2 and Q4.
+</div>
 
 #### Analysing seasonal trend with forecasting
 
@@ -1223,7 +1227,7 @@ autoplot(decomposition_trips) + labs(title = "Seasonal Decomposition of Total Tr
 
 ```
 
-
+<div style="background-color: #FFFFCC; padding: 10px;"> 
 
 - Exmouth's tourism demonstrates notable seasonal patterns, with the peak seasons identified as July and October, supported by weather data showing relatively mild conditions even during winter.
 
@@ -1235,12 +1239,15 @@ autoplot(decomposition_trips) + labs(title = "Seasonal Decomposition of Total Tr
 
 - The fluctuation in the remainder plot has increased, suggesting that factors beyond seasonal variations, such as promotional activities, local events, policy changes, or other tourism-related influences, play a significant role in the number of tourists.
 
+</div>
 
 ### Ecotourism
 
 In Exmouth, there are various types of tourism available. Most of the visitors who come here are interested in having a closer interaction with nature. One of the most popular activities is swimming with whale sharks. These gentle giants are abundant in this region, making it a popular destination for people wanting to experience this unique adventure. 
 
+<div style="background-color: #FFFFCC; padding: 10px;">
 **Due to severe missing data before 2010, our focus is on 2010-2023.**
+</div>
 
 ```{r}
 #| label: fig-compare
@@ -1289,16 +1296,19 @@ exmouth_2010_plotly <- ggplot(exmouth_2010) +
 ggplotly(exmouth_2010_plotly , tooltip = c("x", "y"))
 ```
 
+<div style="background-color: #FFFFCC; padding: 10px;">
 We have combined the number of tourists and the number of whale sharks to observe the relationship between them visually. The strong relationship between the number of travelers and the sighting of a whale shark cannot be perfectly explained due to a few possible reasons. 
 
 - Firstly, a whale shark sighting could be an attraction for travelers, but since the movement of wildlife is difficult to track, there is no guarantee that travelers will be able to see a whale shark every time they go out for it. 
 
 - Secondly, the data coverage is not comprehensive enough, and the process of observing and recording whale sharks is not easy.
+</div>
 
 But we still have found some interesting insights:
 
 - Travel trends in Exmouth highlight a preference for visiting between Q2 and Q4, with Q3 being the peak season for sightseeing, as indicated in the seasonal trend analysis.
 
+<div style="background-color: #FFFFCC; padding: 10px;">
 - Despite the impact of the COVID-19 pandemic on global tourism, the successful year of 2021 for tourism in Australia suggests a potential recovery in the sector.
 
 - The launch of the COVID-19 vaccination program by the Australian Government in December 2020 likely played a role in increasing travelers' confidence, leading to a willingness to travel post-vaccination.
@@ -1306,6 +1316,7 @@ But we still have found some interesting insights:
 - The [2021-2022 Australian Tourism Promotion Plan](https://www.transparency.gov.au/sites/default/files/reports/2021-22_corporate_plan_tourism_australia.pdf), outlined on the Australian Tourism Board's website, encompasses a range of promotional measures initiated by the Australian government in 2021.
 
 - These promotional efforts have significantly contributed to the growth and revival of the Australian tourism industry, providing a positive outlook for the sector.
+</div>
 
 In next section, we combine the weather, previous traveler information and Whale Shark data to determine if any correlations exist among them.
 
@@ -1355,6 +1366,7 @@ In terms of weather, the average temperature of the place remains normal with se
 
 Based on the information provided, it is difficult to gather strong evidence supporting the correlation between weather conditions and the number of whale sharks or tourists. There are numerous factors that can affect the behavior of tourists, such as the season and individual travel preferences. It's challenging to attribute tourist behavior solely to one variable.
 
+<div style="background-color: #FFFFCC; padding: 10px;">
 Based on our data, we can provide the following advice to ecotourists:
 
 - **Best Time to Travel:** It is advisable for ecotourists to plan their trips during Q2 to Q4 when the weather is moderate and rainfall is lower, which is conducive to the development and observation of the ecosystem.
@@ -1366,7 +1378,7 @@ Based on our data, we can provide the following advice to ecotourists:
 - **Preservation of Natural Resources:** Remind them to conserve energy and water resources during their trip and reduce their impact on the local environment to help preserve natural resources.
 
 Through these suggestions, we hope ecotourists can better understand how to respect and protect the ecological environment of the places they visit, while enjoying a meaningful and responsible travel experience.
-
+</div>
 
 
 ## Summary💡💡
