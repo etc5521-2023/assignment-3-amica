@@ -1066,11 +1066,9 @@ This overlap sparks an intriguing hypothesis: could the rainfall indirectly cata
 
 ### Temporal analysis on tourism data
 
-
-Tignostic analysis for tourism data to understand average trips taken by people to "Exmouth" for various reasons.
+Tignostic analysis for tourism data to understand average trips taken by people to Exmouth for various reasons.
 
 ```{r}
-
 
 tourism_shared <- highest_sightings %>%
   as_shared_tsibble(spec = (Purpose) / Region)
@@ -1095,26 +1093,29 @@ p2 <- tourism_feat %>%
 
 The visualized analysis provides a comprehensive insight into the tourism trends in Exmouth, segmented by the purpose of visitation.
 
-Tourism Over Time by Purpose:
+**Tourism Over Time by Purpose**
 
-The first graph displays the tourism trends in Exmouth across different quarters since 1998, stratified by the purpose of the visit.
-One striking observation from this is the consistent rise in tourists visiting Exmouth for holidays. This increasing trend underscores Exmouth's growing appeal as a vacation destination.
-While there are visitors coming to Exmouth for other reasons, such as business and visiting friends or relatives, their volume is relatively subdued when juxtaposed against the holidaymakers.
+- The first graph depicts Exmouth's tourism trends across various quarters from 1998, categorized by the purpose of the visit.
 
-Seasonal versus Trend Strength:
+- A significant observation is the continual increase in tourists visiting Exmouth for holidays, highlighting its growing status as a favored vacation spot.
 
-The second graph contrasts the strength of the seasonal pattern against the trend for different regions.
+- Tourism attracts a significantly larger number of visitors compared to business travelers and other visitors.
 
-Regions clustering together in this plot share similar seasonal and trend dynamics, making it an effective tool to understand patterns and anomalies at a glance.
+**Seasonal versus Trend Strength**
 
-Focusing on Exmouth, the analysis underscores its prominence as a holiday destination. The number of holiday tourists has been on a consistent uptick, underlining its allure. On the contrary, while there are other motivators bringing people to Exmouth, like business or visits to friends and family, their numbers pale in comparison to those coming for leisure. Hence, we will be focusing on "Holiday" data for further analysis.
+- The second graph compares seasonal patterns and trends across different regions.
 
+- Exmouth's analysis emphasizes its status as a popular holiday destination, with a consistent rise in vacationers, overshadowing business and family visitors.
+
+- Further analysis will concentrate on "Holiday" data to delve deeper into Exmouth's vacation trends.
+
+#### Understanding tourism trends in our region of interest
 
 ```{r}
+#| echo: false
 highest_sightings <- highest_sightings %>% filter(Purpose == 'Holiday')
 ```
 
-#### Understanding tourism trends in our region of interest
 
 ```{r}
 #| label: fig-tourismregion
@@ -1133,30 +1134,21 @@ ggplot(highest_sightings, aes(x = year_quarter, y = total_trips)) +
   theme_classic()
 ```
 
+**Overall tourism trends in Exmouth**
 
-- We first start off by visualizing the overall tourist visits for each year in the Exmouth region. From the plot above, we gain two valuable insights. The first being that the average number of trips fluctuate frequently during a year which could be due to the quarter. The second one being that the peaks of the trips seems to be more in the second half of the plot. 
+- The visualization displays the total tourist visits annually in the Exmouth region.
 
-- But is this actually the case? Let's visualize the number of trips in a different way to see how the trips fared overall throughout the years.
+- Two significant observations can be made from the plot: 
 
-
-```{r}
-highest_sightings %>%
-  index_by(year_quarter) %>%
-  summarise(total_trips = mean(total_trips)) %>%
-    mutate(quarter = substr(year_quarter, nchar(year_quarter), nchar(year_quarter) + 2),
-         year = substr(year_quarter, nchar(year_quarter)-4, nchar(year_quarter) )) %>%
-  ggplot(aes(x=year_quarter,y=total_trips)) +
-  geom_line(aes(group=quarter,color=quarter)) +
-              geom_smooth(se=FALSE) +
-  labs(title = "Total Trips Over Time",
-       x = "Year",
-       y = "Total Trips") +
-  theme_classic() +
-  guides(color = "none")
-```
+    - Firstly, there is frequent fluctuation in the average number of trips throughout the year, possibly influenced by the quarter.
+    
+    - Secondly, the peaks of the trips appear to be more prominent in the second half of the plot, suggesting a particular trend in the tourist visits over the years.
 
 
-As we can see from the above plot, the thick blue line does indicate that the overall tourist trips have increased over the years, especially after 2010. However, it we look at the quarter lines themselves, we notice that the teal colored line is way higher than the rest. Could this be due to the quarter being a either spring or winter where whale sharks are prominent as depicted  from our previous analysis on the sightings by seasons.
+**But is this actually the case?** 
+
+**Let's visualize the number of trips in a different way to see how the trips fared overall throughout the years.**
+
 
 ```{r}
 highest_sightings %>%
@@ -1174,21 +1166,27 @@ highest_sightings %>%
   guides(color = "none")
 ```
 
+As we can see from the above:
+
+- The thick blue line in the plot indicates an overall increase in tourist trips over the years, notably after 2010.
+
+- Observing the individual quarter lines, it becomes apparent that the teal colored line is significantly higher than the others.
+
+- This could potentially be attributed to the particular quarter being either spring or winter, a time when whale sharks are prominent, as previously depicted in our analysis of sightings by seasons.
 
 #### Analysing seasonal trend with forecasting
 
-Trend Component:
+**Trend Component**
 
 The trend component reflects long-term progression in the time series data. It provides a smoothed version of the series where short-term fluctuations and seasonality are filtered out.
 
-Seasonal Component:
+**Seasonal Component**
 
 This component captures the regular pattern caused by seasonal factors, which repeats over a specific period - in this case, quarterly, as the frequency is set to 4.
 
-Remainder Component:
+**Remainder Component**
 
 After the trend and seasonal components are extracted from the original series, what remains is the remainder (often referred to as the residual or irregular component). This component captures the random, irregular influences and potential outliers in the data.
-
 
 ```{r}
 #| label: fig-seasonaltrend
@@ -1208,57 +1206,26 @@ decomposition_trips <- stl(ts_data_trips, s.window="periodic")
 # Plot the decomposition
 autoplot(decomposition_trips) + labs(title = "Seasonal Decomposition of Total Trips")
 
-
 ```
 
-However, we can observe from @fig-seasonaltrend that tourism in Exmouth exhibits significant seasonal patterns. According to information from other sources, the most suitable seasons for tourism are July and October. If you examine the weather plots @fig-weathertrend, you will notice that the region remains relatively mild even during the winter, allowing for various engaging outdoor activities such as swimming, marine life observation, and the wildflower season. These factors contribute to the highest number of tourists in Q3, followed by a slight decline in Q4. Q1, on the other hand, experiences a decrease in tourist activity, marking the off-peak season for tourism.
 
-In recent years, there has been a rise in tourism in Exmouth. According to @fig-tourismregion and @fig-seasonaltrend, the overall trend shows a steady increase, with the peak observed after 2014 Q3 occurring in 2021 Q3. Additionally, we have noticed that the remainder plot fluctuation has become larger, indicating that non-seasonal factors play a significant role in the number of tourists. These factors may include promotional activities, local events, policy changes, or other tourism-related factors.
 
-#### Trend analysis to understand number of people travelling to Exmouth for holidays.
+- Exmouth's tourism demonstrates notable seasonal patterns, with the peak seasons identified as July and October, supported by weather data showing relatively mild conditions even during winter.
 
-```{r}
-library(Kendall)
+- The favorable climate allows for various outdoor activities like swimming, observing marine life, and enjoying the wildflower season.
 
-result <- trend::mk.test(highest_sightings$total_trips)
+- These factors contribute to the highest tourist numbers in Q3, followed by a slight decline in Q4, while Q1 experiences a decrease, marking the off-peak season for tourism.
 
-print(result)
+- Recent years have seen a consistent rise in tourism in Exmouth, with the peak observed in 2021 Q3, as indicated by the overall upward trend in the tourism region data and the seasonal trend analysis.
 
-```
+- The fluctuation in the remainder plot has increased, suggesting that factors beyond seasonal variations, such as promotional activities, local events, policy changes, or other tourism-related influences, play a significant role in the number of tourists.
 
-**Analysis of the Mann-Kendall Test on the Time Series Data for Trips to Exmouth**:
-
-After applying the Mann-Kendall test to our dataset for trips to Exmouth, we've obtained the following insights:
-
-1. **z-value (2.7131)**: 
-   - Our z-value is positive, which typically points to an increasing trend. The larger the absolute value of z, the stronger the trend. Here, 2.7131 indicates a notable increasing trend in our dataset.
-
-2. **Sample Size (n = 100)**: 
-   - We have used a considerable sample size of 100 data points, which grants more confidence in the statistical robustness of our results.
-
-3. **Significance (p-value = 0.006666)**: 
-   - The p-value is a fundamental measure in hypothesis testing. In our analysis, a p-value of 0.006666, which is considerably less than the 0.05 threshold, suggests that the trend we've observed in the data is statistically significant.
-
-4. **Alternative Hypothesis**: 
-   - Our test has been formulated around the hypothesis that the trend in the dataset (measured by S) isn't zero. Given our results, we have sufficient evidence to accept this alternative hypothesis.
-
-5. **Sample Estimates**:
-   - **S (912)**: 
-     - The value of the S statistic further corroborates the upward trend in our dataset, given its positive value.
-   - **Variance of S (varS = 112750)**: 
-     - This measure gives us an idea about the dispersion or variability in our trend statistics.
-   - **Tau (τ = 0.1842424)**: 
-     - The Tau statistic, a type of correlation coefficient, confirms the increasing trend. Being a positive value (though not very close to 1), it suggests a moderately strong upward trend.
-
-**Concluding Thoughts**: 
-
-From our analysis, it's evident that there's a statistically significant increase in the number of trips to Exmouth over the time frame captured in the dataset. This trend underscores the potential growing interest of tourists in Exmouth, and as stewards of this region, it's crucial for us to understand and manage this growth responsibly.
-
-However, while statistics provide a quantifiable measure, it's equally important to delve into qualitative aspects, external variables, and other factors that might influence this trend.
 
 ### Ecotourism
 
-In Exmouth, there are various types of tourism available. Most of the visitors who come here are interested in having a closer interaction with nature. One of the most popular activities is swimming with whale sharks. These gentle giants are abundant in this region, making it a popular destination for people wanting to experience this unique adventure. Due to severe missing data before 2010, our focus is on 2010-2023.
+In Exmouth, there are various types of tourism available. Most of the visitors who come here are interested in having a closer interaction with nature. One of the most popular activities is swimming with whale sharks. These gentle giants are abundant in this region, making it a popular destination for people wanting to experience this unique adventure. 
+
+**Due to severe missing data before 2010, our focus is on 2010-2023.**
 
 ```{r}
 #| label: fig-compare
@@ -1307,15 +1274,25 @@ exmouth_2010_plotly <- ggplot(exmouth_2010) +
 ggplotly(exmouth_2010_plotly , tooltip = c("x", "y"))
 ```
 
-In @fig-compare, we have combined the number of tourists and the number of whale sharks to observe the relationship between them visually. The strong relationship between the number of travelers and the sighting of a whale shark cannot be perfectly explained due to a few possible reasons. 
+We have combined the number of tourists and the number of whale sharks to observe the relationship between them visually. The strong relationship between the number of travelers and the sighting of a whale shark cannot be perfectly explained due to a few possible reasons. 
 
 - Firstly, a whale shark sighting could be an attraction for travelers, but since the movement of wildlife is difficult to track, there is no guarantee that travelers will be able to see a whale shark every time they go out for it. 
 
 - Secondly, the data coverage is not comprehensive enough, and the process of observing and recording whale sharks is not easy.
 
-We have noticed a significant pattern for travelers in Exmouth, as previously mentioned in @fig-seasonaltrend. They tend to travel between Q2 - Q4, with the highest number of travelers in Q3 - the most important season for sightseeing. It's worth noting that 2021 was a successful year for tourism in Australia. Would the COVID-19 pandemic have a negative impact on tourism? However, in December 2020, Australia Government launched its COVID-19 vaccination program. People are more willing to travel after getting vaccinated. Additionally, the Australian Tourism Board's website outlines a [2021-2022 Australian Tourism Promotion Plan](https://www.transparency.gov.au/sites/default/files/reports/2021-22_corporate_plan_tourism_australia.pdf), which includes a range of promotional measures launched by the Australian government in 2021. These measures have also contributed to the growth of the Australian tourism industry.
+But we still have found some interesting insights:
 
-In this section, we combine the weather, previous traveler information from @fig-compare, and Whale Shark data to determine if any correlations exist among them.
+- Travel trends in Exmouth highlight a preference for visiting between Q2 and Q4, with Q3 being the peak season for sightseeing, as indicated in the seasonal trend analysis.
+
+- Despite the impact of the COVID-19 pandemic on global tourism, the successful year of 2021 for tourism in Australia suggests a potential recovery in the sector.
+
+- The launch of the COVID-19 vaccination program by the Australian Government in December 2020 likely played a role in increasing travelers' confidence, leading to a willingness to travel post-vaccination.
+
+- The [2021-2022 Australian Tourism Promotion Plan](https://www.transparency.gov.au/sites/default/files/reports/2021-22_corporate_plan_tourism_australia.pdf), outlined on the Australian Tourism Board's website, encompasses a range of promotional measures initiated by the Australian government in 2021.
+
+- These promotional efforts have significantly contributed to the growth and revival of the Australian tourism industry, providing a positive outlook for the sector.
+
+In next section, we combine the weather, previous traveler information and Whale Shark data to determine if any correlations exist among them.
 
 ```{r}
 # Calculate the weather information for the Ecotourism area
@@ -1363,9 +1340,9 @@ In terms of weather, the average temperature of the place remains normal with se
 
 Based on the information provided, it is difficult to gather strong evidence supporting the correlation between weather conditions and the number of whale sharks or tourists. There are numerous factors that can affect the behavior of tourists, such as the season and individual travel preferences. It's challenging to attribute tourist behavior solely to one variable.
 
-Based on our data, you can provide the following advice to ecotourists:
+Based on our data, we can provide the following advice to ecotourists:
 
-- **Best Time to Travel:** It is advisable for ecotourists to plan their trips during Q2 and Q4 when the weather is moderate and rainfall is lower, which is conducive to the development and observation of the ecosystem.
+- **Best Time to Travel:** It is advisable for ecotourists to plan their trips during Q2 to Q4 when the weather is moderate and rainfall is lower, which is conducive to the development and observation of the ecosystem.
 
 - **Marine Ecological Conservation:** Despite the decline in the number of whale shark sightings, it is still recommended for them to participate in whale shark watching activities that comply with conservation standards and to learn about protecting the marine ecosystem.
 
@@ -1373,34 +1350,8 @@ Based on our data, you can provide the following advice to ecotourists:
 
 - **Preservation of Natural Resources:** Remind them to conserve energy and water resources during their trip and reduce their impact on the local environment to help preserve natural resources.
 
-Through these suggestions, ecotourists can better understand how to respect and protect the ecological environment of the places they visit, while enjoying a meaningful and responsible travel experience.
+Through these suggestions, we hope ecotourists can better understand how to respect and protect the ecological environment of the places they visit, while enjoying a meaningful and responsible travel experience.
 
-
-
-```{r}
-# Creating groups for mean_prcp
-weather_tourism_exmouth_2010$mean_prcp_group <- cut(weather_tourism_exmouth_2010$mean_prcp, breaks=seq(0,max(weather_tourism_exmouth_2010$mean_prcp)+10, by=10), labels=FALSE, include.lowest = TRUE)
-weather_tourism_exmouth_2010$mean_prcp_group <- paste((weather_tourism_exmouth_2010$mean_prcp_group-1)*10, weather_tourism_exmouth_2010$mean_prcp_group*10-1, sep="-")
-
-# Printing the dataframe
-print(weather_tourism_exmouth_2010)
-```
-
-```{r}
-
-prcp_sighting <- ggplot(weather_tourism_exmouth_2010, aes(x = n, y = total_trips)) +
-  geom_point(aes(color = mean_prcp_group), size=3, alpha=0.7) +
-  facet_wrap(~ mean_prcp_group, scales="free", ncol=3) +
-  labs(title = "Sighting vs Trips by Precipitation Group",
-       x = "Sighting", y = "Trips") +
-  theme_classic() 
-
-ggplotly(prcp_sighting, tooltip = c("x", "y"))
-
-```
-
-
-The visual representation depicts the relationship between sightings, trips, and precipitation levels. A striking observation is that the majority of sightings and holiday trips coincide with periods of low rainfall, predominantly in the 0-20mm range. This suggests that tourists generally prefer conditions with minimal rainfall for their trips, and interestingly, the sightings also seem to be more prevalent during these times. It's essential to understand that just because these events happen concurrently doesn't necessarily mean one causes the other. The data, in its current form, hints that rainfall might not be a significant factor influencing both sightings and holiday trips. Both events might be happening independently of each other, driven by other factors not captured in this dataset.
 
 
 ## Summary
