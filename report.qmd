@@ -53,7 +53,8 @@ Photo by [Jeremy Bishop](https://unsplash.com/@jeremybishop?utm_content=creditCo
 
 In this study, We expect to encounter these events with our data analysis:
 
-<div style="background-color: #f5e16e; border: 1px solid black;">
+:::{.callout-note}
+# Expectations
 
 -   We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months.
 -   We expect to see differences in the frequency of sightings between coastal areas and open ocean regions, indicating habitat preferences.
@@ -61,7 +62,7 @@ In this study, We expect to encounter these events with our data analysis:
 -   We anticipate the sharks tend to move from east to west during fall and west to east during summer.
 -   We expect to spot the most occurrences in the northern Western Australia.
 
-</div>
+:::
 
 ## Data description
 
@@ -672,9 +673,11 @@ whale_shark %>%
    
 ```
 
--   Based on the plot above, it seems that winter indeed had a substantial number of sightings (319), which closely align with our expectation. Spring had a slightly higher number of sightings (322) than winter, but even though this contradicts with our initial expectation, it is important to note that the difference between spring and winter is relatively small. The other two season, Fall and Summer, clearly has less occurrences, with 258 and 98 sightings, respectively.
+<div style="background-color: #FFFFCC; padding: 10px;">
+-   Based on the plot above, it seems that __winter indeed had a substantial number of sightings (319), which closely align with our expectation__. Spring had a slightly higher number of sightings (322) than winter, but even though this contradicts with our initial expectation, it is important to note that the difference between spring and winter is relatively small. The other two season, Fall and Summer, clearly has less occurrences, with 258 and 98 sightings, respectively.
 
 -   Although our initial expectation was to observe higher occurrences during the winter months, the data shows that sightings were relatively evenly distributed between spring and winter, with spring has slightly more occurrences. Additionally, fall had a significant number of sightings, while summer had the fewest.
+</div>
 
 ### Expectation 2: We expect to see differences in the frequency of sightings between coastal areas and open ocean regions, indicating habitat preferences.
 
@@ -745,11 +748,13 @@ ggplot() +
         plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10))
 ```
 
--   As we can see from the map above, there are very few observations in the open ocean area and majority of the wild sightings have been in the coastal area indicated by red dots.
+<div style="background-color: #FFFFCC; padding: 10px;">
+-   As we can see from the map above, __there are very few observations in the open ocean area and majority of the wild sightings have been in the coastal area__ indicated by red dots.
 
 -   Since the Geoscience Australia considers coastal waters different from territorial sea (coastal boundary), some of the points which are in the coastal waters are excluded from the plot. Also, shape file for coastal waters is not available which doesn't allow us to plot them on the map.
 
 -   So, we can say that our expectation has been met and the chances that whale sharks appear in the coastal area is higher than the open ocean region of Australia.
+</div>
 
 ### Expectation 3: We expect to observe declining occurrences up to this year (2023).
 
@@ -785,15 +790,17 @@ whale_shark %>%
         plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10))
 ```
 
--   The plot suggests that there was a notable increase in whale shark sightings from around 2008 to 2013, with the highest number of sightings occurring in 2013. This period might represent a peak in whale shark observations.
+<div style="background-color: #FFFFCC; padding: 10px;">
+-   The plot suggests that there was a __notable increase in whale shark sightings from around 2008 to 2013, with the highest number of sightings occurring in 2013__. This period might represent a __peak in whale shark observations__.
 
--   After the peak, there is a decline in sightings, but the decline stabilizes after 2017. The number of sightings remains relatively consistent from 2018 to 2023, without a clear trend of continuous decline.
+-   After the peak, __there is a decline in sightings, but the decline stabilizes after 2017__. The number of sightings remains relatively consistent from 2018 to 2023, without a clear trend of continuous decline.
 
--   While there may be fluctuations in the number of sightings from year to year, the data does not show a significant decline in occurrences up to the year 2023. It suggests that the population of whale sharks in the observed area may have stabilized or reached a plateau, at least within the scope of the available data.
-
--   Note that this interpretation is based on the available data and the assumption that the observations are representative of the entire whale shark population in the area. Factors such as changes in survey effort or environmental conditions may also influence the observed trends.
+-   While __there may be fluctuations in the number of sightings from year to year, the data does not show a significant decline in occurrences up to the year 2023__. It suggests that the population of whale sharks in the observed area may have stabilized or reached a plateau, at least within the scope of the available data.
 
 -   The expectation is not met according to the data.
+</div>
+
+> **Note:** This interpretation is based on the available data and the assumption that the observations are representative of the entire whale shark population in the area. Factors such as changes in survey effort or environmental conditions may also influence the observed trends.
 
 ### Expectation 4: We anticipate the sharks tend to move from east to west during fall and west to east during summer.
 
@@ -824,13 +831,17 @@ whale_shark %>% na.omit() %>%
         plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10))
 ```
 
--   Whale sharks generally prefer Western Australian waters more than Eastern waters.
+<div style="background-color: #FFFFCC; padding: 10px;">
 
--   They also prefer winter months over summer months in West whereas other way round in the East.
+-   __Whale sharks generally prefer Western Australian waters more than Eastern waters__.
+
+-   They also __prefer winter months over summer months in West whereas other way round in the East__.
 
 -   This might suggest (if we get more data about the sharks in east), Sharks travel from west to east to enjoy summer months in east and east to west to enjoy winter months in west.
 
--   Note: Here, 134 degrees longitude is used as reference line to separate the East from West since it equally divides the continents in two halves.
+</div>
+
+> **Note:** Here, 134 degrees longitude is used as reference line to separate the East from West since it equally divides the continents in two halves.
 
 ### Expectation 5: We expect to spot the most occurrences in the northern Western Australia.
 
@@ -860,11 +871,12 @@ ggplot() +
         plot.subtitle = element_text(hjust=0.4, face = "italic", size = 10))
 ```
 
--   As can be seen from the map plot above, the sightings are spread out accross western, northern, and eastern part of Australia. We added another dimension, a size, that make some of the occurrence have bigger circle (like a bubble). This is needed because from the dataset, we identified there are so many location that have exact latitude & longitude, which will overlapping each other if we only show it as dot points, and hinder the underlying value of the plot. With this additional dimension, it is clear that most of the occurrences are recorded in the northern of Western Australia area.
+<div style="background-color: #FFFFCC; padding: 10px;">
 
--   In contrast, we can see that the number of occurrences are very small in the southern part of Australia. Right now, we can only assume that Whale Shark may not prefer this area due to it is closer to the south pole, which make the sea water temperature colder compare to the other area. Unfortunately, we could not find any dataset regarding the sea water temperature that can be downloaded and plotted according to the time when the sightings happened. Otherwise, it will provide deeper understanding of whale shark behaviour.
+-  From the map plot, it's evident that __whale shark sightings predominantly span the western, northern, and eastern coasts of Australia, with a notable concentration in Northern Western Australia__. The use of varying circle sizes helps represent multiple sightings at identical latitude and longitude, preventing overlap and offering a clearer representation. The __lesser number of sightings in southern Australia suggests a possible preference of the whale sharks for warmer waters, given the region's proximity to the colder southern pole__. 
+-  While current data doesn't provide insights into sea water temperatures, such information could offer a more in-depth understanding of their behavior. Nevertheless, __the substantial number of sightings in Northern Western Australia aligns with existing knowledge, as whale sharks often migrate to areas like the *Ningaloo Marine Park*__.  -  Additionally, the __prevalence of eco-tourism in these regions likely boosts the recorded sightings__ due to a higher human presence during specific seasons.
 
--   As we have explained so far, we can conclude that our expectation is satisfied with the fact that most of occurrences happened in the northern part of Western Australia. This is align with the information that we gathered from different sources, which says whale shark usually migrate to Ningaloo Marine Park that is located in the northern Western Australia. On the other hand, the high number of occurrences could also supported by the fact that there are eco-tourism around that area, meaning more people will be around that area (on certain season) and record the sightings.
+</div>
 
 ### Whale Sharks Sightings against Weather Condition
 
@@ -912,38 +924,8 @@ We plotted a map that shows the distribution of whale shark sightings surroundin
 whale_shark_weather <- whale_shark_weather %>%
                         mutate(avg_temp = (tmax + tmin) / 2)
 
-# Plot Rain Precipitation Distribution
-p1 <- ggplot(narrogin_v2, aes(x = prcp)) +
-        geom_boxplot() +
-        ggtitle(label = "Rain Precipitation Distribution") +
-        theme_classic()
-
-# Plot Max Temperature Distribution            
-p2 <- ggplot(narrogin_v2, aes(x = tmax)) +
-        geom_boxplot() +
-        ggtitle(label = "Max Temperature Distribution") +
-        theme_classic()
-
-# Plot Min Temperature Distribution            
-p3 <- ggplot(narrogin_v2, aes(x = tmin)) +
-        geom_boxplot() +
-        ggtitle(label = "Min Temperature Distribution") +
-        theme_classic()
 ```
 
-```{r}
-#| label: fig-weatherdist
-#| fig-cap: "Weather Distribution"
-#| fig-width: 12
-#| fig-heigth: 8
-#| echo: false
-#| warning: false
-#| message: false
-
-grid.arrange(p1,p2,p3,ncol = 3)
-```
-
-Let's breakdown the distribution of each weather related variables from @fig-weatherdist. In terms of rain precipitation, it looks like the area around Learmonth Airport is mostly dry, concluded by the zero (0) precipitation throughout the year with raining happened occasionally. On the other hand, these area experienced a high variance of temperature, as can be seen, the minimum temperature was 3.5 degree celcius and maximum temperature was 48.9 degree celcius. The next paragraph will cover the profile of the weather based on their trend over the time.
 
 ```{r}
 #| label: fig-weathertrend
@@ -971,10 +953,18 @@ p6 <- ggplot(narrogin_v2, aes(x = date)) +
 
 grid.arrange(p5,p6, ncol = 2)  
 ```
+<div style="background-color: #FFFFCC; padding: 10px;">
 
-Now, we will assess the trend of rain precipitation and temperature. From figure @fig-weathertrend, the most interesting insight from this plot is the fact that the rain starting to pour in this area more frequently from January, continues to increase into months to come until it started to decrease from July. The rest of the year, the rain happened occasionally. Please be mindful that what we meant is not the heaviness of the rain, rather the frequency of rain pouring over the time, we assume that precipitation of more than 0 means raining. As for the temperature, it is basically a common knowledge that summer is the hottest, winter is the coldest, fall and spring are in between the prior categories, which clearly shown by the plot.
+The `Learmonth Airport` vicinity predominantly __experiences arid conditions, evident from the near absence of precipitation throughout most of the year__, interspersed only by occasional bouts of rain. This region is also characterized by a vast temperature range: __temperatures as low as 3.5°C and soaring up to 48.9°C, showcasing a wide climatic amplitude__.
 
-Through this weather profiling, we have got a new perspective that will help us provide better interpretation of the correlation analysis. It allows us to think why would under certain condition the sightings are more frequent. In the next section, we will incorporate this information to the actual sightings of the whale shark, and uncover the insight of whale shark behaviour.
+Referring to Figure @fig-weathertrend, __a striking observation is the pronounced uptick in rainfall frequency starting in January, which steadily intensifies before beginning to wane post-July, only to revert to sporadic showers for the remainder of the year__. 
+
+Understanding these meteorological nuances affords us a richer lens to interpret the forthcoming correlation analyses. It equips us with the context to hypothesize why certain weather conditions might correlate with heightened whale shark sightings. Moving forward, this climatic backdrop will be juxtaposed against whale shark sightings, aiming to glean insights into their behavioral patterns in relation to the prevailing weather conditions.
+
+<div>
+
+> **Note:** This observation is centered around the frequency of the rain events, rather than their intensity - any non-zero precipitation is interpreted as rainfall. As for the temperature variations, they follow the anticipated seasonal fluctuations: scorching summers, chilly winters, with spring and autumn offering moderate climes.
+
 
 **Whale Shark Sightings vs Temperature** We will start the analysis by unveiling the relationship between whale shark sightings against the average temperature. In the @fig-corrplot1 below, we grouped the observations based on the season to provide better visualisation and level of detail.
 
@@ -1004,11 +994,11 @@ whale_shark_weather %>%
           plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10))
 ```
 
--   Based on the plot above, there appears to be no significant pattern or dependency between temperature and the occurrence of whale shark sightings. Unlike some species that may exhibit preferences for specific temperature ranges, whale shark, in this dataset, seem to defy such temperature-related constrains. This lack of a clear correlation between temperature and sightings suggests that whale sharks may possess a wide temperature tolerance or have a migratory behavior that is not closely tied to local temperature variations.
+<div style="background-color: #FFFFCC; padding: 10px;">
+-   The above plot indicates that there's no clear relationship between temperature and whale shark sightings. While many species have specific temperature preferences, in this dataset, whale sharks don't seem to show a strong temperature-based behavior. This absence of correlation might imply that whale sharks either have a broad range of temperature tolerance or their migratory patterns aren't majorly influenced by local temperature shifts.
+<div>
 
--   Another thing worth noting is the temperature in this dataset is actually an air temperature, which may be totally different with the sea water temperature where whale shark is spotted. So, there might be a case when the air temperature is hot, the sea water temperature is mild and vice versa. Also, the depth of sightings should be considered as well, since deeper sea level may have colder temperature.
-
--   Further analysis might be required by utilising sea water temperature to provide a deeper understanding of the whale shark behaviour. As of now, there is no substantial pattern we can see to conclude the correlation between the air temperature surface and the whale shark sightings.
+> **Note:**  It's essential to underscore that the temperatures in this dataset reflect atmospheric readings, which can diverge considerably from the sea water temperatures where whale sharks are often observed. A high atmospheric temperature, for instance, doesn't guarantee a corresponding warm sea temperature, and vice versa. The depth of sightings can further complicate this, as deeper marine environments are typically cooler. For a comprehensive understanding of the nexus between temperature and whale shark behavior, an integration of sea water temperature data is imperative. Currently, with just atmospheric temperature data at our disposal, drawing any definitive correlation between temperature and whale shark sightings remains elusive.
 
 **Whale Shark Sightings vs Rain Precipitation** The next analysis will be the correlation analysis between sightings and rain precipitation. As known previously that the area is mostly dry, so this might be affecting the sightings as well. The plot will be similar as the previous analysis, where we grouped the observations based on the season to provide better visualisation and level of detail.
 
@@ -1038,9 +1028,41 @@ whale_shark_weather %>%
           plot.subtitle = element_text(hjust=0.5, face = "italic", size = 10))
 ```
 
--   As can be seen from the @fig-corrplot2, predominantly all sightings occur in when there is not raining, while we can still see that whale shark was also spotted when it is raining. However, we thought there might be an underlying factor that could reveal the reason why whale shark spotted more in this area, particularly to the correlation with rain precipitation. If we recall our analysis from figure @fig-countoccur, we know that whale shark are spotted mostly in Winter and Spring season. Additionally, if we consider our insight from weather data profiling of figure @fig-weathertrend, we know that the rain started to pour in this area from January, it consistently happen each month until July. So, from these two insights, there is a chain reaction that might lead to whale shark migrate into this area. After doing some research, we have got the information that a rainfall is actually have an indirect impact into sea ecosystem. When raining pour down, it can lead to increased runoff from land into rivers and eventually into the sea. This runoff can carry nutrients that promotes the growth of plankton, which in turn can be consumed by other creatures in the sea such as fish, crustacean, squid, etc. (Paczkowska et al., 2020). In the end, a big fish such as whale sharks are getting the benefits as well since those are their primary food.
+<div style="background-color: #FFFFCC; padding: 10px;">
+- The relationship between rain precipitation and whale shark sightings, as illustrated in @fig-corrplot2, predominantly showcases __the majority of sightings occurring during dry periods, although sightings during rainy periods are not absent__. Revisiting our observations from figure @fig-countoccur, we identified that the __peak sightings seasons for whale sharks are Winter and Spring__. 
 
--   So, as mentioned in the first point, the rain may not be affect the occurrence of whale shark directly in certain area, but the chain reaction of frequent raining in that area may lead to changes in the sea ecosystem, which benefitting whale shark. Hence, we conclude that there is still a indirect correlation between raining and whale shark sightings.
+Now, juxtaposing this with the weather profile in figure @fig-weathertrend, it __becomes evident that rain begins to mark its presence from January, steadily increasing through to July__. 
+
+</div>
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+cat("
+<style>
+.interesting {
+  background-color: #e6f7ff; /* Light blue to signify importance */
+  border-left: 5px solid #2196F3; /* Blue border to the left */
+  padding: 10px;
+  margin: 20px 0;
+}
+</style>
+")
+
+```
+
+```{r}
+cat("
+<div class='interesting'>
+This overlap sparks an intriguing hypothesis: could the rainfall indirectly catalyze a sequence of events leading to an influx of whale sharks in this region? Delving into research, we uncovered that rain does indeed play a pivotal role in shaping marine ecosystems. Rainfall increases land runoff which, upon merging with rivers, eventually flows into the sea. This influx often carries with it an abundance of nutrients, which can stimulate plankton growth. As these plankton proliferate, they become a food source for an array of marine creatures such as fish, crustaceans, and squids. Whale sharks, being apex feeders in this chain, thus indirectly benefit from this surge in food availability (Paczkowska et al., 2020). 
+
+- In essence, while rainfall might not directly influence whale shark presence in a particular region, its cascading impact on the marine food web potentially creates conditions conducive for these gentle giants. Consequently, we can infer that an indirect correlation likely exists between rainfall patterns and whale shark sightings.
+</div>
+")
+
+```
+
 
 ### Temporal analysis on tourism data
 
@@ -1383,7 +1405,9 @@ The visual representation depicts the relationship between sightings, trips, and
 
 ## Summary
 
-<div style="background-color: #6ec6f5; border: 1px solid black;">
+<div style="border: 2px solid black; padding: 10px; background-color: lightyellow; font-family: serif;">
+
+💡💡
 
 -   The data analysis showed that there were relatively even occurrences of whale shark sightings between spring and winter, with a slight edge for spring. Fall had a significant number of sightings, while summer had the fewest. This finding contradicted the expectation of higher occurrences during winter months.
 -   The analysis using geospatial data confirmed that most whale shark sightings occurred in coastal areas rather than open ocean regions of Australia, aligning with the expectation of differences in habitat preferences.
