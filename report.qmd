@@ -294,6 +294,8 @@ From the @fig-visdat above, we can see:
 
 -   There are `r ws_raw %>% filter(is.na(eventDate)) %>% nrow()` missing values in the `eventDate` variable out of `r ws_raw %>% nrow()` records.
 
+<!--
+
 #### Outliers Check
 
 **Checking `eventDate` variables:**
@@ -325,6 +327,8 @@ Based on @fig-boxplot:
 -   There are `r ws_raw %>% filter(year(eventDate) < 1990) %>% nrow()` rows with record year less than 1990 which will be removed as they are not really reliable.
 
 -   The other outliers might have some valid information since they follow natural order so we won't be excluding them in clean data.
+
+-->
 
 **Checking Location of Occurrences**
 
