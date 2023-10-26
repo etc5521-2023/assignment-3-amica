@@ -53,11 +53,15 @@ Photo by [Jeremy Bishop](https://unsplash.com/@jeremybishop?utm_content=creditCo
 
 In this study, We expect to encounter these events with our data analysis:
 
+<div style="background-color: #f5e16e; border: 1px solid black;">
+
 -   We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months.
 -   We expect to see differences in the frequency of sightings between coastal areas and open ocean regions, indicating habitat preferences.
 -   We expect to observe declining occurrences up to this year (2023).
 -   We anticipate the sharks tend to move from east to west during fall and west to east during summer.
 -   We expect to spot the most occurrences in the northern Western Australia.
+
+</div>
 
 ## Data description
 
@@ -439,44 +443,6 @@ ggplot() +
 ```
 
 
-### Finding nearest tourist destination
-
-Similarly to weather stations, we make use of the same geospatial object of Australia to plot all available tourist destinations in Australia at first from which we will then identify the tourist spot required.
-
-```{r}
-#| label: fig-alltourism
-#| fig-cap: "All Tourist Destinations"
-#| fig-width: 8
-#| fig-heigth: 8
-#| echo: false
-#| warning: false
-#| message: false
-
-t_region <- st_read(here::here("data/SA2_2021_AUST_SHP_GDA2020/SA2_2021_AUST_GDA2020.shp")) |>
-  ms_simplify(keep = 0.1) |>
-  st_transform(crs = st_crs("WGS84")) |>
-  st_make_valid() |>
-  select(STE_NAME21, SA2_NAME21, SA2_CODE21, geometry) |>
-  rename("state" = STE_NAME21,
-         "region" = SA2_NAME21,
-         "sa2_code21" = SA2_CODE21)
-
-polygon_geometry <- st_geometry(t_region)[1]
-
-coordinates <- st_coordinates(polygon_geometry) |>
-  as_tibble()
-
-
-states %>%
-  ggplot() +
-  geom_sf(aes(geometry = geometry)) +
-  geom_point(data = coordinates, aes(x=X,y=Y), color = "red", size = 0.1) +
-  ggtitle("Tourism Spots in Entire Australia") 
-
-```
-
-
-
 
 ### Data Cleansing and Transforming
 
@@ -595,6 +561,16 @@ Below is the code to combine both the whale_weather data with the tourism data. 
 #| warning: false
 #| message: false
 #| eval: true
+
+
+t_region <- st_read(here::here("data/SA2_2021_AUST_SHP_GDA2020/SA2_2021_AUST_GDA2020.shp")) |>
+  ms_simplify(keep = 0.1) |>
+  st_transform(crs = st_crs("WGS84")) |>
+  st_make_valid() |>
+  select(STE_NAME21, SA2_NAME21, SA2_CODE21, geometry) |>
+  rename("state" = STE_NAME21,
+         "region" = SA2_NAME21,
+         "sa2_code21" = SA2_CODE21)
 
 
 # Join
@@ -1403,6 +1379,8 @@ The visual representation depicts the relationship between sightings, trips, and
 
 ## Summary
 
+<div style="background-color: #6ec6f5; border: 1px solid black;">
+
 -   The data analysis showed that there were relatively even occurrences of whale shark sightings between spring and winter, with a slight edge for spring. Fall had a significant number of sightings, while summer had the fewest. This finding contradicted the expectation of higher occurrences during winter months.
 -   The analysis using geospatial data confirmed that most whale shark sightings occurred in coastal areas rather than open ocean regions of Australia, aligning with the expectation of differences in habitat preferences.
 -   Contrary to the expectation of declining occurrences, the data showed an increase in whale shark sightings from around 2008 to 2013, reaching a peak in 2013. Afterward, there was a decline, but it stabilized after 2017, suggesting that the population may have stabilized.
@@ -1411,7 +1389,7 @@ The visual representation depicts the relationship between sightings, trips, and
 -   The correlation analysis between temperature whale shark sightings showed no significant pattern or dependency between them.
 -   Similarly, the correlation analysis between rain precipitation and whale shark sightings suggest that rain precipitation did not directly affect sightings. But it was noted that frequent rainfall may indirectly impact sea ecosystems by promoting plankton growth, which could benefit whale sharks.
 
-
+</div>
 
 ## References
 
