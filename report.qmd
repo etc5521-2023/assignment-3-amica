@@ -53,7 +53,9 @@ Photo by [Jeremy Bishop](https://unsplash.com/@jeremybishop?utm_content=creditCo
 
 In this study, We expect to encounter these events with our data analysis:
 
-<div style="background-color: #f5e16e; border: 1px solid black;">
+
+:::{.callout-note}
+# Expectations
 
 -   We expect to observe seasonal patterns in whale shark sightings, with higher occurrences during winter months.
 -   We expect to see differences in the frequency of sightings between coastal areas and open ocean regions, indicating habitat preferences.
@@ -61,7 +63,8 @@ In this study, We expect to encounter these events with our data analysis:
 -   We anticipate the sharks tend to move from east to west during fall and west to east during summer.
 -   We expect to spot the most occurrences in the northern Western Australia.
 
-</div>
+:::
+
 
 ## Data description
 
@@ -1379,7 +1382,9 @@ The visual representation depicts the relationship between sightings, trips, and
 
 ## Summary
 
-<div style="background-color: #6ec6f5; border: 1px solid black;">
+<div style="border: 2px solid black; padding: 10px; background-color: lightyellow;  font-family: serif;">
+
+💡💡
 
 -   The data analysis showed that there were relatively even occurrences of whale shark sightings between spring and winter, with a slight edge for spring. Fall had a significant number of sightings, while summer had the fewest. This finding contradicted the expectation of higher occurrences during winter months.
 -   The analysis using geospatial data confirmed that most whale shark sightings occurred in coastal areas rather than open ocean regions of Australia, aligning with the expectation of differences in habitat preferences.
@@ -1388,6 +1393,8 @@ The visual representation depicts the relationship between sightings, trips, and
 -   The data confirmed the expectation of most occurrences in the northern part of Western Australia, particularly in the Ningaloo Marine Park area, which aligns with the known migration patterns and ecotourism activities in that region.
 -   The correlation analysis between temperature whale shark sightings showed no significant pattern or dependency between them.
 -   Similarly, the correlation analysis between rain precipitation and whale shark sightings suggest that rain precipitation did not directly affect sightings. But it was noted that frequent rainfall may indirectly impact sea ecosystems by promoting plankton growth, which could benefit whale sharks.
+
+💡💡
 
 </div>
 
