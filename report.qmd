@@ -41,6 +41,7 @@ library(plotly) # update #added
 library(tibble) # update #added
 library(forecast) # update #added
 library(GGally) # update #added
+library(Kendall) #update #added
 ```
 
 ## Introduction
@@ -953,7 +954,7 @@ p3 <- ggplot(narrogin_v2, aes(x = tmin)) +
 grid.arrange(p1,p2,p3,ncol = 3)
 ```
 
-Let's breakdown the distribution of each weather related variables from @fig-weatherdist. In terms of rain precipitation, it looks like the area around Learmonth Airport is mostly dry, concluded by the zero (0) precipitation throughout the year with raining happened occasionally. On the other hand, these area experienced a high variance of temperature, as can be seen, the minimum temperature was 3.5 degree celcius and maximum temperature was 48.9 degree celcius. The next paragraph will cover the profile of the weather based on their trend over the time.
+Let's breakdown the distribution of each weather related variables from @fig-weatherdist. In terms of rain precipitation, it looks like the area around `Learmonth Airport` is mostly dry, concluded by the zero (0) precipitation throughout the year with raining happened occasionally. On the other hand, these area experienced a high variance of temperature, as can be seen, __the minimum temperature was 3.5 degree celcius and maximum temperature was 48.9 degree celcius__. The next analysis will cover the profile of the weather based on their trend over the time.
 
 ```{r}
 #| label: fig-weathertrend
@@ -982,8 +983,6 @@ p6 <- ggplot(narrogin_v2, aes(x = date)) +
 grid.arrange(p5,p6, ncol = 2)  
 ```
 <div style="background-color: #FFFFCC; padding: 10px;">
-
-The `Learmonth Airport` vicinity predominantly __experiences arid conditions, evident from the near absence of precipitation throughout most of the year__, interspersed only by occasional bouts of rain. This region is also characterized by a vast temperature range: __temperatures as low as 3.5°C and soaring up to 48.9°C, showcasing a wide climatic amplitude__.
 
 Referring to Figure @fig-weathertrend, __a striking observation is the pronounced uptick in rainfall frequency starting in January, which steadily intensifies before beginning to wane post-July, only to revert to sporadic showers for the remainder of the year__. 
 
@@ -1070,7 +1069,6 @@ Tignostic analysis for tourism data to understand average trips taken by people 
 
 ```{r}
 
-
 tourism_shared <- highest_sightings %>%
   as_shared_tsibble(spec = (Purpose) / Region)
 
@@ -1098,12 +1096,10 @@ The visualized analysis provides a comprehensive insight into the tourism trends
 
 **Tourism Over Time by Purpose**
 
+<div style="background-color: #FFFFCC; padding: 10px;"> 
 - The first graph depicts Exmouth's tourism trends across various quarters from 1998, categorized by the purpose of the visit.
 
-- A significant observation is the continual increase in tourists visiting Exmouth for holidays, highlighting its growing status as a favored vacation spot.
-
-<div style="background-color: #FFFFCC; padding: 10px;"> 
-- Tourism attracts a significantly larger number of visitors compared to business travelers and other visitors.
+- A significant observation is the __continual increase in tourists visiting Exmouth for holidays__ compared to business travelers and other visitors, __highlighting its growing status as a favored vacation spot__.
 </div>
 
 **Seasonal versus Trend Strength**
@@ -1144,7 +1140,7 @@ ggplotly(tourismoverall , tooltip = c("x", "y"))
 ```
 
 
-- We first start off by visualizing the overall tourist visits for each year in the Exmouth region. From the plot above, we gain two valuable insights. The first being that the average number of trips fluctuate frequently during a year which could be due to the quarter. The second one being that the peaks of the trips seems to be more in the second half of the plot. 
+- We first start off by visualizing the overall tourist visits for each year in the Exmouth region. From the plot above, we gain two valuable insights. The first being that __the average number of trips fluctuate frequently during a year which could be due to the quarter__. The second one being that __the peaks of the trips seems to be more in the second half of the plot__. 
 
 - But is this actually the case? Let's visualize the number of trips in a different way to see how the trips fared overall throughout the years.
 
@@ -1165,8 +1161,9 @@ highest_sightings %>%
   guides(color = "none")
 ```
 
-
-As we can see from the above plot, the thick blue line does indicate that the overall tourist trips have increased over the years, especially after 2010. However, it we look at the quarter lines themselves, we notice that the teal colored line is way higher than the rest. Could this be due to the quarter being a either spring or winter where whale sharks are prominent as depicted  from our previous analysis on the sightings by seasons.
+<div style="background-color: #FFFFCC; padding: 10px;"> 
+As we can see from the above plot, the thick blue line does indicate that the overall tourist trips have increased over the years, especially after 2010. However, it we look at the quarter lines themselves, we notice that the teal colored line is way higher than the rest. Could this be due to __the quarter being a either spring or winter where whale sharks are prominent as depicted  from our previous analysis on the sightings by seasons__.
+</div>
 
 ```{r}
 #| label: fig-tourismqua
@@ -1196,10 +1193,10 @@ tourismquart <- highest_sightings %>%
 ggplotly(tourismquart , tooltip = c("x", "y"))
 ```
 
+<div style="background-color: #FFFFCC; padding: 10px;"> 
 As we can see from the above @fig-tourismqua:
 
-<div style="background-color: #FFFFCC; padding: 10px;"> 
-The most visited season by tourists is Q3 (winter to spring) , followed by Q2 and Q4.
+The __most visited season by tourists is Q3 (winter to spring) , followed by Q2 and Q4__.
 </div>
 
 #### Analysing seasonal trend with forecasting
@@ -1237,14 +1234,15 @@ autoplot(decomposition_trips) + labs(title = "Seasonal Decomposition of Total Tr
 
 ```
 
+<div style="background-color: #FFFFCC; padding: 10px;">
 However, we can observe from @fig-seasonaltrend that tourism in Exmouth exhibits significant seasonal patterns. According to information from other sources, the most suitable seasons for tourism are July and October. If you examine the weather plots @fig-weathertrend, you will notice that the region remains relatively mild even during the winter, allowing for various engaging outdoor activities such as swimming, marine life observation, and the wildflower season. These factors contribute to the highest number of tourists in Q3, followed by a slight decline in Q4. Q1, on the other hand, experiences a decrease in tourist activity, marking the off-peak season for tourism.
 
 In recent years, there has been a rise in tourism in Exmouth. According to @fig-tourismregion and @fig-seasonaltrend, the overall trend shows a steady increase, with the peak observed after 2014 Q3 occurring in 2021 Q3. Additionally, we have noticed that the remainder plot fluctuation has become larger, indicating that non-seasonal factors play a significant role in the number of tourists. These factors may include promotional activities, local events, policy changes, or other tourism-related factors.
+</div>
 
 #### Trend analysis to understand number of people travelling to Exmouth for holidays.
 
 ```{r}
-library(Kendall)
 
 result <- trend::mk.test(highest_sightings$total_trips)
 
@@ -1276,11 +1274,12 @@ After applying the Mann-Kendall test to our dataset for trips to Exmouth, we've 
    - **Tau (τ = 0.1842424)**: 
      - The Tau statistic, a type of correlation coefficient, confirms the increasing trend. Being a positive value (though not very close to 1), it suggests a moderately strong upward trend.
 
-**Concluding Thoughts**: 
 
+<div style="background-color: #FFFFCC; padding: 10px;">
 From our analysis, it's evident that there's a statistically significant increase in the number of trips to Exmouth over the time frame captured in the dataset. This trend underscores the potential growing interest of tourists in Exmouth, and as stewards of this region, it's crucial for us to understand and manage this growth responsibly.
 
 However, while statistics provide a quantifiable measure, it's equally important to delve into qualitative aspects, external variables, and other factors that might influence this trend.
+</div>
 
 ### Ecotourism
 
@@ -1347,19 +1346,21 @@ We have combined the number of tourists and the number of whale sharks to observ
 
 But we still have found some interesting insights:
 
-- Travel trends in Exmouth highlight a preference for visiting between Q2 and Q4, with Q3 being the peak season for sightseeing, as indicated in the seasonal trend analysis.
-
 <div style="background-color: #FFFFCC; padding: 10px;">
-- Despite the impact of the COVID-19 pandemic on global tourism, the successful year of 2021 for tourism in Australia suggests a potential recovery in the sector.
+- Travel trends in Exmouth highlight a preference for visiting between Q2 and Q4, with __Q3 being the peak season for sightseeing__, as indicated in the seasonal trend analysis.
 
-- The launch of the COVID-19 vaccination program by the Australian Government in December 2020 likely played a role in increasing travelers' confidence, leading to a willingness to travel post-vaccination.
+- Despite the impact of the COVID-19 pandemic on global tourism, __the successful year of 2021 for tourism in Australia suggests a potential recovery__ in the sector.
+
+- The __launch of the COVID-19 vaccination program by the Australian Government in December 2020 likely played a role in increasing travelers' confidence__, leading to a willingness to travel post-vaccination.
 
 - The [2021-2022 Australian Tourism Promotion Plan](https://www.transparency.gov.au/sites/default/files/reports/2021-22_corporate_plan_tourism_australia.pdf), outlined on the Australian Tourism Board's website, encompasses a range of promotional measures initiated by the Australian government in 2021.
 
 - These promotional efforts have significantly contributed to the growth and revival of the Australian tourism industry, providing a positive outlook for the sector.
+
 </div>
 
-In next section, we combine the weather, previous traveler information and Whale Shark data to determine if any correlations exist among them.
+
+__In next section, we combine the weather, previous traveler information and Whale Shark data to determine if any correlations exist among them.__
 
 ```{r}
 # Calculate the weather information for the Ecotourism area
@@ -1392,6 +1393,7 @@ weather_tourism_exmouth_2010 <- left_join(exmouth_2010,
                                           whale_shark_weather_exmouth, by = "year_quarter")
 ```
 
+
 ```{r}
 ggpairs(weather_tourism_exmouth_2010, 
         columns = c("year_quarter", "total_trips", "avg_temp", "mean_prcp", "n"),
@@ -1407,7 +1409,7 @@ In terms of weather, the average temperature of the place remains normal with se
 
 Based on the information provided, it is difficult to gather strong evidence supporting the correlation between weather conditions and the number of whale sharks or tourists. There are numerous factors that can affect the behavior of tourists, such as the season and individual travel preferences. It's challenging to attribute tourist behavior solely to one variable.
 
-<div style="background-color: #FFFFCC; padding: 10px;">
+<div style="background-color: #a3c1ad; padding: 10px;">
 Based on our data, we can provide the following advice to ecotourists:
 
 - **Best Time to Travel:** It is advisable for ecotourists to plan their trips during Q2 to Q4 when the weather is moderate and rainfall is lower, which is conducive to the development and observation of the ecosystem.
@@ -1421,30 +1423,6 @@ Based on our data, we can provide the following advice to ecotourists:
 Through these suggestions, we hope ecotourists can better understand how to respect and protect the ecological environment of the places they visit, while enjoying a meaningful and responsible travel experience.
 </div>
 
-```{r}
-# Creating groups for mean_prcp
-weather_tourism_exmouth_2010$mean_prcp_group <- cut(weather_tourism_exmouth_2010$mean_prcp, breaks=seq(0,max(weather_tourism_exmouth_2010$mean_prcp)+10, by=10), labels=FALSE, include.lowest = TRUE)
-weather_tourism_exmouth_2010$mean_prcp_group <- paste((weather_tourism_exmouth_2010$mean_prcp_group-1)*10, weather_tourism_exmouth_2010$mean_prcp_group*10-1, sep="-")
-
-# Printing the dataframe
-print(weather_tourism_exmouth_2010)
-```
-
-```{r}
-
-prcp_sighting <- ggplot(weather_tourism_exmouth_2010, aes(x = n, y = total_trips)) +
-  geom_point(aes(color = mean_prcp_group), size=3, alpha=0.7) +
-  facet_wrap(~ mean_prcp_group, scales="free", ncol=3) +
-  labs(title = "Sighting vs Trips by Precipitation Group",
-       x = "Sighting", y = "Trips") +
-  theme_classic() 
-
-ggplotly(prcp_sighting, tooltip = c("x", "y"))
-
-```
-
-
-The visual representation depicts the relationship between sightings, trips, and precipitation levels. A striking observation is that the majority of sightings and holiday trips coincide with periods of low rainfall, predominantly in the 0-20mm range. This suggests that tourists generally prefer conditions with minimal rainfall for their trips, and interestingly, the sightings also seem to be more prevalent during these times. It's essential to understand that just because these events happen concurrently doesn't necessarily mean one causes the other. The data, in its current form, hints that rainfall might not be a significant factor influencing both sightings and holiday trips. Both events might be happening independently of each other, driven by other factors not captured in this dataset.
 
 
 ## Summary💡💡
@@ -1524,4 +1502,7 @@ Hyndman RJ, Khandakar Y (2008). “Automatic time series forecasting: the foreca
 
 -   **GGally**:   Schloerke B, Cook D, Larmarange J, Briatte F, Marbach M, Thoen E, Elberg A, Crowley J (2021). _GGally: Extension to 'ggplot2'_. R package version 2.1.2,
   <https://CRAN.R-project.org/package=GGally>.
+
+-  **Kendall**:   McLeod A (2022). _Kendall: Kendall Rank Correlation and Mann-Kendall Trend Test_. R package version
+  2.2.1, <https://CRAN.R-project.org/package=Kendall>.
 :::
