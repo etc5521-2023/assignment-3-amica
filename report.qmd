@@ -276,7 +276,6 @@ For the occurrences dataset, we are going to perform data type check, as specifi
 #| fig-cap: "Checking Data Types"
 #| fig-width: 10
 #| fig-heigth: 8
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -307,7 +306,6 @@ From the @fig-visdat above, we can see:
 #| fig-cap: "Profile of Yearly Occurrences"
 #| fig-width: 5
 #| fig-heigth: 5
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -337,7 +335,6 @@ Based on @fig-boxplot:
 #| fig-cap: "All Occurrences"
 #| fig-width: 8
 #| fig-heigth: 8
-#| echo: false
 #| warning: false
 #| message: false
 #| eval: true
@@ -366,7 +363,6 @@ ggplot() +
 #| fig-cap: "Occurrences over Australia"
 #| fig-width: 8
 #| fig-heigth: 8
-#| echo: false
 #| warning: false
 #| message: false
 #| eval: true
@@ -398,7 +394,6 @@ In plotting the map, here we employ the usage of geospatial object of Australia,
 #| fig-cap: "All Weather Station"
 #| fig-width: 8
 #| fig-heigth: 8
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -427,7 +422,6 @@ Secondly, we plot the weather station that is closest to the site with most occu
 #| fig-cap: "Nearest Weather Station"
 #| fig-width: 8
 #| fig-heigth: 8
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -657,7 +651,6 @@ The @fig-countoccur below depict the number of occurrence for every season from 
 #| fig-cap: "Number of Occurrences per Season"
 #| fig-width: 8
 #| fig-heigth: 8
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -699,7 +692,6 @@ For this expectation, we use 2 geospatial objects about territorial sea boundary
 #| fig-cap: "Coastal Boundary"
 #| fig-width: 8
 #| fig-heigth: 8
-#| echo: false
 #| warning: false
 #| message: false
 #| quiet: true
@@ -774,7 +766,6 @@ ggplot() +
 #| fig-cap: "Whale Shark sightings every year"
 #| fig-width: 8
 #| fig-heigth: 8
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -822,7 +813,6 @@ ggplotly(expect3 , tooltip = c("x", "y"))
 #| fig-cap: "Sightings East v/s West season wise"
 #| fig-width: 10
 #| fig-heigth: 8
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -867,7 +857,6 @@ The figure @fig-aumap below shows the sightings of whale shark.
 #| fig-cap: "Locations of Where Sightings are Recorded in Australia"
 #| fig-width: 8
 #| fig-heigth: 8
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -902,7 +891,6 @@ ggplot() +
 #| fig-heigth: 8
 #| warning: false
 #| message: false
-#| echo: false
 
 ggplot() +
   geom_sf(data = states) +
@@ -931,7 +919,6 @@ We plotted a map that shows the distribution of whale shark sightings surroundin
 **Profiling the Weather** Prior to performing the analysis for the correlation of sightings and weather, we would like to profile the weather condition around the learmonth aiport first. This will help us to get the preliminary understanding of how the condition around the area, which we will take as our ammunition to enhance the interpretation of our analysis.
 
 ```{r}
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -963,7 +950,6 @@ p3 <- ggplot(narrogin_v2, aes(x = tmin)) +
 #| fig-cap: "Weather Distribution"
 #| fig-width: 12
 #| fig-heigth: 8
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -977,7 +963,6 @@ Let's breakdown the distribution of each weather related variables from @fig-wea
 #| fig-cap: "Weather Trend"
 #| fig-width: 10
 #| fig-heigth: 10
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -1014,7 +999,6 @@ Understanding these meteorological nuances affords us a richer lens to interpret
 ```{r}
 #| label: fig-corrplot1
 #| fig-cap: "Sightings to Avg. Temperature"
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -1048,7 +1032,6 @@ ggplotly(sightvstemp , tooltip = c("x", "y"))
 ```{r}
 #| label: fig-corrplot2
 #| fig-cap: "Sightings to Rain Precipitation"
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -1083,7 +1066,6 @@ Tignostic analysis for tourism data to understand average trips taken by people 
 ```{r}
 #| label: fig-purpose
 #| fig-cap: "Tourism Trends in Exmouth Based on Purpose"
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -1142,7 +1124,6 @@ highest_sightings <- highest_sightings %>% filter(Purpose == 'Holiday')
 #| fig-cap: "Total trips over night in Exmouth"
 #| fig-width: 12
 #| fig-heigth: 8
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -1166,7 +1147,6 @@ ggplotly(tourismoverall , tooltip = c("x", "y"))
 ```{r}
 #| label: fig-tourismsmooth
 #| fig-cap: "Spaghetti Plot For Tourist Trips in Exmouth"
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -1198,7 +1178,6 @@ As we can see from the above plot @fig-tourismsmooth, the thick blue line does i
 #| fig-cap: "Total Trips in Exmouth By Quarter"
 #| fig-width: 12
 #| fig-height: 11
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -1246,7 +1225,6 @@ After the trend and seasonal components are extracted from the original series, 
 #| fig-cap: "Seasonal and Trend Analysis Plot"
 #| fig-width: 12
 #| fig-heigth: 8
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -1321,7 +1299,6 @@ In Exmouth, there are various types of tourism available. Most of the visitors w
 #| fig-cap: "The Relationship between Tourism and Whale Shark in Exmouth"
 #| fig-width: 12
 #| fig-heigth: 8
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -1391,7 +1368,6 @@ But we still have found some interesting insights:
 __In next section, we combine the weather, previous traveler information and Whale Shark data to determine if any correlations exist among them.__
 
 ```{r}
-#| echo: false
 #| warning: false
 #| message: false
 
@@ -1430,7 +1406,6 @@ weather_tourism_exmouth_2010 <- left_join(exmouth_2010,
 ```{r}
 #| label: fig-ggpairs
 #| fig-cap: "Correlations Between Sightings,Temperature,Precipitation,Tourist Trips"
-#| echo: false
 #| warning: false
 #| message: false
 ggpairs(weather_tourism_exmouth_2010, 
